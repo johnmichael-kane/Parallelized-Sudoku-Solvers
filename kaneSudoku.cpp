@@ -1,7 +1,7 @@
 /*
  * Original Sudoku Solver Source: https://www.tutorialspoint.com/sudoku-solver-in-cplusplus
  * Accessed on: 2/18/2023
- * This version includes enhancements by John Michael Kane applying parallelization techniques to improve
+ * This version includes enhancements by JohnMichael Kane applying parallelization techniques to improve
  * solution-finding speed by distributing the workload across multiple threads. The modifications aim to
  * leverage multi-core processors for faster sudoku solving.
  */
