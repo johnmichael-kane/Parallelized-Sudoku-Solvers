@@ -9,6 +9,12 @@ Rough draft of the paper
 
 # Brute Force Approach
 
+## Run
+
 # Mapping Approach
 
+## Run
+
 # Dancing Link Approach
+
+## Run
