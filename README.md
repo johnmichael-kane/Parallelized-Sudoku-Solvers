@@ -9,7 +9,7 @@ Rough draft of the paper
 
 # Brute Force Approach
 
-## Run
+### Run
 
 # Mapping Approach
 
