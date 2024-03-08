@@ -134,16 +134,18 @@ bool Game::search()
 		}
 	}
 
-	if (searchQueue.size() > 0)
+	// If the search queue is not empty, the last grid is the solution.
+	if (!searchQueue.empty())
 	{
 		success = true;
-		mGameGrid = searchQueue.at(searchQueue.size() - 1);
+		mGameGrid = searchQueue.back(); // Set the solved grid as the current game grid.
 	}
 	else
 	{
+		// If the search queue is empty, the game has no solution.
 		mHasSolution = false;
 	}
-	return success;
+	return success; // Return true if a solution was found, false otherwise.
 }
 
 // Prints statistics and the solution if available.
