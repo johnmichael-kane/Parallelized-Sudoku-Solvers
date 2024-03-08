@@ -18,7 +18,9 @@
 //add run instructions here
 
 # Dancing Link Approach
-//general description of the algorithm and the idea behind it
+
+### Files
+dancing_links.cpp 
 
 ### Run
 1. Enter the correct directory: `cd "Dancing Links"`
