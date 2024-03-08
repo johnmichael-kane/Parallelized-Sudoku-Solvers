@@ -126,9 +126,9 @@ public class Sudoku {
     }
 
     // Method to print the solved Sudoku board to a file
-    public void printSudokuBoardInFile() {
+    public void printSudokuBoardInFile(String level) {
         try {
-            FileWriter writer = new FileWriter(gridSize+"x"+gridSize+"_out.txt"); // Open file for writing
+            FileWriter writer = new FileWriter(gridSize+"x"+gridSize+"_"+level+"_out.txt"); // Open file for writing
             writer.write("Time taken: " + (endTime - startTime) + " milliseconds\n"); // Write time taken to solve
             writer.write("Solved Sudoku:\n");
             for (int y = 0; y < gridSize; y++) {
@@ -152,6 +152,8 @@ public class Sudoku {
     // Main method to run the Sudoku solver
     public static void main(String[] args) {
         String filePath = args[0]; // Get file path from command line argument
+        String level =args[1];
+
         Sudoku sudoku = new Sudoku(filePath);
         System.out.println("Sudoku Board:");
         sudoku.printSudokuBoard(); // Print initial Sudoku board
@@ -161,7 +163,7 @@ public class Sudoku {
             System.out.println("Solved Sudoku:");
             System.out.print("Time taken: " + (sudoku.endTime - sudoku.startTime) + " milliseconds\n");
             sudoku.printSudokuBoard(); // Print solved Sudoku board to console
-            sudoku.printSudokuBoardInFile(); // Write solved Sudoku board to file
+            sudoku.printSudokuBoardInFile(level); // Write solved Sudoku board to file
         } else {
             System.out.println("No solution exists."); // Print message if no solution exists
         }
