@@ -128,7 +128,7 @@ public class Sudoku {
     // Method to print the solved Sudoku board to a file
     public void printSudokuBoardInFile() {
         try {
-            FileWriter writer = new FileWriter("solution.txt"); // Open file for writing
+            FileWriter writer = new FileWriter(gridSize+"x"+gridSize+"_out.txt"); // Open file for writing
             writer.write("Time taken: " + (endTime - startTime) + " milliseconds\n"); // Write time taken to solve
             writer.write("Solved Sudoku:\n");
             for (int y = 0; y < gridSize; y++) {
