@@ -3,6 +3,7 @@
 ## Requirements: Milestone
 - Finish the compilable code instructions in the readme file below
 - Finish a rough draft of the paper
+- All challenges, tasks, and goals for the project outlined
 
 # Brute Force Approach
 //general description of the algorithm and the idea behind it
