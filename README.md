@@ -13,7 +13,7 @@ To execute the solver, follow these steps:
 
 2. Run the compiled program with a Sudoku puzzle file as an argument. Replace `<FILE_NAME>` with the name of the puzzle file:
     ```sh
-    java Sudoku <FILE_NAME>
+    java Sudoku <FILE_NAME> <Level of boead (ex. easy, med, hard)>
     ```
 
 ### Understanding the Code
@@ -34,7 +34,7 @@ The `Sudoku` class encapsulates the functionality for reading Sudoku puzzles fro
 
 The solver employs a backtracking algorithm to efficiently solve Sudoku puzzles by recursively trying different number placements and backtracking when necessary.
 
-## Testing
+## Testing for Easy Boead
 
 ### 9x9 Grid Size Board
 
