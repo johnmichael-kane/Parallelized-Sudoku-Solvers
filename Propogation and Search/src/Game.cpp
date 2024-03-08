@@ -137,7 +137,7 @@ bool Game::search()
 	}
 
 	// If the search queue is not empty, the last grid is the solution.
-	if (!searchQueue.empty())
+	if (!searchQueue.empty()) // OLD: searchQueue.size() > 0
 	{
 		success = true;
 		mGameGrid = searchQueue.back(); // Set the solved grid as the current game grid.

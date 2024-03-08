@@ -1,12 +1,14 @@
 //============================================================================
 // Name        : Sudoku.cpp
 // Author      : Hongbo Tian
+// Editor      : Soleil Cordray
 // Description : Main Function
 //============================================================================
 
 #include <iostream>
 #include <time.h>
 #include "Game.h"
+
 using namespace std;
 
 int main() {
@@ -22,7 +24,8 @@ int main() {
 
 	// Initialise Game & Game Loop
 	Game game(PATH+name);
-	while(!game.Evaluate()){
+	while(!game.Evaluate())
+	{
 	}
 
 	// Print solution and time
