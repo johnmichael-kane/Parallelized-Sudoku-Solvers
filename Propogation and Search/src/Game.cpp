@@ -148,11 +148,12 @@ bool Game::search()
 	return success; // Return true if a solution was found, false otherwise.
 }
 
-// Prints statistics and the solution if available.
+// Prints statistics TO CONSOLE and the solution if available.
 void Game::printStats()
 {
 	stringstream ss;
 
+	// Indicate whether a solution was found or not.
 	if (mHasSolution)
 	{
 		ss << "Solved!!!";
@@ -161,9 +162,11 @@ void Game::printStats()
 	{
 		ss << "Has no Solution.";
 	}
+
+	// If the input was successfully read, print the solution or the status message.
 	if (mSucessInput)
 	{
 		cout << ss.str() << endl;
-		mGameGrid.print();
+		mGameGrid.print(); // Print the current state of the game grid.
 	}
 }
