@@ -21,7 +21,7 @@ public:
 
 private:
 	// Filters the given vector to contain only unique, non-repeating elements.
-	std::vector<int> nonRepeat(std::vector<int> &vec);
+	std::vector<int> nonRepeat(std::vector<int> vec);
 
 	// Clears the possible values grid, preparing it for a new analysis.
 	void clear();
