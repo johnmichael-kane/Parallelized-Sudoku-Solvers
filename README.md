@@ -1,17 +1,16 @@
 # Parallel-Sudoku-Project
 
+You can find the paper for the project [here](https://docs.google.com/document/d/1aVoKkxx--F2Nfqbh13ZVF21VNVL2wHYg11CZaXs5kX8/edit?usp=sharing)
+
 ## Requirements: Milestone
 - Finish the compilable code instructions in the readme file below
 - Finish a rough draft of the paper
 - All challenges, tasks, and goals for the project outlined
 
 # Brute Force Approach
-//general description of the algorithm and the idea behind it
+see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach
 
-### Run
-//add run instructions here
-
-# Mapping Approach
+# Propogation and Search Approach
 //general description of the algorithm and the idea behind it
 
 ### Run
@@ -19,9 +18,8 @@
 
 # Dancing Link Approach
 
-### Files
-dancing_links.cpp 
-
+see the branch [DancingLinksUsingJava](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/DancingLinksUsingJava) for a more complete and detailed implementation.
+The current version here only works for 9x9, the branch above works for 9x9, 16x16, 25x25 implementation.
 ### Run
 1. Enter the correct directory: `cd "Dancing Links"`
 2. Compile dancing_links and linked_matrix:
