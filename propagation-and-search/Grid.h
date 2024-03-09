@@ -22,11 +22,12 @@ class Grid
 {
 
 public:
-	int dynamicSize;		   // Dynamic size of the grid, read from the file
-	vector<vector<int>> mGrid; // Dynamic 2D vector to store the grid values
+	// Defines the size of the grid. For a standard Sudoku, this is 9x9.
+	const static int MAX = 9; // **** SIZE ****
 
 private:
-	string mName; // Grid identifier
+	int mGrid[MAX][MAX]; // 2D array to store the values of the Sudoku grid.
+	string mName;		 // Name or identifier for the grid. Useful if handling multiple grids or for file operations.
 
 public:
 	// Default constructor to initialize a Grid object.
@@ -48,8 +49,6 @@ public:
 	// Returns a vector of Pos objects representing the positions of all unsolved cells.
 	vector<Pos> getUnsolvedPos();
 
-	int getDynamicSize() { return dynamicSize; }
-
 	// Fills a specified position 'pos' in the grid with the value 'value'.
 	void fill(Pos pos, int value);
 
@@ -59,6 +58,7 @@ public:
 	// Checks if the grid is completely filled in accordance with Sudoku rules.
 	bool isComplete();
 
+public:
 	// Reads the grid state from a file specified by 'path'.
 	bool read(string path);
 

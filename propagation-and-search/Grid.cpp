@@ -10,7 +10,7 @@
 #include "Grid.h"
 
 // Constructor initializing the grid with an empty name.
-Grid::Grid() : mName(""), dynamicSize(0)
+Grid::Grid() : mName("")
 {
 }
 
@@ -27,7 +27,7 @@ bool Grid::isLegal()
 	bool legal = true;
 
 	// Check each row and column for duplicates. (check non-repeats)
-	for (int i = 0; i < dynamicSize; i++)
+	for (int i = 0; i < MAX; i++)
 	{
 		vector<int> vRow = getRow(i); // Retrieve all values in the current row.
 		vector<int> vCol = getCol(i); // Retrieve all values in the current column.
@@ -58,7 +58,7 @@ bool Grid::isLegal()
 	{
 		for (int sCol = 0; sCol < 3; sCol++)
 		{
-			// Subsections 
+			// Subsections
 			vector<int> vSection = getSection(sRow, sCol); // Retrieve values in the current 3x3 section.
 			vector<int>::iterator uniqueSection = unique(vSection.begin(), vSection.end());
 			if (uniqueSection != vSection.end())
@@ -78,13 +78,13 @@ bool Grid::isComplete()
 
 	// Create a vector representing the expected numbers in each row, column, or section.
 	vector<int> identity;
-	for (int i = 0; i < dynamicSize; i++)
+	for (int i = 0; i < MAX; i++)
 	{
 		identity.push_back(i + 1);
 	}
 
 	// Check each row and column against the identity vector.
-	for (int i = 0; i < dynamicSize; i++)
+	for (int i = 0; i < MAX; i++)
 	{
 		vector<int> vRow = getRow(i);
 		vector<int> vCol = getCol(i);
@@ -120,59 +120,66 @@ bool Grid::isComplete()
 
 vector<int> Grid::getRow(int row)
 {
-	// Check if the row index is within the bounds of the grid
-	if (row >= 0 && row < dynamicSize)
+	vector<int> vRow;
+	for (int col = 0; col < MAX; col++)
 	{
-		return mGrid[row];
+		if (mGrid[row][col] != 0)
+		{
+			vRow.push_back(mGrid[row][col]);
+		}
 	}
-	else
-	{
-		// Handle the error or return an empty vector
-		return vector<int>(); // Or throw an exception or handle the error as appropriate
-	}
+	return vRow;
 }
 
 vector<int> Grid::getCol(int col)
 {
-	vector<int> colValues;
-	// Assuming the column index is valid
-	for (auto &row : mGrid)
+	vector<int> vCol;
+	for (int row = 0; row < MAX; row++)
 	{
-		colValues.push_back(row[col]);
+		if (mGrid[row][col] != 0)
+		{
+			vCol.push_back(mGrid[row][col]);
+		}
 	}
-	return colValues;
+	return vCol;
 }
 
 vector<int> Grid::getSection(int sRow, int sCol)
 {
-	int sectionSize = std::sqrt(dynamicSize); // Calculate the size of the sections
 	vector<int> vSection;
-	int startRow = (sRow / sectionSize) * sectionSize;
-	int startCol = (sCol / sectionSize) * sectionSize;
-
-	for (int row = startRow; row < startRow + sectionSize; row++)
+	for (int iRow = 0; iRow < 3; iRow++)
 	{
-		for (int col = startCol; col < startCol + sectionSize; col++)
+		for (int iCol = 0; iCol < 3; iCol++)
 		{
-			vSection.push_back(mGrid[row][col]); // Changed to include zeros as well
+			int row = sRow * 3 + iRow;
+			int col = sCol * 3 + iCol;
+			if (mGrid[row][col] != 0)
+			{
+				vSection.push_back(mGrid[row][col]);
+			}
 		}
 	}
 	return vSection;
 }
 
-vector<int> Grid::getSectionByElement(int rRow, int rCol) {
-    int sRow = getSectionStart(rRow);
-    int sCol = getSectionStart(rCol);
-    return getSection(sRow, sCol);
+vector<int> Grid::getSectionByElement(int rRow, int rCol)
+{
+
+	int sRow = getSectionStart(rRow);
+	int sCol = getSectionStart(rCol);
+
+	return getSection(sRow, sCol);
 }
 
-vector<Pos> Grid::getUnsolvedPos() {
+vector<Pos> Grid::getUnsolvedPos()
+{
 	vector<Pos> unslovedPos;
-	for (int row = 0; row < dynamicSize; row++)
+	for (int row = 0; row < 9; row++)
 	{
-		for (int col = 0; col < dynamicSize; col++)
+		for (int col = 0; col < 9; col++)
 		{
-			if (mGrid[row][col] == 0) {
+			if (mGrid[row][col] == 0)
+			{
 				unslovedPos.push_back(Pos(row, col));
 			}
 		}
@@ -180,34 +187,42 @@ vector<Pos> Grid::getUnsolvedPos() {
 	return unslovedPos;
 }
 
-// Read and write to files 
+// Read and write to files
 // **** CHANGES: ****
-	// give the user a list of available files & their difficulty
-	// have them type out the filename they want to test (test for correctness)
+// give the user a list of available files & their difficulty
+// have them type out the filename they want to test (test for correctness)
 bool Grid::read(string path)
 {
-	ifstream myFile(path);
-	if (!myFile.is_open())
+	bool success = true;  // Initially assume the read operation will succeed.
+	mName = path.c_str(); // Store the file path as the name of the grid.
+
+	string tempLine;			   // Temporary string to hold each line read from the file.
+	ifstream myFile(path.c_str()); // Create an input file stream to read from the file at the specified path.
+	int row = 0;				   // Keep track of the current row being populated in the grid.
+
+	if (myFile.is_open()) // Check if the file was successfully opened.
 	{
-		return false;
-	}
-
-	// First line now determines the size of the grid.
-	myFile >> dynamicSize;
-	myFile.ignore(numeric_limits<streamsize>::max(), '\n'); // Skip to the next line
-
-	mGrid.resize(dynamicSize, vector<int>(dynamicSize));
-
-	for (int row = 0; row < dynamicSize; ++row)
-	{
-		for (int col = 0; col < dynamicSize; ++col)
+		// Read lines from the file as long as there are lines to read and we haven't exceeded the grid size.
+		while (getline(myFile, tempLine) && row < MAX)
 		{
-			myFile >> mGrid[row][col];
+			// Iterate through each character position in the line to extract values for the grid.
+			for (int i = 0; i < MAX; i++)
+			{
+				// Convert each character to an integer and assign it to the corresponding cell in the grid.
+				// Assumes that each value in the file is separated by a single character (likely a space),
+				// so it multiplies the index by 2 to skip over these separators.
+				mGrid[row][i] = (int)tempLine.at(2 * i) - '0';
+			}
+			row++; // Move to the next row in the grid.
 		}
+		myFile.close(); // Close the file stream after reading all necessary data.
+	}
+	else
+	{
+		success = false; // If the file couldn't be opened, mark the read operation as unsuccessful.
 	}
 
-	myFile.close();
-	return true;
+	return success; // Return whether the read operation was successful.
 }
 
 // Writes the current state of the Sudoku grid to a file.
@@ -225,10 +240,10 @@ bool Grid::write()
 	if (file.is_open()) // Check if the file was successfully opened for writing.
 	{
 		// Iterate over each row of the grid.
-		for (int i = 0; i < dynamicSize; i++)
+		for (int i = 0; i < MAX; i++)
 		{
 			// Iterate over each column in the current row.
-			for (int j = 0; j < dynamicSize; j++)
+			for (int j = 0; j < MAX; j++)
 			{
 				// Write the value at the current cell to the file.
 				file << mGrid[i][j];
@@ -251,10 +266,11 @@ bool Grid::write()
 	return success;
 }
 
-void Grid::print() {
-	for (int row = 0; row < dynamicSize; row++)
+void Grid::print()
+{
+	for (int row = 0; row < MAX; row++)
 	{
-		for (int col = 0; col < dynamicSize; col++)
+		for (int col = 0; col < MAX; col++)
 		{
 			cout << mGrid[row][col] << " " << flush;
 		}
@@ -264,85 +280,19 @@ void Grid::print() {
 
 // Misc
 int Grid::getSectionStart(int num)
-{
-	int sectionSize = sqrt(dynamicSize); // Assuming dynamicSize is the total grid size, this needs to be adjusted
-	int start = (num / sectionSize) * sectionSize;
-	return start;
-}
-
-/*
-int Grid::getSectionStart(int num) 
-{
-	int sectionSize = sqrt(dynamicSize);
+{ // **** SIZE ****
 	int start;
-
-	switch (dynamicSize)
+	if (num < 3)
 	{
-		case 9:
-			if (num < 3)
-			{
-				start = 0;
-			}
-			else if (num < 6)
-			{
-				start = 1;
-			}
-			else
-			{
-				start = 2;
-			}
-			break;
-
-		case 16:
-			if (num < 4)
-			{
-				start = 0;
-			}
-			else if (num < 8)
-			{
-				start = 1;
-			}
-			else if (num < 12)
-			{
-				start = 2;
-			}
-			else if (num < 16)
-			{
-				start = 3;
-			}
-			else
-			{
-				start = 4;
-			}
-			break;
-
-		case 25:
-			if (num < 5)
-			{
-				start = 0;
-			}
-			else if (num < 10)
-			{
-				start = 1;
-			}
-			else if (num < 15)
-			{
-				start = 2;
-			}
-			else if (num < 20)
-			{
-				start = 3;
-			}
-			else
-			{
-				start = 4;
-			}
-			break;
-		default:
-			std::cout << "Could not retrieve start of section." << std::endl;
-			break;
+		start = 0;
 	}
-
+	else if (num < 6)
+	{
+		start = 1;
+	}
+	else
+	{
+		start = 2;
+	}
 	return start;
 }
-*/
