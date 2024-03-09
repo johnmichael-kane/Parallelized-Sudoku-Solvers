@@ -22,12 +22,11 @@ class Grid
 {
 
 public:
-	// Defines the size of the grid. For a standard Sudoku, this is 9x9.
-	const static int MAX = 9; // **** SIZE ****
+	int dynamicSize;		   // Dynamic size of the grid, read from the file
+	vector<vector<int>> mGrid; // Dynamic 2D vector to store the grid values
 
 private:
-	int mGrid[MAX][MAX]; // 2D array to store the values of the Sudoku grid.
-	string mName;		 // Name or identifier for the grid. Useful if handling multiple grids or for file operations.
+	string mName; // Grid identifier
 
 public:
 	// Default constructor to initialize a Grid object.

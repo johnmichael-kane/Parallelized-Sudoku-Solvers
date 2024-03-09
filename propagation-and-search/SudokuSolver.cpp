@@ -6,23 +6,24 @@
 //============================================================================
 
 #include <iostream>
-#include <time.h>
+#include <chrono>
 
 #include "Game.h"
 
 using namespace std;
+using namespace std::chrono;
 
 int main()
 {
-	const string PATH = "../puzzles/";
+	const string PATH = "puzzles/";
 
 	// Taking user inputs
 	string name;
 	cout << "Enter File Name >> " << flush;
 	cin >> name;
 
-	// Timer
-	clock_t tStart = clock();
+	// Timer start
+	auto tStart = high_resolution_clock::now();
 
 	// Initialise Game & Game Loop
 	Game game(PATH + name);
@@ -30,9 +31,16 @@ int main()
 	{
 	}
 
+	// Timer end
+	auto tEnd = high_resolution_clock::now();
+
 	// Print solution and time
 	game.printStats();
-	cout << "Time Taken: " << (int)(clock() - tStart) / CLOCKS_PER_SEC << " Seconds" << endl;
+
+	// Calculate and convert to milliseconds
+	auto duration = duration_cast<milliseconds>(tEnd - tStart).count();
+
+	cout << "Time Taken: " << duration << " milliseconds" << endl;
 
 	return 0;
 }
