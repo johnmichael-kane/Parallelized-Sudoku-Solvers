@@ -10,7 +10,7 @@ You can find the paper for the project [here](https://docs.google.com/document/d
 # Brute Force Approach
 see the branch for brute force approach
 
-# Mapping Approach
+# Propogation and Search Approach
 //general description of the algorithm and the idea behind it
 
 ### Run
