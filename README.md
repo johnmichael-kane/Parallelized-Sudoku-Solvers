@@ -11,15 +11,18 @@ You can find the paper for the project [here](https://docs.google.com/document/d
 see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach
 
 # Propogation and Search Approach
-//general description of the algorithm and the idea behind it
+//general description
 
 ### Run
-//add run instructions here
+1. Enter the correct directory: `cd propogation-and-search`
+2. Compile the files: `g++ -g  -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp Pos.cpp PossibleGrid.cpp`
+3. Run: `./SudokuSolver`
 
 # Dancing Link Approach
 
 see the branch [DancingLinksUsingJava](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/DancingLinksUsingJava) for a more complete and detailed implementation.
 The current version here only works for 9x9, the branch above works for 9x9, 16x16, 25x25 implementation.
+
 ### Run
 1. Enter the correct directory: `cd "Dancing Links"`
 2. Compile dancing_links and linked_matrix:
