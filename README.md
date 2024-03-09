@@ -8,7 +8,7 @@ You can find the paper for the project [here](https://docs.google.com/document/d
 - All challenges, tasks, and goals for the project outlined
 
 # Brute Force Approach
-see the branch for brute force approach
+see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach
 
 # Propogation and Search Approach
 //general description of the algorithm and the idea behind it
@@ -18,7 +18,7 @@ see the branch for brute force approach
 
 # Dancing Link Approach
 
-check the branch for a more detailed implementation
+see the branch [DancingLinksUsingJava](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/DancingLinksUsingJava) for a more complete and detailed implementation
 
 ### Files
 dancing_links.cpp 
