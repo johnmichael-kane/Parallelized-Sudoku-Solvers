@@ -15,7 +15,7 @@ see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane
 
 ### Run
 1. Enter the correct directory: `cd propogation-and-search`
-2. Compile the files: `g++ -g  -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp Pos.cpp PossibleGrid.cpp`
+2. Compile the files: `g++ -g  -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
 3. Run: `./SudokuSolver`
 
 # Dancing Link Approach
