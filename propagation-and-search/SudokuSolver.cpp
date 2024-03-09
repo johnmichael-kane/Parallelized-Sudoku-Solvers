@@ -7,31 +7,32 @@
 
 #include <iostream>
 #include <time.h>
+
 #include "Game.h"
 
 using namespace std;
 
-int main() {
-	const string PATH = "puzzles/";
+int main()
+{
+	const string PATH = "../puzzles/";
 
 	// Taking user inputs
 	string name;
-	cout << "Enter File Name >> "<< flush;
+	cout << "Enter File Name >> " << flush;
 	cin >> name;
 
 	// Timer
 	clock_t tStart = clock();
 
 	// Initialise Game & Game Loop
-	Game game(PATH+name);
-	while(!game.Evaluate())
+	Game game(PATH + name);
+	while (!game.Evaluate())
 	{
 	}
 
 	// Print solution and time
 	game.printStats();
-	cout << "Time Taken: " << (int)(clock()-tStart)/CLOCKS_PER_SEC << " Seconds" << endl;
+	cout << "Time Taken: " << (int)(clock() - tStart) / CLOCKS_PER_SEC << " Seconds" << endl;
 
 	return 0;
 }
-
