@@ -118,48 +118,52 @@ bool Grid::isComplete()
 
 // Getters for row, column, and sections
 
-vector<int> Grid::getRow(int row) {
-	vector<int> vRow;
-	for (int col = 0; col < dynamicSize; col++)
+vector<int> Grid::getRow(int row)
+{
+	// Check if the row index is within the bounds of the grid
+	if (row >= 0 && row < dynamicSize)
 	{
-		if (mGrid[row][col] != 0) {
-			vRow.push_back(mGrid[row][col]);
-		}
+		return mGrid[row];
 	}
-	return vRow;
+	else
+	{
+		// Handle the error or return an empty vector
+		return vector<int>(); // Or throw an exception or handle the error as appropriate
+	}
 }
 
-vector<int> Grid::getCol(int col) {
-	vector<int> vCol;
-	for (int row = 0; row < dynamicSize; row++)
+vector<int> Grid::getCol(int col)
+{
+	vector<int> colValues;
+	// Assuming the column index is valid
+	for (auto &row : mGrid)
 	{
-		if (mGrid[row][col] != 0) {
-			vCol.push_back(mGrid[row][col]);
-		}
+		colValues.push_back(row[col]);
 	}
-	return vCol;
+	return colValues;
 }
 
-vector<int> Grid::getSection(int sRow, int sCol) {
+vector<int> Grid::getSection(int sRow, int sCol)
+{
+	int sectionSize = std::sqrt(dynamicSize); // Calculate the size of the sections
 	vector<int> vSection;
-	for (int iRow = 0; iRow < 3; iRow++) {
-		for (int iCol = 0; iCol < 3; iCol++) {
-			int row = sRow * 3 + iRow;
-			int col = sCol * 3 + iCol;
-			if (mGrid[row][col] != 0) {
-				vSection.push_back(mGrid[row][col]);
-			}
+	int startRow = (sRow / sectionSize) * sectionSize;
+	int startCol = (sCol / sectionSize) * sectionSize;
+
+	for (int row = startRow; row < startRow + sectionSize; row++)
+	{
+		for (int col = startCol; col < startCol + sectionSize; col++)
+		{
+			vSection.push_back(mGrid[row][col]); // Changed to include zeros as well
 		}
 	}
 	return vSection;
 }
 
 vector<int> Grid::getSectionByElement(int rRow, int rCol) {
-
-	int sRow = getSectionStart(rRow);
-	int sCol = getSectionStart(rCol);
-
-	return getSection(sRow, sCol);
+    int sRow = getSectionStart(rRow);
+    int sCol = getSectionStart(rCol);
+    return getSection(sRow, sCol);
 }
 
 vector<Pos> Grid::getUnsolvedPos() {
@@ -259,6 +263,14 @@ void Grid::print() {
 }
 
 // Misc
+int Grid::getSectionStart(int num)
+{
+	int sectionSize = sqrt(dynamicSize); // Assuming dynamicSize is the total grid size, this needs to be adjusted
+	int start = (num / sectionSize) * sectionSize;
+	return start;
+}
+
+/*
 int Grid::getSectionStart(int num) 
 {
 	int sectionSize = sqrt(dynamicSize);
@@ -331,14 +343,6 @@ int Grid::getSectionStart(int num)
 			break;
 	}
 
-	return start;
-}
-
-/*
-int Grid::getSectionStart(int num)
-{
-	int sectionSize = sqrt(dynamicSize); // Assuming dynamicSize is the total grid size, this needs to be adjusted
-	int start = (num / sectionSize) * sectionSize;
 	return start;
 }
 */

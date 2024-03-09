@@ -4,30 +4,29 @@
  *  Created on: 14 Jul 2015
  *      Author: eva
  *  Updated on: 8 Mar 2024
- * 		Editor: Soleil Cordray
+ *      Editor: Soleil Cordray
  */
 
 #ifndef POS_H_
 #define POS_H_
 
-#include <sstream> // Include for std::stringstream, used in toString() methodusing namespace std;
-using namespace std; // Use the standard namespace to avoid prefixing standard library types with 'std::'.
+#include <sstream>
+using namespace std;
 
-// Define the Pos structure, which represents a position in a two-dimensional grid (like a Sudoku grid).
-struct Pos {
-	int row;
-	int col;
+struct Pos
+{
+	int row, col;
 
-	// Constructor for the Pos structure. Initializes a Pos instance with the specified row and column indices.
-	Pos(int row, int col);
-	string toString();
+	// Constructor directly in the header file.
+	Pos(int r, int c) : row(r), col(c) {}
 
-	/* potential replacement for toString:
-	string toString() {
-		stringstream ss; // Create a stringstream instance for assembling the string.
-		ss << "(" << row << ", " << col << ")"; // Append the row and column indices to the stringstream.
-		return ss.str(); // Convert the stringstream to a string and return it.
-	} */
+	// toString method directly in the header file.
+	string toString() const
+	{
+		stringstream ss;
+		ss << "[" << row << ", " << col << "]";
+		return ss.str();
+	}
 };
 
 #endif /* POS_H_ */

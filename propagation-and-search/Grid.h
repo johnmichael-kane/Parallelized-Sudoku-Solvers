@@ -48,6 +48,8 @@ public:
 	// Returns a vector of Pos objects representing the positions of all unsolved cells.
 	vector<Pos> getUnsolvedPos();
 
+	int getDynamicSize() { return dynamicSize; }
+
 	// Fills a specified position 'pos' in the grid with the value 'value'.
 	void fill(Pos pos, int value);
 
@@ -57,7 +59,6 @@ public:
 	// Checks if the grid is completely filled in accordance with Sudoku rules.
 	bool isComplete();
 
-public:
 	// Reads the grid state from a file specified by 'path'.
 	bool read(string path);
 

@@ -15,12 +15,13 @@
 class PossibleGrid
 {
 public:
-	vector<int> mPossibleGrid[Grid::MAX][Grid::MAX]; // 2D array storing possible values for each cell
-	vector<Pos> mUnsolvedPos;						 // List of positions in the grid that are not yet solved
+	// Using a vector of vectors to dynamically store possible values for each cell
+	std::vector<std::vector<std::vector<int>>> mPossibleGrid;
+	std::vector<Pos> mUnsolvedPos;
 
 private:
 	// Filters the given vector to contain only unique, non-repeating elements.
-	vector<int> nonRepeat(vector<int> vec);
+	std::vector<int> nonRepeat(std::vector<int> &vec);
 
 	// Clears the possible values grid, preparing it for a new analysis.
 	void clear();
@@ -30,17 +31,18 @@ public:
 	PossibleGrid();
 
 	// Analyzes the given grid to determine possible values for each unsolved cell.
-	void Analysis(Grid grid);
+	// Ensure this takes a constant reference to a Grid object
+	void Analysis(Grid &grid);
 
 	// Performs cross-referencing to find cells with a unique possible value
 	// by examining their row, column, and section.
-	vector<pair<Pos, int>> crossRef();
+	std::vector<std::pair<Pos, int>> crossRef();
 
 	// Prints the possible values for each unsolved cell in the grid.
 	void print();
 
-	// Converts a vector of integers into a string representation. **** WHY? ****
-	string vecToString(vector<int> vec);
+	// Converts a vector of integers into a string representation.
+	std::string vecToString(std::vector<int> &vec); // Ensure consistency with std:: prefix
 };
 
 #endif /* POSSIBLEGRID_H_ */
