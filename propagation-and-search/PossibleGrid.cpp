@@ -8,9 +8,8 @@
  */
 
 #include "PossibleGrid.h"
-#include <cmath> // For std::sqrt in calculating section sizes dynamically
 
-PossibleGrid::PossibleGrid()
+PossibleGrid::PossibleGrid() : grid(nullptr)
 {
 }
 
@@ -71,7 +70,10 @@ void PossibleGrid::Analysis(Grid &grid)
 vector<pair<Pos, int>> PossibleGrid::crossRef()
 {
 	vector<pair<Pos, int>> pairs;		   // Stores positions and their determined values.
-	int gridSize = grid.getDynamicSize();  // Assuming you have access to a Grid object named 'grid'.
+
+	// int gridSize = grid.getDynamicSize();  // Assuming you have access to a Grid object named 'grid'.
+	int gridSize = grid->getDynamicSize(); // Use '->' to access members of a pointer
+
 	int sectionSize = std::sqrt(gridSize); // Calculate the size of each section.
 
 	// Adjusted to consider dynamic grid size.

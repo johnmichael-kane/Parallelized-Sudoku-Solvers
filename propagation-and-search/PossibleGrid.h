@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <cmath>
 #include "Grid.h" // Includes the definition of the Grid class
 #include "Pos.h"  // Includes the definition of the Pos class
 
@@ -20,6 +21,8 @@ public:
 	std::vector<Pos> mUnsolvedPos;
 
 private:
+	Grid *grid; // Pointer to a Grid object
+
 	// Filters the given vector to contain only unique, non-repeating elements.
 	std::vector<int> nonRepeat(std::vector<int> vec);
 
@@ -29,6 +32,11 @@ private:
 public:
 	// Constructor: Initializes a new instance of the PossibleGrid class.
 	PossibleGrid();
+
+	void setGrid(Grid *g)
+	{
+		grid = g;
+	}
 
 	// Analyzes the given grid to determine possible values for each unsolved cell.
 	// Ensure this takes a constant reference to a Grid object

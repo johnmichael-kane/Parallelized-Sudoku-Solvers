@@ -35,6 +35,8 @@ Game::Game(string path) : mPath(path),		  // Path to the input file.
 	// Try to read the game grid from the file at the given path.
 	// mSucessInput is true if the file is successfully read and false otherwise.
 	mSucessInput = mGameGrid.read(path);
+
+	mGamePossibleGrid.setGrid(&mGameGrid); // For PossibleGrid.h
 	// Analyze the initial game grid to populate possible values. **** SIZE ****
 	mGamePossibleGrid.Analysis(mGameGrid);
 }
@@ -45,6 +47,7 @@ bool Game::Evaluate()
 	// Only proceed if the input file was successfully read.
 	if (mSucessInput)
 	{
+		mGamePossibleGrid.setGrid(&mGameGrid); // For PossibleGrid.h
 		// Re-analyze the game grid to update possible values.
 		mGamePossibleGrid.Analysis(mGameGrid);
 		bool methodTrigger = true; // A flag to trigger different solving methods.

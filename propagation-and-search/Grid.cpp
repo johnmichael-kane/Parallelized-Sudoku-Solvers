@@ -194,7 +194,7 @@ bool Grid::read(string path)
 
 	// First line now determines the size of the grid.
 	myFile >> dynamicSize;
-	myFile.ignore(numeric_limits<streamsize>::max(), '\n'); // Skip to the next line
+	myFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Skip to the next line
 
 	mGrid.resize(dynamicSize, vector<int>(dynamicSize));
 
@@ -269,80 +269,3 @@ int Grid::getSectionStart(int num)
 	int start = (num / sectionSize) * sectionSize;
 	return start;
 }
-
-/*
-int Grid::getSectionStart(int num) 
-{
-	int sectionSize = sqrt(dynamicSize);
-	int start;
-
-	switch (dynamicSize)
-	{
-		case 9:
-			if (num < 3)
-			{
-				start = 0;
-			}
-			else if (num < 6)
-			{
-				start = 1;
-			}
-			else
-			{
-				start = 2;
-			}
-			break;
-
-		case 16:
-			if (num < 4)
-			{
-				start = 0;
-			}
-			else if (num < 8)
-			{
-				start = 1;
-			}
-			else if (num < 12)
-			{
-				start = 2;
-			}
-			else if (num < 16)
-			{
-				start = 3;
-			}
-			else
-			{
-				start = 4;
-			}
-			break;
-
-		case 25:
-			if (num < 5)
-			{
-				start = 0;
-			}
-			else if (num < 10)
-			{
-				start = 1;
-			}
-			else if (num < 15)
-			{
-				start = 2;
-			}
-			else if (num < 20)
-			{
-				start = 3;
-			}
-			else
-			{
-				start = 4;
-			}
-			break;
-		default:
-			std::cout << "Could not retrieve start of section." << std::endl;
-			break;
-	}
-
-	return start;
-}
-*/

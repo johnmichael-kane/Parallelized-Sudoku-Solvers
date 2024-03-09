@@ -14,6 +14,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 #include "Pos.h"
 
 using namespace std;
