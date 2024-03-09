@@ -1,5 +1,7 @@
 # Parallel-Sudoku-Project
 
+You can find the paper for the project [here](https://docs.google.com/document/d/1aVoKkxx--F2Nfqbh13ZVF21VNVL2wHYg11CZaXs5kX8/edit?usp=sharing)
+
 ## Requirements: Milestone
 - Finish the compilable code instructions in the readme file below
 - Finish a rough draft of the paper
@@ -15,6 +17,8 @@ see the branch for brute force approach
 //add run instructions here
 
 # Dancing Link Approach
+
+check the branch for a more detailed implementation
 
 ### Files
 dancing_links.cpp 
