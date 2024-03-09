@@ -19,10 +19,7 @@ see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane
 # Dancing Link Approach
 
 see the branch [DancingLinksUsingJava](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/DancingLinksUsingJava) for a more complete and detailed implementation
-
-### Files
-dancing_links.cpp 
-
+the current version here only works for 9x9, the branch above works for 9x9, 16x16, 25x25 implementation.
 ### Run
 1. Enter the correct directory: `cd "Dancing Links"`
 2. Compile dancing_links and linked_matrix:
