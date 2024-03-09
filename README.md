@@ -6,10 +6,7 @@
 - All challenges, tasks, and goals for the project outlined
 
 # Brute Force Approach
-//general description of the algorithm and the idea behind it
-
-### Run
-//add run instructions here
+see the branch for brute force approach
 
 # Mapping Approach
 //general description of the algorithm and the idea behind it
