@@ -62,7 +62,7 @@ public class Sudoku {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-		String filename = args[0];
+		String filename = "../../data/" + args[0];
 		File inputFile = new File(filename);
 		Scanner input = null;
 		int[][] vals = null;
