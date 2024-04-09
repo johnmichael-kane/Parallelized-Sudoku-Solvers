@@ -28,7 +28,7 @@ To execute the solver, follow these steps:
 
 1. Enter the correct directory:
     ```sh
-    cd dancing-links/basic
+    cd dancing-links
     ```
 
 2. Compile the Java code:
