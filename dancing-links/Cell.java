@@ -1,4 +1,3 @@
-
 public class Cell {
 
 	public int row;

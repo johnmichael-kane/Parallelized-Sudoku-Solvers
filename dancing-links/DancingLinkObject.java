@@ -1,4 +1,3 @@
-
 public class DancingLinkObject {
 
 	public DancingLinkObject left;

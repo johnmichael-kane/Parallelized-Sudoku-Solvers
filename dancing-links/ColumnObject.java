@@ -1,4 +1,3 @@
-
 public class ColumnObject extends DancingLinkObject {
 
 	public int size;

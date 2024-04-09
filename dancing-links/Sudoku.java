@@ -62,7 +62,18 @@ public class Sudoku {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-		String filename = "../../data/" + args[0];
+		if(args.length < 2) {
+			System.out.println("Invalid # of strings");
+			System.out.println("Usage: java Sudoku <version> <filename>");
+			System.out.println("<version> = 4threads | 8threads | none");
+			System.out.println("<filename> = 9x9_input.txt | 16x16_input.txt | 25x25_input.txt");
+            System.exit(1);
+		}
+
+//		changed for different input prompts
+		String version = args[0];
+		String filename = "../data/" + args[1];
+		
 		File inputFile = new File(filename);
 		Scanner input = null;
 		int[][] vals = null;
@@ -111,7 +122,28 @@ public class Sudoku {
 		printSudokuBoard(boardSize, partitionSize,vals);
 		Sudoku.startTime = System.currentTimeMillis(); // Record start time
 		ExactMatrix myMatrix = new ExactMatrix(vals);
-		DancingLinkSolver solver = new DancingLinkSolver(myMatrix.finalMatrix, boardSize);
+
+		DancingLinkSolver solver = null;
+		switch(version.toLowerCase()) {
+			/*case "4threads":
+				solver= new DancingLinkSovler4Threads(myMatrix.finalMatrix, boardSize);
+				break;
+			
+			case "8threads":
+				solver = new DancingLinkSolver8Threads(myMatrix.finalMatrix, boardSize);
+				break;*/
+
+			case "none":
+				solver = new DancingLinkSolver(myMatrix.finalMatrix, boardSize);
+				break;
+
+			default:
+				System.out.println("INvalid version specified.");
+				System.exit(2);
+				break;
+
+		}
+		
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time
 		System.out.println("Solved Sudoku:");
 		System.out.print("Time taken: " + (Sudoku.endTime - Sudoku.startTime) + " milliseconds\n");
