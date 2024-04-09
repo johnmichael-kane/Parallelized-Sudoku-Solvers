@@ -115,9 +115,9 @@ public class Sudoku {
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time
 		System.out.println("Solved Sudoku:");
 		System.out.print("Time taken: " + (Sudoku.endTime - Sudoku.startTime) + " milliseconds\n");
-		printSudokuBoard(boardSize, partitionSize,solver.solution);
+		printSudokuBoard(boardSize, partitionSize, solver.getSolution());
 
-		printSudokuBoardInFile(boardSize, partitionSize,solver.solution);
+		printSudokuBoardInFile(boardSize, partitionSize, solver.getSolution());
 
 
 	}

@@ -78,6 +78,10 @@ public class DancingLinkSolver {
 			curr.uncover();
 		}
 	}
+//brings the print to main
+	public int[][] getSolution() {
+		return solution;
+	}
 
 	private void makeSolution() {
 		done = true;
