@@ -40,8 +40,8 @@ To execute the solver, follow these steps:
     ```sh
     java Sudoku <version> <filename>
     ```
-    Acceptable <version> includes {'4threads', '8threads', and 'none'} for each of the types of parallelization. 
-    Acceptable <filename> includes {'9x9_input.txt', '16x16_input.txt', and '25x25_input.txt'} for each board size.
+    - Acceptable <version> includes {'4threads', '8threads', and 'none'} for each of the types of parallelization. 
+    - Acceptable <filename> includes {'9x9_input.txt', '16x16_input.txt', and '25x25_input.txt'} for each board size.
     
 
 ## Testing
