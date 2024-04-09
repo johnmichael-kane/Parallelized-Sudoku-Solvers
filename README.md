@@ -36,10 +36,12 @@ To execute the solver, follow these steps:
     javac Sudoku.java
     ```
 
-3. Run the compiled program with a Sudoku puzzle file as an argument. Replace `<FILE_NAME>` with the name of the puzzle file:
+3. Run the compiled program with a Sudoku puzzle file as an argument. Replace `<filename>` with the name of the puzzle file:
     ```sh
-    java Sudoku <FILE_NAME>
+    java Sudoku <version> <filename>
     ```
+    Acceptable <version> includes {'4threads', '8threads', and 'none' for each of the types of parallelization.
+    
 
 ## Testing
 
