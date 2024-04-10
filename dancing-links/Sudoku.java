@@ -124,20 +124,25 @@ public class Sudoku {
 
 		DancingLinkSolver solver = null;
 		switch(version.toLowerCase()) {
-			/*case "4threads":
-				solver= new DancingLinkSovler4Threads(myMatrix.finalMatrix, boardSize);
+			case "2threads":
+				solver= new DancingLinkSolver2Thread(myMatrix.finalMatrix, boardSize);
+				break;
+			
+
+			case "4threads":
+				solver= new DancingLinkSolver4Thread(myMatrix.finalMatrix, boardSize);
 				break;
 			
 			case "8threads":
-				solver = new DancingLinkSolver8Threads(myMatrix.finalMatrix, boardSize);
-				break;*/
+				solver = new DancingLinkSolver8Thread(myMatrix.finalMatrix, boardSize);
+				break;
 
 			case "none":
 				solver = new DancingLinkSolver(myMatrix.finalMatrix, boardSize);
 				break;
 
 			default:
-				System.out.println("INvalid version specified.");
+				System.out.println("Invalid version specified.");
 				System.exit(2);
 				break;
 
