@@ -65,6 +65,7 @@ public class DancingLinkSolver {
 			ColumnObject curr = chooseColumn();
 			curr.cover();
 			for (DancingLinkObject r = curr.down; r != curr; r = r.down) {
+				System.out.println(String.format("r %s %s %s", r.info.row, r.info.col, r.info.number));
 				result.push(r);
 				for (DancingLinkObject j = r.right; j != r; j = j.right) {
 					j.column.cover();
