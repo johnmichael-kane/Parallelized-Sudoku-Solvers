@@ -8,12 +8,12 @@ To execute the solver, follow these steps:
 
 1. Compile the Java code:
     ```sh
-    javac Sudoku.java
+    javac SudokuSolver.java
     ```
 
 2. Run the compiled program with a Sudoku puzzle file as an argument. Replace `<FILE_NAME>` with the name of the puzzle file:
     ```sh
-    java Sudoku <FILE_NAME>
+    java SudokuSolver <filePath> <Level> <numberOfThreads>
     ```
 
 ### Understanding the Code
