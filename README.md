@@ -17,7 +17,7 @@ see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane
 1. Enter the correct directory: `cd propagation-and-search`
 2. Compile the files: `g++ -g  -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
 3. Run: `./SudokuSolver`
-4. Choose Puzzle: filename.txt
+4. Select puzzle during runtime: `filename.txt`
     - Name format: [mode][size].txt
         - 9x9: easy9.txt
         - 16x16: easy16.txt
