@@ -1,0 +1,29 @@
+C++
+
+OpenMP for files:
+
+- essentua
+
+- Parallel Loop Execution: If your code involves heavy computations or iterations over large 
+  datasets, use 
+    -  #pragma omp parallel
+        - distribute loop iterations across multiple threads.
+
+- Task-Based Parallelism: For non-uniform tasks that may not neatly fit into a loop structure, 
+  consider using #pragma omp task to create tasks that can execute concurrently.
+
+- Data Management:
+    - Use private, shared, or firstprivate to control how data is accessed and modified by different 
+      threads, ensuring each thread has the correct data context without interfering with others.
+
+- Synchronization: manage access to shared resources, ensuring data consistency
+    - #pragma omp critical or #pragma omp atomic
+
+- Performance Tuning:
+    - collapse
+        - optimize nested loops
+    - ordered
+        - manage output sequences
+    - schedule
+        - fine-tune distribution of loop iterations
+

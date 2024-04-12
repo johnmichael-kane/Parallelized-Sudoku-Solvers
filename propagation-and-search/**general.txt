@@ -1,0 +1,31 @@
+Task Parallelism: 
+Different tasks involved in solving the Sudoku (like checking rows, columns, and boxes, or applying different solving algorithms) are executed in parallel.
+
+Parallel Backtracking: 
+You can spawn a new thread each time you reach a branching point in your backtracking algorithm. 
+Each thread would attempt to solve the Sudoku from that point with different numbers.
+
+Load Balancing: 
+Ensure that the work is evenly distributed among threads to avoid scenarios where some threads have finished their work while others are still busy.
+    
+Synchronization: 
+Use mutexes or other synchronization techniques to manage shared resources, like the board state if necessary.
+   
+Testing and Profiling: 
+Regularly test and profile your parallel code to identify bottlenecks or race conditions.
+
+Consider using higher-level libraries such as Intel TBB (Threading Building Blocks) or OpenMP, 
+which can simplify the handling of threads and provide more sophisticated parallel patterns and optimizations.
+
+For a simpler integration, you could use OpenMP to parallelize loops easily, particularly when 
+processing multiple boards or when applying certain independent checks or heuristics across the puzzle:
+
+OPEN MP:
+- Ease of Use: Adding a few #pragma directives can parallelize loops without the need to manage threads directly.
+- Scalability: It allows your program to scale with the number of processors by simply using more threads as available.
+- Flexibility: You can enable or disable parallelism just by adding or removing pragmas, without changing the underlying code structure.
+
+INTEL TBB:
+- Task-based Parallelism: It supports sophisticated patterns such as task grouping and synchronization without explicitly managing thread lifecycle.
+- Load Balancing: TBB automatically balances the computing workload among available processors, which optimizes utilization and performance.
+- Concurrency-safe Containers: Provides several thread-safe containers and primitives that can be used to manage shared data more safely.
