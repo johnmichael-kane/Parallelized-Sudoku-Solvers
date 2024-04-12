@@ -1,29 +1,98 @@
+How to parallelize our project
+
+PARALLELIZE:
+- grid initialization
+- validation checks
+- recursive solving
+- task groups
+
+----------------------------------------------------------------------------------------------------
+
 C++
 
-OpenMP for files:
+----------------------------------------------------------------------------------------------------
 
-- essentua
+1. Parallel Initialization of Grids
+    If the solver initializes or resets the grid multiple times or performs any preprocessing steps 
+    on the grid, these operations can often be parallelized. For example, initializing possible 
+    values for each cell can be done in parallel for different rows or sections.
 
-- Parallel Loop Execution: If your code involves heavy computations or iterations over large 
-  datasets, use 
-    -  #pragma omp parallel
-        - distribute loop iterations across multiple threads.
+2. Parallel Validation Checks
+    Many Sudoku solvers validate rows, columns, and 3x3 squares to ensure the rules are adhered to. Y
+    ou can parallelize these checks. For instance, checking all rows in parallel, all columns in 
+    parallel, and all squares in parallel, because these checks are independent of each other.
 
-- Task-Based Parallelism: For non-uniform tasks that may not neatly fit into a loop structure, 
-  consider using #pragma omp task to create tasks that can execute concurrently.
+3. Parallel Recursive Solving
+    The solving process, particularly if it uses a backtracking method, is more challenging to 
+    parallelize due to its recursive nature and dependencies. However, you can still explore 
+    parallelism at the top levels of recursion. For example, you can launch separate threads for 
+    different starting positions or for different initial guesses at a certain cell, especially in 
+    the early stages of the puzzle where there are many possibilities.
 
-- Data Management:
-    - Use private, shared, or firstprivate to control how data is accessed and modified by different 
-      threads, ensuring each thread has the correct data context without interfering with others.
+4. Parallel Loop Execution
+    Any loops that iterate over independent data sets, such as checking possible values for 
+    different cells, can be parallelized using OpenMP’s loop constructs.
 
-- Synchronization: manage access to shared resources, ensuring data consistency
-    - #pragma omp critical or #pragma omp atomic
+5. Task-Based Parallelism
+    For more advanced implementations, consider using OpenMP tasks to handle different parts of the 
+    grid independently. This approach is useful in dynamically balancing the workload among threads, 
+    especially when some parts of the puzzle are more complex to solve than others.
 
-- Performance Tuning:
-    - collapse
-        - optimize nested loops
-    - ordered
-        - manage output sequences
-    - schedule
-        - fine-tune distribution of loop iterations
+Synchronization: Use synchronization mechanisms such as barriers, critical sections, or atomic 
+operations where necessary to manage dependencies and prevent race conditions.
 
+----------------------------------------------------------------------------------------------------
+
+Java
+
+----------------------------------------------------------------------------------------------------
+
+1. Parallel Initialization of Grids
+    You can use Java's ExecutorService to parallelize the initialization of the Sudoku grid or any 
+    preprocessing steps. This is especially useful for initializing possible values for each cell 
+    independently.
+
+2. Parallel Validation Checks
+    Java's ForkJoinPool or parallel streams can be used to validate rows, columns, and 3x3 squares 
+    concurrently. These checks are independent and can be performed simultaneously.
+
+3. Parallel Recursive Solving
+    The backtracking algorithm used in Sudoku solving is recursive and typically not straightforward 
+    to parallelize due to its depth-first search nature. However, you can use parallel branches for 
+    different initial guesses using ExecutorService, creating separate tasks for different paths.
+
+4. Parallel Loop Execution
+    For independent loops, Java 8’s Stream API offers a simple way to execute loops in parallel, for 
+    example when processing each cell or row independently.
+
+5. Task-Based Parallelism
+    Java’s ForkJoinPool is particularly well-suited for tasks that can be broken down into smaller, 
+    recursive tasks, which is great for a depth-first search approach in Sudoku.
+
+Parallel Initialization with ExecutorService
+
+    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            final int row = i, col = j;
+            executor.submit(() -> grid[row][col].initialize());
+        }
+    }
+    executor.shutdown();
+    executor.awaitTermination(1, TimeUnit.MINUTES);
+
+Parallel Validation with Parallel Streams
+
+    boolean rowsValid = IntStream.range(0, 9).parallel().allMatch(i -> checkRow(grid, i));
+    boolean colsValid = IntStream.range(0, 9).parallel().allMatch(j -> checkColumn(grid, j));
+    boolean squaresValid = IntStream.range(0, 9).parallel().allMatch(k -> checkSquare(grid, k));
+
+    boolean isValid = rowsValid && colsValid && squaresValid;
+
+Parallel Recursive Solving with ExecutorService
+
+    ExecutorService solverExecutor = Executors.newCachedThreadPool();
+    Callable<Boolean> solveTask = () -> solve(grid, 0, 0);
+    Future<Boolean> result = solverExecutor.submit(solveTask);
+    solverExecutor.shutdown();
+    solverExecutor.awaitTermination(1, TimeUnit.HOURS);
