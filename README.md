@@ -18,7 +18,7 @@ see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane
 2. Compile the files: `g++ -g  -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
 3. Run: `./SudokuSolver`
 4. Select puzzle during runtime: `filename.txt`(where filename follows the format [mode][size].txt)
-    - Available filename selections:
+    - Available selections:
         - 9x9: `easy9.txt`, `medium9.txt`, `hard9.txt`
         - 16x16: `easy16.txt`, `medium16.txt`, `hard16.txt`
         - 25x25: `easy25.txt`, `medium25.txt`, `hard25.txt`
