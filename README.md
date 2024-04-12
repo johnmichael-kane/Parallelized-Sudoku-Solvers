@@ -10,11 +10,11 @@ You can find the paper for the project [here](https://docs.google.com/document/d
 # Brute Force Approach
 see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach
 
-# Propogation and Search Approach
+# Propagation and Search Approach
 //general description
 
 ### Run
-1. Enter the correct directory: `cd propogation-and-search`
+1. Enter the correct directory: `cd propagation-and-search`
 2. Compile the files: `g++ -g  -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
 3. Run: `./SudokuSolver`
 
