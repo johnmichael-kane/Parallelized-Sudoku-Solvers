@@ -1,4 +1,4 @@
-## Sudoku Solver using Backtracking
+## Parallelized Sudoku Solver using Backtracking
 
 This program implements a Sudoku solver using a brute-force approach with backtracking.
 
