@@ -17,23 +17,39 @@ To execute the solver, follow these steps:
     ```
 
 ### Understanding the Code
+The `SudokuSolver` class handles the complexities of reading, solving, and outputting Sudoku puzzles using multithreading. Here’s an overview of how it works:
 
-The `Sudoku` class encapsulates the functionality for reading Sudoku puzzles from files, solving them using backtracking, and printing the solutions. Here's an overview of how it works:
+1.  **Imports**:
+    
+    *   **java.io.\*** for file handling.
+    *   **java.util.Scanner** for reading Sudoku files.
+    *   **java.util.concurrent.\*** for managing multithreading.
+    *   **java.util.concurrent.atomic.AtomicBoolean** for thread-safe boolean operations.
+2.  **Class Declaration**:
+    
+    *   The `SudokuSolver` implements `Runnable`, enabling its instances to be executed by threads.
+3.  **Instance Variables**:
+    
+    *   **board**: Stores the Sudoku grid.
+    *   **gridSize** and **blockSize**: Define the dimensions of the Sudoku puzzle.
+    *   **solved**: A thread-safe flag that indicates whether the puzzle is solved.
+    *   **startTime** and **endTime**: Track the execution duration.
+4.  **Constructor**:
+    
+    *   Initializes the puzzle from a file and calculates necessary dimensions.
+5.  **Methods**:
+    
+    *   **run()**: Starts the solving process when the thread is executed.
+    *   **solve(int row, int col)**: Recursively attempts to fill the Sudoku board, using backtracking.
+    *   **isValidPlacement()**, **isNumberInRow()**, **isNumberInColumn()**, **isNumberInBox()**: Check the validity of placing a number on the board.
+    *   **printSudokuBoardInFile(String level, int threadsNum)**: Outputs the solved board to a file with details about the solving process.
+    *   **formatNumber(int number)**: Formats numbers for consistent display.
+6.  **Main Method**:
+    
+    *   Parses command-line arguments for the file path, difficulty level, and the number of threads.
+    *   Initializes a `SudokuSolver` object, prints the initial board, starts multiple threads to solve the puzzle, and outputs the results.
 
-1. **Imports**: The code imports necessary classes for file handling and scanning.
-
-2. **Class Declaration**: The `Sudoku` class represents a Sudoku puzzle.
-
-3. **Instance Variables**: The class contains instance variables for the Sudoku board, grid size, block size, and timing.
-
-4. **Constructor**: The constructor initializes the Sudoku puzzle by reading it from a file.
-
-5. **Methods**: The class provides methods for reading the puzzle file, checking the validity of number placements, solving the puzzle recursively, formatting numbers, and printing the Sudoku board.
-
-6. **Main Method**: The main method reads the file path from command-line arguments, initializes a `Sudoku` object, prints the initial Sudoku board, solves the puzzle, prints the solved Sudoku board to the console, and writes it to a file if a solution is found.
-
-The solver employs a backtracking algorithm to efficiently solve Sudoku puzzles by recursively trying different number placements and backtracking when necessary.
-
+The solver uses a backtracking algorithm to efficiently solve Sudoku puzzles by trying different number placements recursively and employing multithreading to potentially speed up the process.
 ## Testing
 
 ### 9x9 Grid Size Board
