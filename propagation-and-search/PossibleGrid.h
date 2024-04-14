@@ -9,12 +9,13 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include <algorithm> // std::sort, std:: move, etc.
-#include <utility> // std::move
-#include <iterator> // std::distance
-#include <sstream> // std::stringstream
+#include <algorithm> // sort, move, etc.
+#include <utility> // move
+#include <iterator> // distance
+#include <numeric> // iota
+#include <sstream> // stringstream
 #include "Grid.h" 
-#include "Position.h" 
+#include "Position.h"
 
 class PossibleGrid {
 public:
@@ -46,9 +47,6 @@ private:
 	// Uniqueness
 	vector<int> uniqueValues(vector<int> vec);
 	std::vector<std::pair<Position, int>> identifyUnique(int index, bool isRow) const;
-	std::vector<std::pair<Position, int>> filterUnique(const std::vector<int> &collection, 
-													   const std::multimap<int, 
-													   Position> &valueMap) const;
 };
 
 #endif /* POSSIBLEGRID_H_ */

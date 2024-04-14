@@ -11,8 +11,7 @@
 #include "Grid.h"
 #include "Position.h"
 
-class Game
-{
+class Game {
 private:
 	string puzzle;
 	bool isFinished;

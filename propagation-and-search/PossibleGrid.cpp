@@ -15,39 +15,42 @@ void PossibleGrid::clear() {
 }
 
 void PossibleGrid::analyzeMoves(const Grid &grid) {
-	if (this->grid == nullptr)
-	{
-		std::cerr << "Grid pointer not set.";
-		return; // Exit if grid is not initialized
-	}
+	if (this->grid == nullptr) return;
 
 	clear();
 	possibleValues.resize(grid.gridSize, vector<vector<int>>(grid.gridSize));
 	unsolvedPositions = grid.getUnsolvedPositions();
-	vector<int> possibilities(grid.gridSize);
-	const vector<int> range(1, grid.gridSize + 1);
+
+	// fill vector with [1 ... gridSize]
+	const vector<int> range = [&] {
+		vector<int> r(grid.gridSize);
+		iota(r.begin(), r.end(), 1); 
+		return r;
+	}();
+
+	vector<int> usedValues(grid.gridSize);
 
 	for (const auto &pos : unsolvedPositions) {
-		const vector<int> usedSectionValues = grid.getSection(pos.row, pos.col);
-		const vector<int> usedRowValues = grid.getRow(pos.row);
-		const vector<int> usedColValues = grid.getCol(pos.col);
+		const vector<int> &usedSectionValues = grid.getSection(pos.row, pos.col);
+		const vector<int> &usedRowValues = grid.getRow(pos.row);
+		const vector<int> &usedColValues = grid.getCol(pos.col);
 
-		vector<int> usedValues(usedSectionValues);
+		usedValues.clear();
+		usedValues.insert(usedValues.end(), usedSectionValues.begin(), usedSectionValues.end());
 		usedValues.insert(usedValues.end(), usedRowValues.begin(), usedRowValues.end());
 		usedValues.insert(usedValues.end(), usedColValues.begin(), usedColValues.end());
 
 		sort(usedValues.begin(), usedValues.end());
 		usedValues.erase(unique(usedValues.begin(), usedValues.end()), usedValues.end()); // no dups
 
-		auto it = set_difference(range.begin(), range.end(), usedValues.begin(), usedValues.end(),
-								 possibilities.begin());
-		possibilities.resize(it - possibilities.begin());
-
-		possibleValues[pos.row][pos.col] = move(possibilities);
+		vector<int> possibilities;
+		set_difference(range.begin(), range.end(), usedValues.begin(), usedValues.end(),
+					   back_inserter(possibilities));
+		possibleValues[pos.row][pos.col] = std::move(possibilities);
 	}
 }
 
-// Cross-reference rows and columns to find unique possible values for positions.
+// Cross-reference rows and columns and return unique possible value pairs (position & value).
 vector<pair<Position, int>> PossibleGrid::crossReference() const {
 	vector<pair<Position, int>> pairs;
 	for (int i = 0; i < grid->gridSize; ++i) {
@@ -56,41 +59,29 @@ vector<pair<Position, int>> PossibleGrid::crossReference() const {
 		pairs.insert(pairs.end(), rowUnique.begin(), rowUnique.end());
 		pairs.insert(pairs.end(), colUnique.begin(), colUnique.end());
 	}
-	return pairs; // results
+	return pairs;
 }
 
 // Identify unique values in a specified row/column
 vector<pair<Position, int>> PossibleGrid::identifyUnique(int index, bool isRow) const {
-	vector<int> possibilities;
 	multimap<int, Position> valueMap; // map: quick lookup
-	for (int i = 0; i < grid->gridSize; ++i)
-	{
-		auto &values = isRow ? possibleValues[index][i] : possibleValues[i][index];
-		if (!values.empty()) {
-			possibilities.insert(possibilities.end(), values.begin(), values.end());
-			for (int val : values) {
-				valueMap.insert({val, isRow ? Position(index, i) : Position(i, index)});
-			}
+	for (int i = 0; i < grid->gridSize; ++i) {
+		const vector<int> &values = isRow ? possibleValues[index][i] : possibleValues[i][index];
+		for (int val : values) {
+			valueMap.emplace(val, isRow ? Position(index, i) : Position(i, index));
 		}
 	}
-	return filterUnique(possibilities, valueMap);
-}
 
-// Filter out unique values, grab their position from a map, and return unique pairs.
-vector<pair<Position, int>> PossibleGrid::filterUnique(const vector<int> &values, 
-														const multimap<int, Position> &map) const {
-	vector<pair<Position, int>> uniquePairs; // in map
-	auto filteredValues = values;
+	vector<pair<Position, int>> uniquePairs;
+	for (auto it = valueMap.begin(); it != valueMap.end(); ++it) { // auto = type-safe
+		const auto &value = it->first;  // key
+		const auto &position = it->second; // value 
 
-	sort(filteredValues.begin(), filteredValues.end());
-	auto it = unique_copy(filteredValues.begin(), filteredValues.end(), filteredValues.begin());
-	filteredValues.erase(it, filteredValues.end());
-
-	for (int val : filteredValues) {
-		if (map.count(val) == 1) { // appears once (unique)
-			uniquePairs.push_back(make_pair(map.find(val)->second, val));
+		if (valueMap.count(value) == 1) { // appears once (unique)
+			uniquePairs.push_back(make_pair(position, value));
 		}
 	}
+
 	return uniquePairs;
 }
 
