@@ -11,9 +11,6 @@
 #include "Grid.h"
 #include <limits>
 
-// Constructor initializing the grid with an empty name.
-Grid::Grid() : gridSize(0), sectionSize(0), gridName("") {}
-
 // Set value of a specific cell if position is within grid bounds.
 void Grid::fill(const Pos &pos, int value) {
 	if (pos.row >= 0 && pos.row < gridSize && pos.col >= 0 && pos.col < gridSize) {
@@ -24,21 +21,15 @@ void Grid::fill(const Pos &pos, int value) {
 // Enforce Sudoku rule: no duplicate numbers in any row, column, or section.
 // First, check whether numbers within each row/column are unique.
 // Then, check whether numbers within each section are unique.
-bool Grid::isLegal() const {
-	for (int i = 0; i < gridSize; i++) {
-		if (!isUnique(getRow(i)) || !isUnique(getCol(i))) {
+bool Grid::isLegal() const
+{
+	for (int i = 0; i < gridSize; i++)
+	{
+		if (!isUnique(getRow(i)) || !isUnique(getCol(i)) || !isUnique(getSection(i / sectionSize * sectionSize, (i % sectionSize) * sectionSize)))
+		{
 			return false;
 		}
 	}
-
-	for (int row = 0; row < gridSize; row += sectionSize) {
-		for (int col = 0; col < gridSize; col += sectionSize) {
-			if (!isUnique(getSection(row, col))) {
-				return false;
-			}
-		}
-	}
-
 	return true;
 }
 
@@ -46,7 +37,11 @@ bool Grid::isLegal() const {
 // First, generate a sequence from 1 to gridSize named "identity".
 // Then, determine whether sorted rows & columns match "identity" (i.e., are filled).
 bool Grid::isComplete() const {
-	if (!isLegal()) return false;
+	if (!isLegal())
+	{
+		std::cout << "Grid is illegal." << std::endl;
+		return false;
+	}
 
 	vector<int> identity(gridSize);
 	iota(identity.begin(), identity.end(), 1); 
@@ -63,11 +58,13 @@ bool Grid::isComplete() const {
 }
 
 // Check whether all numbers in a given vector are unique (no duplicates).
-bool Grid::isUnique(const vector<int> &values) const {
-	vector<int> temp(values);
-	sort(temp.begin(), temp.end());
-	auto last = unique(temp.begin(), temp.end());
-	return last == temp.end();
+bool Grid::isUnique(const vector<int> &values) const
+{
+	vector<int> filtered;
+	copy_if(values.begin(), values.end(), back_inserter(filtered), [](int n)
+			{ return n != 0; });
+	sort(filtered.begin(), filtered.end());
+	return adjacent_find(filtered.begin(), filtered.end()) == filtered.end();
 }
 
 //========================================================================================
@@ -127,6 +124,7 @@ bool Grid::read(const string &path)
 {
 	ifstream file(path);
 	if (!file.is_open()) {
+		std::cout << "Unable to open file: " << path << std::endl;
 		return false;
 	}
 

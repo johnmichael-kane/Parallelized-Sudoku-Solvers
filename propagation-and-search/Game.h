@@ -12,31 +12,28 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 #include "PossibleGrid.h"
 #include "Grid.h"
 #include "Pos.h"
 
-using namespace std;
-
-class Game
-{
+class Game {
 private:
 	string gameFile;
 	bool isFinished;
 	bool hasSolution;
 	Grid gameGrid;
-	PossibleGrid possibleGameGrid;
-	int linearCycle;
-	int crossRefCycle;
-	int searchCycle;
-	bool linearConstraintSolution();
-	bool crossReferenceSolution();
-	bool search();
+	PossibleGrid possibleGrid;
 
 public:
-	Game(string path);
+	Game(const string &path);
 	bool Evaluate();
-	void printStats();
+	void printStats() const;
+
+private:
+	bool linearConstraintSolution();
+	bool crossReferenceSolution();
+	bool depthFirstSearch();
 };
 
 #endif /* GAME_H_ */ 

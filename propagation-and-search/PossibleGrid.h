@@ -16,7 +16,7 @@ class PossibleGrid
 {
 public:
 	Grid *grid;
-	vector<vector<vector<int>>> possibleGrid;
+	vector<vector<vector<int>>> possibleValues;
 	vector<Pos> unsolvedPositions;
 
 	PossibleGrid() : grid(nullptr) {}
@@ -27,10 +27,10 @@ public:
 	}
 
 	void clear();
-	vector<int> invalidNumbers(const Post &pos) const;
+	vector<int> invalidNumbers(const Pos &pos) const;
 	void Analysis();
-	std::vector<std::pair<Pos, int>> crossReference();
-	std::string vectorsToString(std::vector<int> &vector);
-	void print();
+	vector<pair<Pos, int>> crossReference();
+	string vectorsToString(const vector<int> &vector) const; 
+	void print() const;
 };
 #endif /* POSSIBLEGRID_H_ */
