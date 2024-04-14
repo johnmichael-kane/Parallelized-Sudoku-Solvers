@@ -10,18 +10,27 @@ import java.util.Scanner;
 class ExactMatrix {
 
 	public int[][] matrix;
-	public Cell[][] finalMatrix;
 	int sudokuSize;
 	
 	public ExactMatrix(int[][] matrix) {
 		this.matrix = matrix;
-		finalMatrix = new Cell[matrix.length*matrix.length*matrix.length][matrix[0].length*matrix[0].length*4];
 		sudokuSize = this.matrix.length;
-		initMatrix();
-		makeFinalMatrix();
+		
 	}
 	
-	private void initMatrix() {
+	//rather than creating finalMatrix, initMatrix, then makeFinalMatrix, we keep it all for that function
+	public Cell[][] makeFinalMatrix() {
+		Cell[][] finalMatrix = new Cell[matrix.length*matrix.length*matrix.length][matrix[0].length*matrix[0].length*4];
+		initMatrix(finalMatrix);
+		for (int i=0; i<sudokuSize; i++) {
+			for (int j=0; j<sudokuSize; j++){
+				fillInMatrix(finalMatrix, i, j, matrix[i][j]);
+			}
+		}
+		return finalMatrix;
+	}
+
+	private void initMatrix(Cell[][] finalMatrix) {
 		for (int i=0;i<finalMatrix.length; i++) {
 			for (int j=0;j<finalMatrix[0].length; j++){
 				finalMatrix[i][j] = null;
@@ -29,29 +38,16 @@ class ExactMatrix {
 		}
 		
 	}
-	//initialize a local Cell[][] at the start of here
-	public void makeFinalMatrix() {
-		for (int i=0;i<sudokuSize; i++) {
-			for (int j=0;j<sudokuSize; j++){
-				int currNum = matrix[i][j];
-				fillInMatrix(i,j,currNum);
+
+	private void fillInMatrix(Cell[][] finalMatrix, int row, int col, int number) {
+		for (int num = 1; num <= sudokuSize; num++) {
+			if (number == 0 || num == number) {
+				fillCell(finalMatrix, row, col, num);
 			}
 		}
 	}
-
-	private void fillInMatrix(int row, int col, int number) {
-		for (int i = 1; i <= sudokuSize; i++) {
-				if (number!=0){
-					fillCell(row, col, number);
-				} else {
-					for (int num=1; num<=sudokuSize; num++) {
-						fillCell(row, col, num);
-					}
-				}
-		}
-	}
-	//create a method to include the local Cell[][] finalMatrix as a
-	private void fillCell(int row, int col, int number) {
+	
+	private void fillCell(Cell[][] finalMatrix, int row, int col, int number) {
 		int matrixRow = row*matrix.length*matrix.length + col*matrix.length+number-1;
 		int col1 = row*sudokuSize+col;
 		int col2 = sudokuSize*sudokuSize+row*sudokuSize+number-1;
@@ -64,9 +60,7 @@ class ExactMatrix {
 	}
 
 	private int getGridNumber(int row, int col) {
-
 		int gridSize = (int)Math.sqrt(sudokuSize);
-
 		return (col/gridSize)+((int)(row/gridSize))*gridSize;
 	}
 }
@@ -175,12 +169,9 @@ public class Sudoku {
 		printSudokuBoard(boardSize, partitionSize,vals);
 		Sudoku.startTime = System.currentTimeMillis(); // Record start time
 
-
-		//goes throught he
 		ExactMatrix myMatrix = new ExactMatrix(vals);
-		DancingLinkSolver solver = new DancingLinkSolver(myMatrix.finalMatrix, boardSize);
-
-
+		Cell[][] finalMatrix = myMatrix.makeFinalMatrix();
+		DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize);
 
 
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time

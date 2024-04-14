@@ -1,4 +1,4 @@
-Time taken: 219 milliseconds
+Time taken: 202 milliseconds
 Solved Sudoku:
 
 | 23  18  20  08  15 | 22  21  06  17  03 | 13  09  05  11  10 | 24  19  14  07  04 | 12  25  16  01  02 |
