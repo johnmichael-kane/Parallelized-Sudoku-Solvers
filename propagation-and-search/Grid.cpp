@@ -1,271 +1,172 @@
-/*
- * Grid.cpp
- *
- *  Created on: 15 Jul 2015
- *      Author: Hongbo Tian
- *  Updated on: 8 Mar 2024
- * 		Editor: Soleil Cordray
- */
+//========================================================================================
+// Name        : Grid.cpp
+// Author      : Hongbo Tian (Created 15 Jul 2015)
+// Editor      : Soleil Cordray (Edited 8 Mar 2024)
+// Description : Manages the state and validation of a Sudoku grid. This class facilitates
+//               reading from and writing to files, checking the legality and completeness
+//               of the grid, and managing unsolved positions. It supports dynamic grid sizes,
+//               making it suitable for standard and non-standard Sudoku puzzles.
+//========================================================================================
 
 #include "Grid.h"
+#include <limits>
 
 // Constructor initializing the grid with an empty name.
-Grid::Grid() : mName(""), dynamicSize(0)
-{
+Grid::Grid() : gridSize(0), sectionSize(0), gridName("") {}
+
+// Set value of a specific cell if position is within grid bounds.
+void Grid::fill(const Pos &pos, int value) {
+	if (pos.row >= 0 && pos.row < gridSize && pos.col >= 0 && pos.col < gridSize) {
+		gridValues[pos.row][pos.col] = value;
+	}
 }
 
-// Fills a cell at the specified position with a value.
-void Grid::fill(Pos pos, int value)
-{
-	mGrid[pos.row][pos.col] = value;
-}
-
-// Checks if the grid does not violate Sudoku rules.
-// by ensuring there are no repeated values in any row or column.
-bool Grid::isLegal()
-{
-	bool legal = true;
-
-	// Check each row and column for duplicates. (check non-repeats)
-	for (int i = 0; i < dynamicSize; i++)
-	{
-		vector<int> vRow = getRow(i); // Retrieve all values in the current row.
-		vector<int> vCol = getCol(i); // Retrieve all values in the current column.
-
-		// The unique algorithm rearranges the elements in the range [first, last) in such a way that each element
-		// that is equal to the preceding element appears only once. The relative order of elements that are not duplicates
-		// is preserved, and the physical size of the container is not altered.
-		// Applying 'unique' does not by itself remove duplicates because the end of the non-duplicate range
-		// is returned but elements are not erased.
-		vector<int>::iterator uniqueRow = unique(vRow.begin(), vRow.end());
-		vector<int>::iterator uniqueCol = unique(vCol.begin(), vCol.end());
-
-		// Check if there are elements beyond the 'unique' range by comparing the iterator to the end of the vector.
-		// If the 'unique' iterator does not equal the end iterator, it indicates there were duplicate elements
-		// in the row or column, marking the grid as potentially illegal.
-		if (uniqueRow != vRow.end())
-		{
-			legal = false; // Found duplicates in a row, so the grid is not legal.
-		}
-		if (uniqueCol != vCol.end())
-		{
-			legal = false; // Found duplicates in a column, so the grid is not legal.
+// Enforce Sudoku rule: no duplicate numbers in any row, column, or section.
+// First, check whether numbers within each row/column are unique.
+// Then, check whether numbers within each section are unique.
+bool Grid::isLegal() const {
+	for (int i = 0; i < gridSize; i++) {
+		if (!isUnique(getRow(i)) || !isUnique(getCol(i))) {
+			return false;
 		}
 	}
 
-	// Additionally, checks each 3x3 section for non-repeating values, similar to the row and column checks.
-	for (int sRow = 0; sRow < 3; sRow++)
-	{
-		for (int sCol = 0; sCol < 3; sCol++)
-		{
-			// Subsections 
-			vector<int> vSection = getSection(sRow, sCol); // Retrieve values in the current 3x3 section.
-			vector<int>::iterator uniqueSection = unique(vSection.begin(), vSection.end());
-			if (uniqueSection != vSection.end())
-			{
-				legal = false; // Found duplicates in a section, so the grid is not legal.
+	for (int row = 0; row < gridSize; row += sectionSize) {
+		for (int col = 0; col < gridSize; col += sectionSize) {
+			if (!isUnique(getSection(row, col))) {
+				return false;
 			}
 		}
 	}
 
-	return legal; // Return true if no duplicates were found in rows, columns, and sections; false otherwise.
+	return true;
 }
 
-// Determines if the grid is completely and correctly filled out.
-bool Grid::isComplete()
-{
-	bool complete = isLegal();
+// Verify if the grid completely filled with numbers 1 to gridSize in every row, column, and section.
+// First, generate a sequence from 1 to gridSize named "identity".
+// Then, determine whether sorted rows & columns match "identity" (i.e., are filled).
+bool Grid::isComplete() const {
+	if (!isLegal()) return false;
 
-	// Create a vector representing the expected numbers in each row, column, or section.
-	vector<int> identity;
-	for (int i = 0; i < dynamicSize; i++)
-	{
-		identity.push_back(i + 1);
-	}
+	vector<int> identity(gridSize);
+	iota(identity.begin(), identity.end(), 1); 
 
-	// Check each row and column against the identity vector.
-	for (int i = 0; i < dynamicSize; i++)
-	{
-		vector<int> vRow = getRow(i);
-		vector<int> vCol = getCol(i);
-
-		// Sort before comparison to ensure the order matches the identity vector.
-		sort(vRow.begin(), vRow.end());
-		sort(vCol.begin(), vCol.end());
-
-		if (vRow != identity || vCol != identity)
-		{
-			complete = false;
+	for (int i = 0; i < gridSize; i++) {
+		auto row = getRow(i), col = getCol(i);
+		sort(row.begin(), row.end());
+		sort(col.begin(), col.end());
+		if (row != identity || col != identity) {
+			return false;
 		}
 	}
+	return true;
+}
 
-	// Check each 3x3 section against the identity vector. **** SIZE ****
-	for (int sRow = 0; sRow < 3; sRow++)
+// Check whether all numbers in a given vector are unique (no duplicates).
+bool Grid::isUnique(const vector<int> &values) const {
+	vector<int> temp(values);
+	sort(temp.begin(), temp.end());
+	auto last = unique(temp.begin(), temp.end());
+	return last == temp.end();
+}
+
+//========================================================================================
+// Getters
+//========================================================================================
+
+// If row (index) within bounds, return the values from that row; otherwise, return an empty vector
+vector<int> Grid::getRow(int row) const {
+	return row >= 0 && row < gridSize ? gridValues[row] : vector<int>();
+}
+
+// If col (index) within bounds, loop through grid rows and return all values from that column
+std::vector<int> Grid::getCol(int col) const {
+	vector<int> column;
+	if (col >= 0 && col < gridSize)
 	{
-		for (int sCol = 0; sCol < 3; sCol++)
+		for (const auto &row : gridValues)
 		{
-			vector<int> vSection = getSection(sRow, sCol);
-			sort(vSection.begin(), vSection.end());
-			if (identity != vSection)
-			{
-				complete = false;
+			column.push_back(row[col]);
+		}
+	}
+	return column;
+}
+
+// Get top left section of given row and col (indices), and return all values from that section
+vector<int> Grid::getSection(int row, int col) const {
+	vector<int> section;
+	int startRow = (row / sectionSize) * sectionSize;
+	int startCol = (col / sectionSize) * sectionSize;
+	for (int row = startRow; row < startRow + sectionSize; row++) {
+		for (int col = startCol; col < startCol + sectionSize; col++) {
+			section.push_back(gridValues[row][col]);
+		}
+	}
+	return section;
+}
+
+// Loop through grid and return all unsolved positions within it
+vector<Pos> Grid::getUnsolvedPositions() const {
+	std::vector<Pos> unsolved;
+	for (int row = 0; row < gridSize; row++) {
+		for (int col = 0; col < gridSize; col++) {
+			if (gridValues[row][col] == 0) {
+				unsolved.emplace_back(row, col);
 			}
 		}
 	}
-
-	return complete;
+	return unsolved;
 }
 
-// Getters for row, column, and sections
-
-vector<int> Grid::getRow(int row)
-{
-	// Check if the row index is within the bounds of the grid
-	if (row >= 0 && row < dynamicSize)
-	{
-		return mGrid[row];
-	}
-	else
-	{
-		// Handle the error or return an empty vector
-		return vector<int>(); // Or throw an exception or handle the error as appropriate
-	}
-}
-
-vector<int> Grid::getCol(int col)
-{
-	vector<int> colValues;
-	// Assuming the column index is valid
-	for (auto &row : mGrid)
-	{
-		colValues.push_back(row[col]);
-	}
-	return colValues;
-}
-
-vector<int> Grid::getSection(int sRow, int sCol)
-{
-	int sectionSize = std::sqrt(dynamicSize); // Calculate the size of the sections
-	vector<int> vSection;
-	int startRow = (sRow / sectionSize) * sectionSize;
-	int startCol = (sCol / sectionSize) * sectionSize;
-
-	for (int row = startRow; row < startRow + sectionSize; row++)
-	{
-		for (int col = startCol; col < startCol + sectionSize; col++)
-		{
-			vSection.push_back(mGrid[row][col]); // Changed to include zeros as well
-		}
-	}
-	return vSection;
-}
-
-vector<int> Grid::getSectionByElement(int rRow, int rCol) {
-    int sRow = getSectionStart(rRow);
-    int sCol = getSectionStart(rCol);
-    return getSection(sRow, sCol);
-}
-
-vector<Pos> Grid::getUnsolvedPos() {
-	vector<Pos> unslovedPos;
-	for (int row = 0; row < dynamicSize; row++)
-	{
-		for (int col = 0; col < dynamicSize; col++)
-		{
-			if (mGrid[row][col] == 0) {
-				unslovedPos.push_back(Pos(row, col));
-			}
-		}
-	}
-	return unslovedPos;
-}
+//========================================================================================
+// File
+//========================================================================================
 
 // Read and write to files 
-// **** CHANGES: ****
-	// give the user a list of available files & their difficulty
-	// have them type out the filename they want to test (test for correctness)
-bool Grid::read(string path)
+bool Grid::read(const string &path)
 {
-	ifstream myFile(path);
-	if (!myFile.is_open())
-	{
+	ifstream file(path);
+	if (!file.is_open()) {
 		return false;
 	}
 
-	// First line now determines the size of the grid.
-	myFile >> dynamicSize;
-	myFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Skip to the next line
+	// First line determines the size of the grid.
+	file >> gridSize;
+	file.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Skip to the next line
+	gridValues.resize(gridSize, vector<int>(gridSize));
+	sectionSize = static_cast<int>(sqrt(gridSize));
 
-	mGrid.resize(dynamicSize, vector<int>(dynamicSize));
-
-	for (int row = 0; row < dynamicSize; ++row)
-	{
-		for (int col = 0; col < dynamicSize; ++col)
-		{
-			myFile >> mGrid[row][col];
+	for (int row = 0; row < gridSize; ++row) {
+		for (int col = 0; col < gridSize; ++col) {
+			file >> gridValues[row][col];
 		}
 	}
 
-	myFile.close();
+	file.close();
 	return true;
 }
 
 // Writes the current state of the Sudoku grid to a file.
-bool Grid::write()
-{
-	bool success = true; // Initially, assume the write operation will be successful.
-
-	// Prepare the file name by prefixing "ANS" to the original file name (stored in mName).
-	// This indicates that this file is an answer or solution file.
-	string name = "ANS" + mName;
-
-	// Create an output file stream to write to the file named "ANS"+mName.
-	ofstream file(name.c_str());
-
-	if (file.is_open()) // Check if the file was successfully opened for writing.
-	{
-		// Iterate over each row of the grid.
-		for (int i = 0; i < dynamicSize; i++)
-		{
-			// Iterate over each column in the current row.
-			for (int j = 0; j < dynamicSize; j++)
-			{
-				// Write the value at the current cell to the file.
-				file << mGrid[i][j];
-				// Follow each number with a space for readability and formatting.
-				file << " ";
-			}
-			// After writing all columns of the current row, write a newline character to move to the next row in the file.
-			file << "\n";
-		}
-		// After writing the entire grid to the file, close the file stream.
-		file.close();
-	}
-	else
-	{
-		// If the file could not be opened for writing, set success to false to indicate failure.
-		success = false;
-	}
-
-	// Return the success status of the write operation.
-	return success;
+bool Grid::write() const {
+	ofstream file("ANS" + gridName);
+	if (file.is_open()) {
+        for (const auto& row : gridValues) {
+            for (int num : row) {
+                file << num << ' ';
+            }
+            file << '\n';
+        }
+        file.close();
+        return true;
+    }
+    return false;
 }
 
-void Grid::print() {
-	for (int row = 0; row < dynamicSize; row++)
-	{
-		for (int col = 0; col < dynamicSize; col++)
-		{
-			cout << mGrid[row][col] << " " << flush;
+void Grid::print() const {
+	for (const auto &row : gridValues) {
+		for (int num : row) {
+			cout << num << " ";
 		}
 		cout << endl;
 	}
-}
-
-// Misc
-int Grid::getSectionStart(int num)
-{
-	int sectionSize = sqrt(dynamicSize); // Assuming dynamicSize is the total grid size, this needs to be adjusted
-	int start = (num / sectionSize) * sectionSize;
-	return start;
 }

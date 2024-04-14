@@ -1,177 +1,134 @@
-/*
- * Game.cpp
- *
- *  Created on: 15 Jul 2015
- *      Author: Hongbo Tian
- *  Updated on: 8 Mar 2024
- * 		Editor: Soleil Cordray
- */
+//========================================================================================
+// Name        : Game.cpp
+// Author      : Hongbo Tian (Created 15 Jul 2015)
+// Editor      : Soleil Cordray (Updated 8 Mar 2024)
+// Description : Manage the game state, evaluate game progress, and print game statistics.
+//========================================================================================
 
 #include "Game.h"
 
-// Constructor: Initializes a game with a specified path for the input file.
-Game::Game(string path) : mPath(path),		  // Path to the input file.
-						  mFin(false),		  // Flag to check if the game has finished.
-						  mHasSolution(true), // Flag to indicate if the game has a solution.
-						  mLinearCycle(0),	  // Counter for linear constraint cycles.
-											  // apply rules to individual rows/columns/3x3 subgrids **** SIZE ****
-											  // rule: each row/column/subgrid mustcontain 1-9 exactly once
-											  // deduce by eliminating all other vals present
-											  // solve the simpler parts straightforwardly
-						  mCrossRefCycle(0),  // Counter for cross-reference cycles.
-											  // cross-reference different rows/columns/subgrids
-											  // look at cell vals & see if potential vals are impossible in other
-											  // parts of the same row/col/subgrid due to placement of numbers
-											  // in related rows/cols/subgrids
-											  // eliminate possible vals for cell that can't exist due to linear structures
-											  // make progress on puzzles that need more than linear constraints to solve
-						  mSearchCycle(0)	  // Counter for search cycles
-											  // pick an unsolved cell, assume possible val, continue solving based on val
-											  // if leads to contradiction (unsolvable) backtrack & mark val incorrect
-											  // DFS
-											  // process repeats until puzzle solution found or deemed unsolvable
-											  // intensive;last resort when other methods insufficient
+Game::Game(string path) : gameFile(path),	 
+						  isFinished(false),
+						  hasSolution(true),
+						  linearCycle(0),	 // Counter for linear constraint cycles.
+										  // apply rules to individual rows/columns/3x3 subgrids **** SIZE ****
+										  // rule: each row/column/subgrid mustcontain 1-9 exactly once
+										  // deduce by eliminating all other vals present
+										  // solve the simpler parts straightforwardly
+						  crossRefCycle(0), // Counter for cross-reference cycles.
+											// cross-reference different rows/columns/subgrids
+											// look at cell vals & see if potential vals are impossible in other
+											// parts of the same row/col/subgrid due to placement of numbers
+											// in related rows/cols/subgrids
+											// eliminate possible vals for cell that can't exist due to linear structures
+											// make progress on puzzles that need more than linear constraints to solve
+						  searchCycle(0) // Counter for search cycles
+										 // pick an unsolved cell, assume possible val, continue solving based on val
+										 // if leads to contradiction (unsolvable) backtrack & mark val incorrect
+										 // DFS
+										 // process repeats until puzzle solution found or deemed unsolvable
+										 // intensive;last resort when other methods insufficient
 {
-	// Try to read the game grid from the file at the given path.
-	// mSucessInput is true if the file is successfully read and false otherwise.
-	mSucessInput = mGameGrid.read(path);
-
-	mGamePossibleGrid.setGrid(&mGameGrid); // For PossibleGrid.h
-	// Analyze the initial game grid to populate possible values. **** SIZE ****
-	mGamePossibleGrid.Analysis(mGameGrid);
+	possibleGameGrid.setGrid(&gameGrid);
+	possibleGameGrid.Analysis(gameGrid);
 }
 
-// Evaluates the current state of the game and attempts to progress towards a solution.
+// Evaluate the current game state and try to make progress towards solution.
+// 1) Update reference grid and re-analyze the current grid state.
+// 2) First, attempt to solve the grid using linear constraints (simple eliminations).
+// 3) If unsolved, then attempt to solve the grid using cross-referencing.
+// 4) If still unsolved, then solve the grid using DFS.
+// 5) Complete evaluation: determine if solution found.
 bool Game::Evaluate()
 {
-	// Only proceed if the input file was successfully read.
-	if (mSucessInput)
-	{
-		mGamePossibleGrid.setGrid(&mGameGrid); // For PossibleGrid.h
-		// Re-analyze the game grid to update possible values.
-		mGamePossibleGrid.Analysis(mGameGrid);
-		bool methodTrigger = true; // A flag to trigger different solving methods.
+	possibleGameGrid.setGrid(&gameGrid); 
+	possibleGameGrid.Analysis(gameGrid);
 
-		// Linear Constrains Part 1: Solve positions with only one possible value.
-		// Look for elements with only one possible solution
-		vector<Pos>::iterator PosIt;
-		for (PosIt = mGamePossibleGrid.mUnsolvedPos.begin();
-			 PosIt != mGamePossibleGrid.mUnsolvedPos.end(); PosIt++)
+	if (!linearConstraintSolution())
+	{
+		if (!crossReferenceSolution())
 		{
-			// If a position has exactly one possible value, fill it in the grid.
-			if (mGamePossibleGrid.mPossibleGrid[PosIt->row][PosIt->col].size() == 1)
+			if (!gameGrid.isComplete())
 			{
-				methodTrigger = false; // Reset the flag as we've made progress.
-				mGameGrid.fill(*PosIt,
-							   mGamePossibleGrid.mPossibleGrid[PosIt->row][PosIt->col].at(0));
+				isFinished = search();
 			}
 		}
-
-		// Linear Constrains Part 2: Cross-reference rows, columns, and sections to find solutions.
-		// The core of this method is implemented in PossibleGrid
-		// returns a array of pairs with Pos and value to fill
-		if (methodTrigger)
-		{
-			// crossRef returns a list of positions and their determined values.
-			vector<pair<Pos, int>> pairs = mGamePossibleGrid.crossRef();
-			vector<pair<Pos, int>>::iterator it;
-			for (it = pairs.begin(); it != pairs.end(); it++)
-			{
-				methodTrigger = false;				   // Again, reset the flag as progress is made.
-				mGameGrid.fill(it->first, it->second); // Fill in the grid with the solved values.
-			}
-		}
-
-		// Attempt a depth-first search if other methods fail to solve the grid completely.
-		if (methodTrigger && !mGameGrid.isComplete())
-		{
-			mFin = search(); // The search method returns true if the grid is solved.
-		}
-		return mGameGrid.isComplete(); // Return true if the grid is complete, false otherwise.
 	}
-	else
-	{
-		// If the input file was not successfully read, indicate an error.
-		cout << "Invalid File Name" << endl;
-		return false; // Return false as the game cannot proceed without a valid input.
-	}
+	return gameGrid.isComplete(); 
 }
 
-// Implements a depth-first search algorithm to solve the grid.
+// Attempt to fill single-option cells and return true if any cell was filled.
+bool Game::linearConstraintSolution()
+{
+	bool progressMade = false;
+	for (Pos &pos : possibleGameGrid.unsolvedPositions)
+	{
+		if (possibleGameGrid.possibleGrid[pos.row][pos.col].size() == 1)
+		{
+			gameGrid.fill(pos, possibleGameGrid.possibleGrid[pos.row][pos.col][0]);
+			progressMade = true;
+		}
+	}
+	return progressMade;
+}
+
+// Use cross-referencing to fill cells that can uniquely be determined.
+bool Game::crossReferenceSolution()
+{
+	vector<pair<Pos, int>> pairs = possibleGameGrid.crossReference();
+	if (pairs.empty())
+		return false;
+	for (auto &[pos, value] : pairs)
+	{
+		gameGrid.fill(pos, value);
+	}
+	return true;
+}
+
+// Implements a depth-first search algorithm to explore possible grid configurations.
+// Start queue of possible grids with initial game state.
+// Create possible grid instance and analyze to update possible values.
+// Update main game grid if solution found (grid complete).
+// Otherwise, loop through each possible value from the first unsolved position.
 bool Game::search()
 {
-	// Depth first search
 	cout << "Depth First Search . . . " << endl;
-	bool success = true;
+	vector<Grid> searchQueue = {gameGrid};
 
-	// Initialize the search queue with the current state of the game grid.
-	vector<Grid> searchQueue;
-	searchQueue.push_back(mGameGrid);
-	// Continue searching until the last grid in the queue is complete or the queue is empty.
-	while (!searchQueue.operator[](searchQueue.size() - 1).isComplete() && searchQueue.size() > 0)
+	while (!searchQueue.empty())
 	{
-		mSearchCycle++; // Increment the search cycle counter.
+		Grid currentGrid = searchQueue.back();
+		searchQueue.pop_back(); // process grid (remove)
 
-		// Take the last grid from the queue to analyze.
-		Grid currentGrid = searchQueue.at(searchQueue.size() - 1);
+		if (!currentGrid.isLegal()) continue; // illegal grid (skip)
 
-		// Test element in queue
-		// If the current grid state is legal, try to find further solutions.
-		if (currentGrid.isLegal())
+		PossibleGrid possibilities; 
+		possibilities.Analysis(currentGrid);
+
+		if (currentGrid.isComplete())
 		{
-			PossibleGrid possGrid; // Temporary structure to analyze possible values. **** ERROR? ****
-			possGrid.Analysis(currentGrid); // Analyze the current grid.
-			searchQueue.pop_back(); // Remove the analyzed grid from the queue.
-			Pos pos = possGrid.mUnsolvedPos.at(0); // Get the first unsolved position.
-			vector<int> posValues = possGrid.mPossibleGrid[pos.row][pos.col]; // Get possible values for this position.
-			// For each possible value, create a new grid with that value filled in and add it to the queue.
-			for (vector<int>::iterator it = posValues.begin(); it != posValues.end(); it++)
-			{
-				Grid tempGrid = currentGrid;
-				tempGrid.fill(pos, *it);
-				searchQueue.push_back(tempGrid);
-			}
+			gameGrid = currentGrid;
+			return true;
 		}
-		else
+
+		Pos pos = possibilities.getFirstUnsolvedPosition();
+		if (pos.row == -1 && pos.col == -1) continue; // no unsolved (skip)
+
+		for (int value : possibilities.possibleGrid[pos.row][pos.col])
 		{
-			// If the current grid is not legal, remove it from the queue.
-			searchQueue.pop_back();
+			Grid tempGrid = currentGrid;
+			tempGrid.fill(pos, value);
+			searchQueue.emplace_back(tempGrid);
 		}
 	}
 
-	// If the search queue is not empty, the last grid is the solution.
-	if (!searchQueue.empty()) // OLD: searchQueue.size() > 0
-	{
-		success = true;
-		mGameGrid = searchQueue.back(); // Set the solved grid as the current game grid.
-	}
-	else
-	{
-		// If the search queue is empty, the game has no solution.
-		mHasSolution = false;
-	}
-	return success; // Return true if a solution was found, false otherwise.
+	hasSolution = false;
+	return false;
 }
 
-// Prints statistics TO CONSOLE and the solution if available.
+// Prints game statistics and the grid if a solution is available.
 void Game::printStats()
 {
-	stringstream ss;
-
-	// Indicate whether a solution was found or not.
-	if (mHasSolution)
-	{
-		ss << "Solved!!!";
-	}
-	else
-	{
-		ss << "Has no Solution.";
-	}
-
-	// If the input was successfully read, print the solution or the status message.
-	if (mSucessInput)
-	{
-		cout << ss.str() << endl;
-		mGameGrid.print(); // Print the current state of the game grid.
-	}
+	cout << (hasSolution ? "Solved!!!" : "Has no Solution.") << endl;
+	gameGrid.print();
 }

@@ -1,11 +1,8 @@
-/*
- * Pos.h
- *
- *  Created on: 14 Jul 2015
- *      Author: eva
- *  Updated on: 8 Mar 2024
- *      Editor: Soleil Cordray
- */
+//========================================================================================
+// Name        : Pos.h
+// Author      : Hongbo Tian (Created 14 Jul 2015)
+// Editor      : Soleil Cordray (Updated 8 Mar 2024)
+//========================================================================================
 
 #ifndef POS_H_
 #define POS_H_

@@ -1,204 +1,130 @@
-/*
- * PossibleGird.cpp
- *
- *  Created on: 15 Jul 2015
- *      Author: Hongbo Tian
- *  Updated on: 8 Mar 2024
- * 		Editor: Soleil Cordray
- */
+//========================================================================================
+// Name        : PossibleGrid.cpp
+// Author      : Hongbo Tian (Created 15 Jul 2015)
+// Editor      : Soleil Cordray (Updated 8 Mar 2024)
+// Description : Analyze a Sudoku grid and determine the possible values for each unsolved cell.
+//========================================================================================
 
 #include "PossibleGrid.h"
 
-PossibleGrid::PossibleGrid() : grid(nullptr)
+// Initialize null grid.
+PossibleGrid::PossibleGrid() : grid(nullptr) {}
+
+// If unsolved positions remain, return the first unsolved position.
+Pos PossibleGrid::getFirstUnsolvedPosition()
 {
-}
-
-// Analyzes the given grid to populate possible values for each cell. **** POTENTIALLY CHANGE ****
-void PossibleGrid::Analysis(Grid &grid)
-{
-	clear();						 // Clears any existing data before starting the analysis.
-	int gridSize = grid.dynamicSize; // Directly access the dynamicSize public member.
-
-	mPossibleGrid.resize(gridSize, std::vector<std::vector<int>>(gridSize, std::vector<int>()));
-
-	mUnsolvedPos = grid.getUnsolvedPos();
-
-	for (auto &pos : mUnsolvedPos)
+	if (!unsolvedPositions.empty())
 	{
-		std::vector<int> invalid;
-
-		// Collect numbers that are already used in the row, column, and section of the current position.
-		std::vector<int> invalidRow = grid.getRow(pos.row);
-		std::vector<int> invalidCol = grid.getCol(pos.col);
-		std::vector<int> invalidSec = grid.getSectionByElement(pos.row, pos.col);
-
-		// Combine all invalid numbers into a single vector.
-		invalid.insert(invalid.end(), invalidRow.begin(), invalidRow.end());
-		invalid.insert(invalid.end(), invalidCol.begin(), invalidCol.end());
-		invalid.insert(invalid.end(), invalidSec.begin(), invalidSec.end());
-
-		// Unique sort to remove duplicates.
-		sort(invalid.begin(), invalid.end());
-		invalid.erase(unique(invalid.begin(), invalid.end()), invalid.end());
-
-		// Calculate possible values by excluding invalid numbers from 1 to gridSize.
-		std::vector<int> possibleValues;
-		for (int i = 1; i <= gridSize; ++i)
-		{
-			if (find(invalid.begin(), invalid.end(), i) == invalid.end())
-			{
-				possibleValues.push_back(i);
-			}
-		}
-
-		// Ensure mPossibleGrid is correctly resized to accommodate dynamic grid sizes.
-		if (mPossibleGrid.size() <= pos.row)
-		{
-			mPossibleGrid.resize(pos.row + 1);
-		}
-		if (mPossibleGrid[pos.row].size() <= pos.col)
-		{
-			mPossibleGrid[pos.row].resize(pos.col + 1);
-		}
-
-		// Update mPossibleGrid for the current position.
-		mPossibleGrid[pos.row][pos.col] = possibleValues;
+		return unsolvedPositions.front();
+	}
+	else
+	{
+		return Pos(-1, -1);
 	}
 }
 
-// Performs cross-referencing to identify positions with unique possible values within rows, columns, and sections.
-vector<pair<Pos, int>> PossibleGrid::crossRef()
-{
-	vector<pair<Pos, int>> pairs;		   // Stores positions and their determined values.
-
-	// int gridSize = grid.getDynamicSize();  // Assuming you have access to a Grid object named 'grid'.
-	int gridSize = grid->getDynamicSize(); // Use '->' to access members of a pointer
-
-	int sectionSize = std::sqrt(gridSize); // Calculate the size of each section.
-
-	// Adjusted to consider dynamic grid size.
-	for (int i = 0; i < gridSize; i++)
-	{
-		vector<int> rowCollection, colCollection;
-		multimap<int, Pos> rowMap, colMap;
-
-		for (int j = 0; j < gridSize; j++)
-		{
-			if (!mPossibleGrid[i][j].empty())
-			{
-				vector<int> possibleRow = mPossibleGrid[i][j];
-				rowCollection.insert(rowCollection.end(), possibleRow.begin(), possibleRow.end());
-				for (auto val : possibleRow)
-				{
-					rowMap.insert({val, Pos(i, j)});
-				}
-			}
-			if (!mPossibleGrid[j][i].empty())
-			{
-				vector<int> possibleCol = mPossibleGrid[j][i];
-				colCollection.insert(colCollection.end(), possibleCol.begin(), possibleCol.end());
-				for (auto val : possibleCol)
-				{
-					colMap.insert({val, Pos(j, i)});
-				}
-			}
-		}
-
-		vector<int> uniqueRowValues = nonRepeat(rowCollection);
-		for (auto val : uniqueRowValues)
-		{
-			pairs.push_back({rowMap.find(val)->second, val});
-		}
-
-		vector<int> uniqueColValues = nonRepeat(colCollection);
-		for (auto val : uniqueColValues)
-		{
-			pairs.push_back({colMap.find(val)->second, val});
-		}
-	}
-
-	// Cross-reference using dynamically calculated sections.
-	for (int sRow = 0; sRow < gridSize; sRow += sectionSize)
-	{
-		for (int sCol = 0; sCol < gridSize; sCol += sectionSize)
-		{
-			vector<int> secCollection;
-			multimap<int, Pos> secMap;
-
-			for (int iRow = sRow; iRow < sRow + sectionSize; iRow++)
-			{
-				for (int iCol = sCol; iCol < sCol + sectionSize; iCol++)
-				{
-					if (!mPossibleGrid[iRow][iCol].empty())
-					{
-						vector<int> possibleSec = mPossibleGrid[iRow][iCol];
-						secCollection.insert(secCollection.end(), possibleSec.begin(), possibleSec.end());
-						for (auto val : possibleSec)
-						{
-							secMap.insert({val, Pos(iRow, iCol)});
-						}
-					}
-				}
-			}
-
-			vector<int> uniqueSecValues = nonRepeat(secCollection);
-			for (auto val : uniqueSecValues)
-			{
-				pairs.push_back({secMap.find(val)->second, val});
-			}
-		}
-	}
-
-	return pairs;
-}
-
-// Filters the input vector to return only non-repeating values.
-vector<int> PossibleGrid::nonRepeat(vector<int> vec)
-{
-	sort(vec.begin(), vec.end());
-
-	vector<int> nonRepeat; // This will store each number that appears exactly once in vec.
-	// Iterate through sorted vec to collect non-repeating numbers.
-	for (auto it = vec.begin(); it != vec.end();)
-	{
-		// Count the number of occurrences of *it.
-		auto itNext = find_if(it, vec.end(), [it](int &value)
-							  { return value != *it; });
-		// If the number occurs exactly once, add it to nonRepeat.
-		if (distance(it, itNext) == 1)
-		{
-			nonRepeat.push_back(*it);
-		}
-		// Move the iterator to the next distinct number.
-		it = itNext;
-	}
-
-	return nonRepeat;
-}
-
-// Prints the possible values for unsolved positions.
-void PossibleGrid::print()
-{
-	for (Pos &pos : mUnsolvedPos)
-	{
-		cout << pos.toString() << " : " << vecToString(mPossibleGrid[pos.row][pos.col]) << endl;
-	}
-}
-
-// Clears the possible values grid, preparing for a new analysis.
+// Clear possible grid values (prepare for new analysis).
 void PossibleGrid::clear()
 {
-	mPossibleGrid.clear();
-	mUnsolvedPos.clear();
+	possibleGrid.clear();
+	unsolvedPositions.clear();
 }
 
-// Converts a vector of integers to a space-separated string.
-std::string PossibleGrid::vecToString(std::vector<int> &vec)
+// Find all invalid numbers within the row, column, and section intersecting the specified position.
+// 1) Initialize invalids list (numbers that are already used) in a set (automatic non-duplicates).
+// 2) Set up invalids list to be defined by an input vector and only include its non-zero elements. 
+// 3) Add known invalids.
+vector<int> PossibleGrid::invalidNumbers(Pos pos, Grid grid)
+{
+	std::set<int> invalids;
+
+	auto addInvalids = [&](const vector<int> &source)
+	{
+		for (int num : source)
+		{
+			if (num != 0) invalids.insert(num);
+		}
+	};
+
+	addInvalids(grid.getRow(pos.row));
+	addInvalids(grid.getCol(pos.col));
+	addInvalids(grid.getSection(pos.row, pos.col));
+
+	return vector<int>(invalids.begin(), invalids.end());
+}
+
+// Analyze the given grid to populate possible values for each cell.
+// 1) Resize possible grid according to grid size.
+// 2) For each unsolved position in the grid, filter out numbers that are invalid (already used). 
+// 3) Then, add the list of possible values (i.e., can use) for the unsolved positions. 
+void PossibleGrid::Analysis(Grid &grid)
+{
+	clear();
+	int gridSize = grid.gridSize;
+	possibleGrid.resize(gridSize, vector<vector<int>>(gridSize));
+	unsolvedPositions = grid.getUnsolvedPositions();
+
+	for (const auto &pos : unsolvedPositions)
+	{
+		vector<int> invalids = invalidNumbers(pos, grid);
+		vector<int> possibleValues;
+		for (int i = 1; i <= gridSize; ++i)
+		{
+			if (find(invalids.begin(), invalids.end(), i) == invalids.end())
+			{
+				possibleValues.emplace_back(i);
+			}
+		}
+		possibleGrid[pos.row][pos.col] = possibleValues;
+	}
+}
+
+// Perform cross-referencing to find positions with truly unique possible values in their context.
+// Iterate over all rows and columns of the grid.
+// If a cell has only one possible value, check if unique in intersecting row, column, and section.
+vector<pair<Pos, int>> PossibleGrid::crossReference()
+{
+	vector<pair<Pos, int>> uniquePositions;
+	int gridSize = grid->gridSize;
+
+	for (int row = 0; row < gridSize; row++)
+	{
+		for (int col = 0; col < gridSize; col++)
+		{
+			if (possibleGrid[row][col].size() == 1)
+			{
+				int value = possibleGrid[row][col].front();
+				vector<int> rowValues = grid->getRow(row);
+				vector<int> colValues = grid->getCol(col);
+				vector<int> secValues = grid->getSection(row, col);
+
+				if (grid->isUnique(rowValues) && grid->isUnique(colValues) && grid->isUnique(secValues))
+				{
+					uniquePositions.emplace_back(Pos(row, col), value);
+				}
+			}
+		}
+	}
+
+	return uniquePositions;
+}
+
+// Convert vector of integers into a string separated by spaces.
+std::string PossibleGrid::vectorsToString(std::vector<int> &vector)
 {
 	stringstream ss;
-	for (auto value : vec)
+	for (auto value : vector)
 	{
 		ss << value << " ";
 	}
 	return ss.str();
+}
+
+// Print possible values for unsolved positions.
+void PossibleGrid::print()
+{
+	for (const auto &pos : unsolvedPositions)
+	{
+		cout << pos.toString() << " : " << vectorsToString(possibleGrid[pos.row][pos.col]) << endl;
+	}
 }
