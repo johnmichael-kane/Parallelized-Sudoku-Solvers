@@ -53,7 +53,7 @@ int main()
 
 	auto end_time = high_resolution_clock::now();
 
-	game.printStats();
+	game.printResult();
 
 	// Measure game runtime
 
