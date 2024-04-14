@@ -1,12 +1,16 @@
-//============================================================================
-// Name        : Sudoku.cpp
+//========================================================================================
+// Name        : SudokuSolver.cpp
 // Author      : Hongbo Tian
 // Editor      : Soleil Cordray
-// Description : Main Function
-//============================================================================
+// Description : Start game, print solution & runtime
+//========================================================================================
 
 #include <iostream>
+#include <fstream>
 #include <chrono>
+#include <cctype>
+#include <string>
+#include <algorithm>
 
 #include "Game.h"
 
@@ -15,32 +19,48 @@ using namespace std::chrono;
 
 int main()
 {
+	// Puzzle selection (user inputted filename)
+	
 	const string PATH = "puzzles/";
 
-	// Taking user inputs
+	cout << "\nGame Difficulties: easy, medium, hard" << endl;
+	cout << "Board Sizes: 9 (9x9), 16 (16x16), 25 (25x25)" << endl;
+	cout << "File Name Format: [mode][size].txt (e.g., easy9.txt)\n" << endl;
+
+	ifstream file;
 	string name;
-	cout << "Enter File Name >> " << flush;
-	cin >> name;
+	while (!file.is_open()) 
+	{
+		cout << "Enter a file name to start the game! >> " << flush;
+		cin >> name;
+		file.open(PATH + name);
+		if (!file)
+		{
+			cout << "Invalid file name.\n" << endl;
+			cin.clear();
+		}
+	}
+	file.close();
 
-	// Timer start
-	auto tStart = high_resolution_clock::now();
+	// Run game
 
-	// Initialise Game & Game Loop
+	auto start_time = high_resolution_clock::now();
+
 	Game game(PATH + name);
 	while (!game.Evaluate())
 	{
 	}
 
-	// Timer end
-	auto tEnd = high_resolution_clock::now();
+	auto end_time = high_resolution_clock::now();
 
-	// Print solution and time
 	game.printStats();
 
-	// Calculate and convert to milliseconds
-	auto duration = duration_cast<milliseconds>(tEnd - tStart).count();
+	// Measure game runtime
 
-	cout << "Time Taken: " << duration << " milliseconds" << endl;
+	auto game_time = duration_cast<milliseconds>(end_time - start_time).count();
+
+	cout << "Time Taken: " << game_time << " milliseconds" << endl;
 
 	return 0;
 }
+
