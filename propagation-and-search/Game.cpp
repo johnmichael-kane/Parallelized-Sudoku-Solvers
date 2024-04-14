@@ -7,57 +7,45 @@
 
 #include "Game.h"
 
-Game::Game(string path) : puzzle(path),
-						  isFinished(false),
-						  hasSolution(true),
-						  linearCycle(0),
-						  crossReferenceCycle(0),
-						  searchCycle(0)
-{
+Game::Game(string path) : puzzle(path) {
 	hasSuccessInput = gameGrid.read(path);
-	possibleGrid.setGrid(&gameGrid);
-	possibleGrid.analyzeMoves(gameGrid);
-}
-
-bool Game::Evaluate()
-{
-	if (hasSuccessInput)
-	{
+	if (hasSuccessInput) {
 		possibleGrid.setGrid(&gameGrid);
 		possibleGrid.analyzeMoves(gameGrid);
-		bool methodTrigger = true;
-
-		vector<Position>::const_iterator PosIt;
-		for (PosIt = possibleGrid.getUnsolvedPositions().cbegin();
-			 PosIt != possibleGrid.getUnsolvedPositions().cend(); ++PosIt)
-		{
-			if (possibleGrid.getPossibleValuesAt(PosIt->row, PosIt->col).size() == 1)
-			{
-				methodTrigger = false;
-				gameGrid.fill(*PosIt,
-							  possibleGrid.getPossibleValuesAt(PosIt->row, PosIt->col).at(0));
-			}
-		}
-
-		if (methodTrigger)
-		{
-			vector<pair<Position, int>> pairs = possibleGrid.crossReference();
-			vector<pair<Position, int>>::iterator it;
-			for (it = pairs.begin(); it != pairs.end(); it++)
-			{
-				methodTrigger = false;
-				gameGrid.fill(it->first, it->second);
-			}
-		}
-
-		if (methodTrigger && !gameGrid.isComplete()) isFinished = search();
-		return gameGrid.isComplete();
 	}
-	else
-	{
-		cout << "Invalid File Name" << endl;
-		return false; 
+}
+
+bool Game::Evaluate() {
+	if (!hasSuccessInput) return false;
+
+	possibleGrid.setGrid(&gameGrid);
+	possibleGrid.analyzeMoves(gameGrid);
+	bool trigger = true;
+
+	// Linear Constraints: solve single-value positions.
+	for (const auto &pos : possibleGrid.getUnsolvedPositions()) {
+		const auto &possibleValues = possibleGrid.getPossibleValuesAt(pos.row, pos.col);
+		if (possibleValues.size() == 1) {
+			trigger = false;
+			gameGrid.fill(pos, possibleValues.front());
+		}
 	}
+
+	// Cross Reference: solve intersecting positions.
+	if (trigger) {
+		auto pairs = possibleGrid.crossReference();
+		for (const auto &pair : pairs) {
+			trigger = false;
+			gameGrid.fill(pair.first, pair.second);
+		}
+	}
+
+	// Search: solve leftover positions across grid.
+	if (trigger && !gameGrid.isComplete()) {
+		isFinished = search();
+	}
+
+	return gameGrid.isComplete();
 }
 
 bool Game::search()

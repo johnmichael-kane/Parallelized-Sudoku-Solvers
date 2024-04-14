@@ -9,14 +9,12 @@
 
 using namespace std;
 
-struct Position
-{
+struct Position {
     int row, col;
 
     Position(int r, int c) : row(r), col(c) {}
 
-    string toString() const
-    {
+    string toString() const {
         stringstream ss;
         ss << "[" << row << ", " << col << "]";
         return ss.str();

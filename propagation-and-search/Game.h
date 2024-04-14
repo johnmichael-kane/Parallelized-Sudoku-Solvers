@@ -14,16 +14,16 @@
 class Game {
 private:
 	string puzzle;
-	bool isFinished;
-	bool hasSolution;
-	bool hasSuccessInput;
+	bool isFinished = false;
+	bool hasSolution = true;
+	bool hasSuccessInput = false;
 	Grid gameGrid;
 	PossibleGrid possibleGrid;
-	int linearCycle;
-	int crossReferenceCycle;
-	int searchCycle;
-	bool search();
+	int linearCycle = 0;
+	int crossReferenceCycle = 0;
+	int searchCycle = 0;
 
+	bool search();
 public:
 	Game(string path);
 	bool Evaluate();
