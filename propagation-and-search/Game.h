@@ -1,39 +1,34 @@
-//========================================================================================
 // Name        : Game.h
-// Author      : Hongbo Tian (Created 15 Jul 2015)
-// Editor      : Soleil Cordray (Updated 8 Mar 2024)
-//========================================================================================
-
-// Game.h: Header file for the Game class, which encapsulates the logic and state for a puzzle game.
-// This class is responsible for managing the game state, evaluating game progress, and printing game statistics.
+// Author      : Hongbo Tian
+// Editor      : Soleil Cordray
 
 #ifndef GAME_H_
 #define GAME_H_
 
 #include <iostream>
 #include <vector>
-#include <string>
 #include "PossibleGrid.h"
 #include "Grid.h"
-#include "Pos.h"
+#include "Position.h"
 
-class Game {
+class Game
+{
 private:
-	string gameFile;
+	string puzzle;
 	bool isFinished;
 	bool hasSolution;
+	bool hasSuccessInput;
 	Grid gameGrid;
 	PossibleGrid possibleGrid;
+	int linearCycle;
+	int crossReferenceCycle;
+	int searchCycle;
+	bool search();
 
 public:
-	Game(const string &path);
+	Game(string path);
 	bool Evaluate();
-	void printStats() const;
-
-private:
-	bool linearConstraintSolution();
-	bool crossReferenceSolution();
-	bool depthFirstSearch();
+	void printResult() const;
 };
 
-#endif /* GAME_H_ */ 
+#endif /* GAME_H_ */

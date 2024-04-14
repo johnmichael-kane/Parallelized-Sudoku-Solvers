@@ -1,8 +1,6 @@
-//========================================================================================
 // Name        : Grid.h
-// Author      : Hongbo Tian (Created 15 Jul 2015)
-// Editor      : Soleil Cordray (Updated 8 Mar 2024)
-//========================================================================================
+// Author      : Hongbo Tian
+// Editor      : Soleil Cordray
 
 #ifndef GRID_H_
 #define GRID_H_
@@ -12,39 +10,37 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
-#include <numeric>
-#include "Pos.h"
-
-using namespace std;
+#include "Position.h"
 
 class Grid {
 
 public:
 	int gridSize;
 	int sectionSize;
-	vector<vector<int>> gridValues;
+	vector<vector<int>> grid;
+	string puzzle;
 
-private:
-	string gridName;
+	Grid() : gridSize(0), sectionSize(0) {}
+	explicit Grid(int size) : gridSize(size), sectionSize(int(sqrt(size))) {}
 
-public:
-	Grid() : gridSize(0), sectionSize(0), gridName("") {}
+	void fill(const Position &pos, int value);
 
-	void fill(const Pos &pos, int value);
-	bool isLegal() const;
-	bool isComplete() const;
-	bool isUnique(const std::vector<int> &values) const;
+	// Conditions
+	bool isLegal();
+	bool isComplete();
 
-	// Getters
-	vector<int> getRow(int row) const;
-	vector<int> getCol(int col) const;
-	vector<int> getSection(int row, int col) const;
-	vector<Pos> getUnsolvedPositions() const;
-
-	// File
+	// File Operations
 	bool read(const string &path);
 	bool write() const;
 	void print() const;
+	
+	// Retrieval
+	const vector<int> getRow(int row) const;
+	const vector<int> getCol(int col) const;
+	const vector<int> getSection(int row, int col) const;
+	const vector<Position> getUnsolvedPositions() const;
+
+	int getSectionStart(int num) const { return (num / sectionSize) * sectionSize; }
 };
 
 #endif /* GRID_H_ */

@@ -1,36 +1,54 @@
-//========================================================================================
 // Name        : PossibleGrid.h
-// Author      : Hongbo Tian (Created 15 Jul 2015)
-// Editor      : Soleil Cordray (Updated 8 Mar 2024)
-//========================================================================================
+// Author      : Hongbo Tian
+// Editor      : Soleil Cordray
 
 #ifndef POSSIBLEGRID_H_ 
 #define POSSIBLEGRID_H_
 
+#include <iostream>
+#include <sstream>
 #include <vector>
-#include <set>
+#include <map>
+#include <algorithm> // std::sort, std:: move, etc.
+#include <utility> // std::move
+#include <iterator> // std::distance
+#include <sstream> // std::stringstream
 #include "Grid.h" 
-#include "Pos.h"  
+#include "Position.h" 
 
-class PossibleGrid
-{
+class PossibleGrid {
 public:
-	Grid *grid;
-	vector<vector<vector<int>>> possibleValues;
-	vector<Pos> unsolvedPositions;
+	PossibleGrid();
+	void setGrid(Grid *g) { this->grid = g; }
+	void print() const;
 
-	PossibleGrid() : grid(nullptr) {}
+	// Analysis
+	void analyzeMoves(const Grid &grid);
+	vector<pair<Position, int>> crossReference() const;
 
-	void setGrid(Grid *g)
-	{
-		grid = g;
+	// Getters
+	const std::vector<Position> &getUnsolvedPositions() const { return unsolvedPositions; }
+	const std::vector<int> &getPossibleValuesAt(int row, int col) const {
+		if (row < 0 || row >= possibleValues.size() || col < 0 || col >= possibleValues[row].size()) {
+			throw std::out_of_range("Accessing possibleValues out of range");
+		}
+		return possibleValues[row][col];
 	}
 
+private:
+	Grid *grid;
+	vector<vector<vector<int>>> possibleValues;
+	vector<Position> unsolvedPositions;
+
 	void clear();
-	vector<int> invalidNumbers(const Pos &pos) const;
-	void Analysis();
-	vector<pair<Pos, int>> crossReference();
-	string vectorsToString(const vector<int> &vector) const; 
-	void print() const;
+	string vectorToString(const std::vector<int> &vec) const;
+
+	// Uniqueness
+	vector<int> uniqueValues(vector<int> vec);
+	std::vector<std::pair<Position, int>> identifyUnique(int index, bool isRow) const;
+	std::vector<std::pair<Position, int>> filterUnique(const std::vector<int> &collection, 
+													   const std::multimap<int, 
+													   Position> &valueMap) const;
 };
+
 #endif /* POSSIBLEGRID_H_ */
