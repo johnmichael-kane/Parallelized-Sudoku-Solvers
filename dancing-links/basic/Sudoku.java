@@ -7,6 +7,70 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+class ExactMatrix {
+
+	public int[][] matrix;
+	public Cell[][] finalMatrix;
+	int sudokuSize;
+	
+	public ExactMatrix(int[][] matrix) {
+		this.matrix = matrix;
+		finalMatrix = new Cell[matrix.length*matrix.length*matrix.length][matrix[0].length*matrix[0].length*4];
+		sudokuSize = this.matrix.length;
+		initMatrix();
+		makeFinalMatrix();
+	}
+	
+	private void initMatrix() {
+		for (int i=0;i<finalMatrix.length; i++) {
+			for (int j=0;j<finalMatrix[0].length; j++){
+				finalMatrix[i][j] = null;
+			}
+		}
+		
+	}
+	//initialize a local Cell[][] at the start of here
+	public void makeFinalMatrix() {
+		for (int i=0;i<sudokuSize; i++) {
+			for (int j=0;j<sudokuSize; j++){
+				int currNum = matrix[i][j];
+				fillInMatrix(i,j,currNum);
+			}
+		}
+	}
+
+	private void fillInMatrix(int row, int col, int number) {
+		for (int i = 1; i <= sudokuSize; i++) {
+				if (number!=0){
+					fillCell(row, col, number);
+				} else {
+					for (int num=1; num<=sudokuSize; num++) {
+						fillCell(row, col, num);
+					}
+				}
+		}
+	}
+	//create a method to include the local Cell[][] finalMatrix as a
+	private void fillCell(int row, int col, int number) {
+		int matrixRow = row*matrix.length*matrix.length + col*matrix.length+number-1;
+		int col1 = row*sudokuSize+col;
+		int col2 = sudokuSize*sudokuSize+row*sudokuSize+number-1;
+		int col3 = 2*sudokuSize*sudokuSize+col*sudokuSize+number-1;
+		int col4 = 3*sudokuSize*sudokuSize+getGridNumber(row, col)*sudokuSize+number-1;
+		finalMatrix[matrixRow][col1] = new Cell(row, col, number);
+		finalMatrix[matrixRow][col2] = new Cell(row, col, number);
+		finalMatrix[matrixRow][col3] = new Cell(row, col, number);
+		finalMatrix[matrixRow][col4] = new Cell(row, col, number);
+	}
+
+	private int getGridNumber(int row, int col) {
+
+		int gridSize = (int)Math.sqrt(sudokuSize);
+
+		return (col/gridSize)+((int)(row/gridSize))*gridSize;
+	}
+}
+
 public class Sudoku {
 
 	private static int boardSize = 0;
@@ -110,8 +174,15 @@ public class Sudoku {
 		System.out.println("\nSudoku Board:");
 		printSudokuBoard(boardSize, partitionSize,vals);
 		Sudoku.startTime = System.currentTimeMillis(); // Record start time
+
+
+		//goes throught he
 		ExactMatrix myMatrix = new ExactMatrix(vals);
 		DancingLinkSolver solver = new DancingLinkSolver(myMatrix.finalMatrix, boardSize);
+
+
+
+
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time
 		System.out.println("Solved Sudoku:");
 		System.out.print("Time taken: " + (Sudoku.endTime - Sudoku.startTime) + " milliseconds\n");
