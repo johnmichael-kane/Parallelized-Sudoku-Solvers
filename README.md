@@ -8,4 +8,6 @@ The current version here only works for 9x9, the branch above works for 9x9, 16x
 1. Enter the correct directory: `cd dancing-links/basic`
 2. Compile the DancingLinkSolver: `javac DancingLinkSolver.java`
 3. Compile Sudoku.java: `javac Sudoku.java`
-4. Run the file: `java Sudoku <FILE_NAME>`
+4. Run the file: `java Sudoku <FILE_NAME> <NUM_THREADS>`
+- <FILE_NAME> accepts the current file names like 9x9_input.txt
+- <NUM_THREADS> only accepts 1, 2, 4, and 8. All other options default 1 thread.
