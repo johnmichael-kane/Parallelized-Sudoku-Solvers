@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class ExactMatrix {
 
@@ -175,11 +176,14 @@ public class Sudoku {
 		
 		System.out.println("\nSudoku Board:");
 		printSudokuBoard(boardSize, partitionSize,vals);
-		Sudoku.startTime = System.currentTimeMillis(); // Record start time
+		Sudoku.startTime = System.currentTimeMillis(); // Record start time; code starts here
+
+		AtomicBoolean solutionFound = new AtomicBoolean(false);
+
 
 		ExactMatrix myMatrix = new ExactMatrix(vals);
 		Cell[][] finalMatrix = myMatrix.makeFinalMatrix();
-		DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize);
+		DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize, solutionFound);
 
 
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time

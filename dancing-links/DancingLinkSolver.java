@@ -94,15 +94,14 @@ public class DancingLinkSolver {
 	public ColumnObject header;
 	int size;
 	Stack<DancingLinkObject> result;
-	static AtomicBoolean solutionFound = new AtomicBoolean(false);
+	private AtomicBoolean solutionFound;
 
-	public DancingLinkSolver(Cell[][] matrix, int size) {
+	public DancingLinkSolver(Cell[][] matrix, int size, AtomicBoolean solutionFound) {
 		this.size = size;
 		this.solution = new int[size][size];
 		result = new Stack<>();
 		this.header=makeLinks(matrix);
-		
-		solutionFound.set(false);
+		this.solutionFound = solutionFound;
 		search();
 	}
 
@@ -155,10 +154,8 @@ public class DancingLinkSolver {
 				j.column.cover();
 			}
 			
-			search(); //continue to search (get deeper)
-			if (solutionFound.get()) break; //early exit if solution found
-			//replace lines above with:
-			//executor.submit(this::search);
+			search(); 
+			if (solutionFound.get()) break; 
 			
 			r = result.pop();
 			curr = r.column;
@@ -170,14 +167,14 @@ public class DancingLinkSolver {
 	}
 	
 	private void makeSolution() {
-		solutionFound.set(true);
 		while (!result.isEmpty()) {
 			DancingLinkObject curr = result.pop();
 			solution[curr.info.row][curr.info.col] = curr.info.number;
 		}
+		solutionFound.set(true);
 	}
 
-	public ColumnObject chooseColumn() {
+	private ColumnObject chooseColumn() {
 		ColumnObject toReturn = null;
 		int min = Integer.MAX_VALUE;
 		for (ColumnObject j = (ColumnObject) header.right; j != header; j = (ColumnObject) j.right) {
