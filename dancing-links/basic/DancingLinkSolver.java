@@ -95,8 +95,6 @@ public class DancingLinkSolver {
 	public ColumnObject header;
 	int size;
 	Stack<DancingLinkObject> result;
-	
-	boolean done = false;
 	static AtomicBoolean solutionFound = new AtomicBoolean(false);
 	private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -201,7 +199,6 @@ public class DancingLinkSolver {
 	}
 	
 	private void makeSolution() {
-		done = true;
 		while (!result.isEmpty()) {
 			DancingLinkObject curr = result.pop();
 			solution[curr.info.row][curr.info.col] = curr.info.number;
