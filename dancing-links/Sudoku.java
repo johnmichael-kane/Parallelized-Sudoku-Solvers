@@ -88,6 +88,8 @@ public class Sudoku {
 	public static String n(int n) {
 		return n > 9 ? "" + n : "0" + n;
 	}
+
+	//used for BFS 
 	private static boolean isValidMove(int[][] board, Point cell, int num) {
 		int row = cell.x;
 		int col = cell.y;
@@ -115,6 +117,7 @@ public class Sudoku {
 		return true; // No violations, so it's a valid move
 	}
 	
+	//used for BFS
 	private static Point findNextEmptyCell(int[][] board) {
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[i].length; j++) {
@@ -126,6 +129,7 @@ public class Sudoku {
 		return null; // No empty cells found
 	}
 
+	//used for BFS
 	private static int calculateEmptyCells(int[][] board) {
 		int emptyCells = 0;
 		for (int[] row : board) {
@@ -138,6 +142,7 @@ public class Sudoku {
 		return emptyCells;
 	}
 
+	//used for printing the input/output
 	public static void printSudokuBoard(int boardSize, int blocksize, int vals[][] ) {
 		for (int y = 0; y < boardSize; y++) {
 			if (y % blocksize == 0) {
@@ -155,6 +160,7 @@ public class Sudoku {
 		System.out.println("");
 	}
 
+	//prints the file
 	public static void printSudokuBoardInFile(int boardSize, int blocksize, int vals[][]) {
 		try {
 			FileWriter writer = new FileWriter(boardSize+"x"+boardSize+"_out.txt"); // Open file for writing
@@ -179,6 +185,7 @@ public class Sudoku {
 	}
 
 	//allows a copy without accessing the same information
+	//used in the generateStartingBoards
 	private static int[][] deepCopy(int[][] original) {
 		if (original == null) {
 			return null;
@@ -190,6 +197,7 @@ public class Sudoku {
 		return result;
 	}
 
+	//controls the threads and what shuts down and not
 	private static void shutdownAndAwaitTermination(ExecutorService pool){
 		pool.shutdown(); // Disable new tasks from being submitted
 		try {
@@ -208,6 +216,7 @@ public class Sudoku {
 		}
 	}
 	
+	//this is the function that does the initial BFS and splits them up
 	private static List<int[][]> generateStartingBoards(int[][] originalBoard, int blockSize, int numBoards) {
 		List<int[][]> boards = new ArrayList<int[][]>(); // Specify the type inside <>
 		if(numBoards == 1){
@@ -250,6 +259,7 @@ public class Sudoku {
 		return boards;
 	}
 
+	//this just for the input
 	private static int parseNumThreads(String input){
 		try {
             int numThreads = Integer.parseInt(input);
