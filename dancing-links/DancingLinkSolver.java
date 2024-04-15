@@ -169,7 +169,6 @@ public class DancingLinkSolver {
 	//for some reason with the comments it runs 100% of the time but not without them
 	private void makeSolution() {
 		DancingLinkObject curr = result.pop();
-		int i=0;
 		if(curr.info.number != 0){
 			solution[curr.info.row][curr.info.col] = curr.info.number;
 			System.out.print(curr.info.number);
@@ -179,13 +178,8 @@ public class DancingLinkSolver {
 				solution[curr.info.row][curr.info.col] = curr.info.number;
 				System.out.print(curr.info.number);
 			}
-			System.out.println("\ni: " + i);
 			solutionFound.set(true);
 		}
-		else{
-			System.out.println("INVALID!");
-		}
-		
 	}
 
 	private ColumnObject chooseColumn() {
