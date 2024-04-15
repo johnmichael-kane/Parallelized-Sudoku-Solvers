@@ -2,6 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "java",
+      "name": "Sudoku",
+      "request": "launch",
+      "mainClass": "Sudoku",
+      "projectName": "Parallelized-Sudoku-Solvers_7ebecb39"
+    },
+    {
       "name": "C/C++ Runner: Debug Session",
       "type": "lldb",
       "request": "launch",

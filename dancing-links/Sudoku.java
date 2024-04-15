@@ -5,8 +5,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 class ExactMatrix {
 
@@ -70,8 +75,9 @@ public class Sudoku {
 
 	private static int boardSize = 0;
 	private static int partitionSize = 0;
-	private static long startTime; // Start time for solving the puzzle
-	private static long endTime; // End time for solving the puzzle
+	private static long startTime; 
+	private static long endTime; 
+	private static final AtomicReference<int[][]> solutionMatrix = new AtomicReference<>();
 
 
 	// Method to format single-digit numbers with leading zero
@@ -95,13 +101,6 @@ public class Sudoku {
 		}
 		System.out.println("");
 	}
-	/* 
-	 // BFS to generate starting boards
-	 private static List<int[][]> generateStartingBoards(int[][] originalBoard, int blockSize, int numBoards) {
-        // ... implement BFS ...
-        return new ArrayList<>(); // return a list of starting board configurations
-    }*/
-	
 
 	public static void printSudokuBoardInFile(int boardSize, int blocksize, int vals[][]) {
 		try {
@@ -126,9 +125,77 @@ public class Sudoku {
 		}
 	}
 
+	//allows a copy without accessing the same information
+	private static int[][] deepCopy(int[][] original) {
+		if (original == null) {
+			return null;
+		}
+		final int[][] result = new int[original.length][];
+		for (int i = 0; i < original.length; i++) {
+			result[i] = original[i].clone(); // This clones the inner array
+		}
+		return result;
+	}
+
+	private static void shutdownAndAwaitTermination(ExecutorService pool){
+		pool.shutdown(); // Disable new tasks from being submitted
+		try {
+			// Wait a while for existing tasks to terminate
+			if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
+				pool.shutdownNow(); // Cancel currently executing tasks
+				// Wait a while for tasks to respond to being cancelled
+				if (!pool.awaitTermination(60, TimeUnit.SECONDS))
+					System.err.println("Pool did not terminate");
+			}
+		} catch (InterruptedException ie) {
+			// (Re-)Cancel if current thread also interrupted
+			pool.shutdownNow();
+			// Preserve interrupt status
+			Thread.currentThread().interrupt();
+		}
+	}
+	
+	private static List<int[][]> generateStartingBoards(int[][] originalBoard, int blockSize, int numBoards) {
+		List<int[][]> boards = new ArrayList<int[][]>(); // Specify the type inside <>
+		if(numBoards == 1){
+			boards.add(deepCopy(originalBoard));
+		}
+		else{
+			for (int i = 0; i < numBoards; i++) {
+				int[][] newBoard = deepCopy(originalBoard); 
+				// ... apply BFS logic to fill first X empty spaces ...
+				boards.add(newBoard);
+			}
+		}
+		
+		return boards;
+	}
+
+	private static int parseNumThreads(String input){
+		try {
+            int numThreads = Integer.parseInt(input);
+            if (numThreads == 1 || numThreads == 2 || numThreads == 4 || numThreads == 8) {
+                return numThreads;
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("Number format exception for input string: " + input);
+        }
+        return -1; // Indicate invalid input
+    }
+	
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+		if(args.length < 2) { //error for less than 1 args
+			System.out.println("Usage: java Sudoku <FILE_NAME> <NUM_THREADS>");
+            return;
+		}
+
 		String filename = args[0];
-		String numThreads = args[1];
+		int numThreads = parseNumThreads(args[1]);
+		if (numThreads == -1){
+			System.out.println("Invalid number of threads. Please use 1, 2, 4, or 8.");
+            return;
+		}
+
 		File inputFile = new File(filename);
 		Scanner input = null;
 		int[][] vals = null;
@@ -178,18 +245,30 @@ public class Sudoku {
 		printSudokuBoard(boardSize, partitionSize,vals);
 		Sudoku.startTime = System.currentTimeMillis(); // Record start time; code starts here
 
+		
+		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 		AtomicBoolean solutionFound = new AtomicBoolean(false);
 
+		List<int[][]> startingBoards = generateStartingBoards(vals, partitionSize, numThreads);
+		for (int[][] board : startingBoards) {
+			executor.submit(() -> {
+				ExactMatrix matrix = new ExactMatrix(board);
+				Cell[][] finalMatrix = matrix.makeFinalMatrix();
+				DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize, solutionFound);
+                if (solutionFound.get()) {
+                    solutionMatrix.set(solver.solution); // Store the solution when found
+                }
+            });
+        }
 
-		ExactMatrix myMatrix = new ExactMatrix(vals);
-		Cell[][] finalMatrix = myMatrix.makeFinalMatrix();
-		DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize, solutionFound);
-
+		shutdownAndAwaitTermination(executor);
 
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time
 		System.out.println("Solved Sudoku:");
 		System.out.print("Time taken: " + (Sudoku.endTime - Sudoku.startTime) + " milliseconds\n");
-		printSudokuBoard(boardSize, partitionSize,solver.solution);
-		printSudokuBoardInFile(boardSize, partitionSize,solver.solution);
+
+		int[][] finalSolution = solutionMatrix.get();
+		printSudokuBoard(boardSize, partitionSize, finalSolution);
+		printSudokuBoardInFile(boardSize, partitionSize, finalSolution);
 	}
 }
