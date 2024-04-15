@@ -14,6 +14,9 @@ public class DancingLinkSolver {
 		result = new Stack<>();
 		solution = new int[size][size];
 		makeLinks(matrix);
+	}
+
+	public void startSearch(){
 		search();
 	}
 
@@ -53,28 +56,50 @@ public class DancingLinkSolver {
 		}
 		head.size = matrix[0].length;
 		this.header = head;
+		printMatrix(headers);
 	}
 
+	private void printMatrix(List<ColumnObject> headers) {
+		System.out.println("Complete Matrix:");
+		for (ColumnObject colHead : headers) {
+			System.out.print("Column " + colHead.name + ": ");
+			DancingLinkObject temp = colHead.down;
+			while (temp != colHead) {
+				System.out.print("(" + temp.info.row + "," + temp.info.col + "," + temp.info.number + ") ");
+				temp = temp.down;
+			}
+			System.out.println();  // Newline for the next column
+		}
+	}
+	
 	public void search() {
+		//System.out.println(String.format("header: %s %s", header.size, header.name));
+		//System.out.println(String.format("header: %s %s %s", header.info.row, header.info.col, header.info.number));
+		//System.out.println(String.format("header->right: %s %s %s", header.right.info.row, header.right.info.col, header.right.info.number));
 		if (header.right == header) {
+			//System.out.println(String.format("header: %s %s %s", header.info.row, header.info.col, header.info.number));
+			//System.out.println(String.format("header->right: %s %s %s", header.right.info.row, header.right.info.col, header.right.info.number));
 			makeSolution();
 		} else {
 			ColumnObject curr = chooseColumn();
 			curr.cover();
 			for (DancingLinkObject r = curr.down; r != curr; r = r.down) {
+				System.out.println(String.format("r %s %s %s", r.info.row, r.info.col, r.info.number));
 				result.push(r);
 				for (DancingLinkObject j = r.right; j != r; j = j.right) {
 					j.column.cover();
 				}
 				search();
-				if (done)
+				if (done){
 					break;
+				}
 				r = result.pop();
 				curr = r.column;
 				for (DancingLinkObject j = r.left; j != r; j = j.left) {
 					j.column.uncover();
 				}
 			}
+
 			curr.uncover();
 		}
 	}

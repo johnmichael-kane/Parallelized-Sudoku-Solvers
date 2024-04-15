@@ -61,17 +61,7 @@ public class Sudoku {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-		if(args.length < 2) {
-			System.out.println("Invalid # of strings");
-			System.out.println("Usage: java Sudoku <version> <filename>");
-			System.out.println("<version> = 4threads | 8threads | none");
-			System.out.println("<filename> = 9x9_input.txt | 16x16_input.txt | 25x25_input.txt");
-            System.exit(1);
-		}
-
-//		changed for different input prompts
-		String version = args[0];
-		String filename = "../data/" + args[1];
+		String filename = "../data/" + args[0];
 		
 		File inputFile = new File(filename);
 		Scanner input = null;
@@ -122,31 +112,8 @@ public class Sudoku {
 		Sudoku.startTime = System.currentTimeMillis(); // Record start time
 		ExactMatrix myMatrix = new ExactMatrix(vals);
 
-		DancingLinkSolver solver = null;
-		switch(version.toLowerCase()) {
-			case "2threads":
-				solver= new DancingLinkSolver2Thread(myMatrix.finalMatrix, boardSize);
-				break;
-			
-
-			case "4threads":
-				solver= new DancingLinkSolver4Thread(myMatrix.finalMatrix, boardSize);
-				break;
-			
-			case "8threads":
-				solver = new DancingLinkSolver8Thread(myMatrix.finalMatrix, boardSize);
-				break;
-
-			case "none":
-				solver = new DancingLinkSolver(myMatrix.finalMatrix, boardSize);
-				break;
-
-			default:
-				System.out.println("Invalid version specified.");
-				System.exit(2);
-				break;
-
-		}
+		DancingLinkSolver solver =  new DancingLinkSolver(myMatrix.finalMatrix, boardSize);
+		solver.startSearch();
 		
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time
 		System.out.println("Solved Sudoku:");
