@@ -121,6 +121,7 @@ public class Sudoku {
 
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
 		String filename = args[0];
+		String numThreads = args[1];
 		File inputFile = new File(filename);
 		Scanner input = null;
 		int[][] vals = null;
@@ -171,16 +172,13 @@ public class Sudoku {
 
 		ExactMatrix myMatrix = new ExactMatrix(vals);
 		Cell[][] finalMatrix = myMatrix.makeFinalMatrix();
-		DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize);
+		DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize, numThreads);
 
 
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time
 		System.out.println("Solved Sudoku:");
 		System.out.print("Time taken: " + (Sudoku.endTime - Sudoku.startTime) + " milliseconds\n");
 		printSudokuBoard(boardSize, partitionSize,solver.solution);
-
 		printSudokuBoardInFile(boardSize, partitionSize,solver.solution);
-
-
 	}
 }

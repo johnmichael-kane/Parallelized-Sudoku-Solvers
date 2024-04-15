@@ -92,28 +92,53 @@ class ColumnObject extends DancingLinkObject {
 }
 
 public class DancingLinkSolver {
-	
-	//private Cell[][] initialBoard;
-	//private ExecutorService executor;
-	//private AtomicBoolean solutionFound = new AtomicBoolean(false);
-	//private final int MAX_DEPTH = 20; //example depth for BFS phase
-	//private volatile Solution finalSolution = null; //placeholder for actual solution implementaiton
-
-	
 	int[][] solution;
 	public ColumnObject header;
 	int size;
+	int threads = 0; //set to 0 by default
 	Stack<DancingLinkObject> result;
-	boolean done = false;
-
 	
+	//replace boolean done with the solutionFound
+	boolean done = false;
+	static AtomicBoolean solutionFound = new AtomicBoolean(false);
+	private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-	public DancingLinkSolver(Cell[][] matrix, int size) {
+	public DancingLinkSolver(Cell[][] matrix, int size, String numThreads) {
+		switch(numThreads.toLowerCase()){
+			case "0":
+				System.out.println("non-parallelized implementation:");
+				break;
+
+			case "2":
+				threads=2;
+				System.out.println("2 thread implementation:");
+				break;
+
+			case "4":
+				threads=4;
+				System.out.println("4 thread implementation:");
+				break;
+
+			case "8":
+				threads=8;
+				System.out.println("8 thread implementation:");
+				break;
+
+			default:
+				System.out.println("Invalid numThreads input");
+				System.out.println("Default non-parellized implemenation:");
+				break;
+
+		}
 		this.size = size;
+		this.solution = new int[size][size];
+
+		
 		result = new Stack<>();
-		solution = new int[size][size];
 		makeLinks(matrix);
 		search();
+		//replace the shit above with
+		//header=makeLinks(matrix)
 	}
 
 	private void makeLinks(Cell[][] matrix) {
@@ -155,6 +180,7 @@ public class DancingLinkSolver {
 	}
 
 	public void search() {
+		if(solutionFound.get()) return;
 		if (header.right == header) {
 			makeSolution();
 		} else {
@@ -165,9 +191,13 @@ public class DancingLinkSolver {
 				for (DancingLinkObject j = r.right; j != r; j = j.right) {
 					j.column.cover();
 				}
+				
 				search();
 				if (done)
 					break;
+				//replace lines above with:
+				//executor.submit(this::search);
+				
 				r = result.pop();
 				curr = r.column;
 				for (DancingLinkObject j = r.left; j != r; j = j.left) {
