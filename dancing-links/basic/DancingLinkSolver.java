@@ -117,7 +117,6 @@ public class DancingLinkSolver {
 		this.executor = Executors.newFixedThreadPool(nThreads > 0 ? nThreads : 1); // Ensure at least one thread
 		solutionFound.set(false);
 		searchParallel();
-		//search();
 	}
 
 	private ColumnObject makeLinks(Cell[][] matrix) {
@@ -136,11 +135,6 @@ public class DancingLinkSolver {
 			DancingLinkObject prev = null;
 			for (int j = 0; j < matrix[0].length; j++) {
 				if (matrix[i][j] != null) {
-					// if (j<10) {
-					// System.out.println(String.format("[Column %s, (%s, %s:
-					// %s)])", j, matrix[i][j].row, matrix[i][j].col,
-					// matrix[i][j].number));
-					// }
 					ColumnObject columnHeader = headers.get(j);
 					DancingLinkObject currNode = new DancingLinkObject(columnHeader, matrix[i][j]);
 					if (prev == null) {
@@ -162,7 +156,7 @@ public class DancingLinkSolver {
 		for (int i = 0; i < 10; i++) {  // Example: submit initial tasks, you might need a different way to generate or manage tasks
 			executor.submit(this::search);
 		}
-	
+		
 		executor.shutdown();
 		try {
 			if (!executor.awaitTermination(1, TimeUnit.HOURS)) { // Wait 1 hour for existing tasks to terminate
