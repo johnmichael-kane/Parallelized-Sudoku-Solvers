@@ -96,25 +96,15 @@ public class DancingLinkSolver {
 	int size;
 	Stack<DancingLinkObject> result;
 	static AtomicBoolean solutionFound = new AtomicBoolean(false);
-	private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-	public DancingLinkSolver(Cell[][] matrix, int size, String numThreads) {
+	public DancingLinkSolver(Cell[][] matrix, int size) {
 		this.size = size;
 		this.solution = new int[size][size];
 		result = new Stack<>();
 		this.header=makeLinks(matrix);
-
-		int nThreads;
-		try{
-			nThreads=Integer.parseInt(numThreads);
-		} catch (NumberFormatException e){
-			nThreads = 1; // default to 1 thread
-        	System.out.println("Invalid thread count provided; using default: " + nThreads);
-		}
 		
-		this.executor = Executors.newFixedThreadPool(nThreads > 0 ? nThreads : 1); // Ensure at least one thread
 		solutionFound.set(false);
-		searchParallel();
+		search();
 	}
 
 	private ColumnObject makeLinks(Cell[][] matrix) {
@@ -150,29 +140,11 @@ public class DancingLinkSolver {
 		return head;
 	}
 
-	private void searchParallel(){
-		for (int i = 0; i < 10; i++) {  // Example: submit initial tasks, you might need a different way to generate or manage tasks
-			executor.submit(this::search);
-		}
-		
-		executor.shutdown();
-		try {
-			if (!executor.awaitTermination(1, TimeUnit.HOURS)) { // Wait 1 hour for existing tasks to terminate
-				executor.shutdownNow(); // Cancel currently executing tasks
-				System.out.println("Solver timeout exceeded, forced shutdown.");
-			}
-		} catch (InterruptedException e) {
-			System.out.println("Solver was interrupted: " + e.getMessage());
-			Thread.currentThread().interrupt(); // Preserve interrupt status
-		}
-	}
-
 	private void search() {
 		if (solutionFound.get()) return; //Check if another thread found the solution
 
 		if (header.right == header) {
 			makeSolution();
-			solutionFound.set(true);
 			return;
 		} 
 
@@ -199,6 +171,7 @@ public class DancingLinkSolver {
 	}
 	
 	private void makeSolution() {
+		solutionFound.set(true);
 		while (!result.isEmpty()) {
 			DancingLinkObject curr = result.pop();
 			solution[curr.info.row][curr.info.col] = curr.info.number;
