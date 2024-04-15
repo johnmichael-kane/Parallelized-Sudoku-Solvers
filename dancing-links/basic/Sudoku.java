@@ -94,7 +94,13 @@ public class Sudoku {
 		}
 		System.out.println("");
 	}
-
+	/* 
+	 // BFS to generate starting boards
+	 private static List<int[][]> generateStartingBoards(int[][] originalBoard, int blockSize, int numBoards) {
+        // ... implement BFS ...
+        return new ArrayList<>(); // return a list of starting board configurations
+    }*/
+	
 
 	public static void printSudokuBoardInFile(int boardSize, int blocksize, int vals[][]) {
 		try {
@@ -166,13 +172,14 @@ public class Sudoku {
 		if (count != boardSize * boardSize)
 			throw new RuntimeException("Incorrect number of inputs.");
 
+		
 		System.out.println("\nSudoku Board:");
 		printSudokuBoard(boardSize, partitionSize,vals);
 		Sudoku.startTime = System.currentTimeMillis(); // Record start time
 
 		ExactMatrix myMatrix = new ExactMatrix(vals);
 		Cell[][] finalMatrix = myMatrix.makeFinalMatrix();
-		DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize, numThreads);
+		DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize);
 
 
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time
