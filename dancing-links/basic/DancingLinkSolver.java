@@ -95,7 +95,6 @@ public class DancingLinkSolver {
 	int[][] solution;
 	public ColumnObject header;
 	int size;
-	int threads = 0; //set to 0 by default
 	Stack<DancingLinkObject> result;
 	
 	//replace boolean done with the solutionFound
@@ -104,44 +103,26 @@ public class DancingLinkSolver {
 	private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 	public DancingLinkSolver(Cell[][] matrix, int size, String numThreads) {
-		switch(numThreads.toLowerCase()){
-			case "0":
-				System.out.println("non-parallelized implementation:");
-				break;
-
-			case "2":
-				threads=2;
-				System.out.println("2 thread implementation:");
-				break;
-
-			case "4":
-				threads=4;
-				System.out.println("4 thread implementation:");
-				break;
-
-			case "8":
-				threads=8;
-				System.out.println("8 thread implementation:");
-				break;
-
-			default:
-				System.out.println("Invalid numThreads input");
-				System.out.println("Default non-parellized implemenation:");
-				break;
-
-		}
 		this.size = size;
 		this.solution = new int[size][size];
-
-		
 		result = new Stack<>();
-		makeLinks(matrix);
+		this.header=makeLinks(matrix);
+
+		int nThreads;
+		try{
+			nThreads=Integer.parseInt(numThreads);
+		} catch (NumberFormatException e){
+			nThreads = 1; // default to 1 thread
+        	System.out.println("Invalid thread count provided; using default: " + nThreads);
+		}
+		
+		//this.executor = Executors.newFixedThreadPool(nThreads > 0 ? nThreads : 1); // Ensure at least one thread
+		
+		//searchParallel();
 		search();
-		//replace the shit above with
-		//header=makeLinks(matrix)
 	}
 
-	private void makeLinks(Cell[][] matrix) {
+	private ColumnObject makeLinks(Cell[][] matrix) {
 		ColumnObject head = new ColumnObject(-1);
 		List<ColumnObject> headers = new ArrayList<>();
 
@@ -176,7 +157,7 @@ public class DancingLinkSolver {
 
 		}
 		head.size = matrix[0].length;
-		this.header = head;
+		return head;
 	}
 
 	public void search() {
@@ -207,50 +188,7 @@ public class DancingLinkSolver {
 			curr.uncover();
 		}
 	}
-	/* 
-	public void solve(){
-		List<Cell[][]> startingBoards = generateStartingBoards(this.initialBoard);
-
-		for(Cell [][] board : startingBoards){
-			if(solutionFound.get()) break;
-
-			executor.submit(() -> solveBoard(board));
-		}
-
-		try{
-			executor.shutdown();
-			executor.awaitTermination(1, TimeUnit.HOURS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		if(finalSolution != null){
-			// output or process the solution
-		} else{
-			//handle the case where no solution is found
-		}
-	}
-
-	//method to be BFS
-	private List<Cell[][]> generateStartingBoards(Cell[][] board){
-		//implement logic to generate all possible boards filling up to MAX_DEPTH empty spaces
-		//This part simulates the baord generation kernal (in a GPU based implementaiton)
-		return new ArrayList<>(); //return a list of potential board configurations
-	}
-
-	//simulated backtracking search for each board
-	private void solveBoard(Cell[][] board){
-		//implement DFS logic
-		//adapted for parallel execution (without recursion)
-		//this simulates backtracking kernel in GPU context
-
-		if(/*checkIfSolution(board) ){
-			solutionFound.set(true);
-			//finalSolution = /*extractSolution(board) ;
-			executor.shutdownNow(); //stop all running tasks immediately if it works
-		}
-	}
-	*/
+	
 	private void makeSolution() {
 		done = true;
 		while (!result.isEmpty()) {
