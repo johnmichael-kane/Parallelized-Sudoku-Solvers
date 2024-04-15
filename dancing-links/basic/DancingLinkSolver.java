@@ -116,10 +116,10 @@ public class DancingLinkSolver {
         	System.out.println("Invalid thread count provided; using default: " + nThreads);
 		}
 		
-		//this.executor = Executors.newFixedThreadPool(nThreads > 0 ? nThreads : 1); // Ensure at least one thread
-		
-		//searchParallel();
-		search();
+		this.executor = Executors.newFixedThreadPool(nThreads > 0 ? nThreads : 1); // Ensure at least one thread
+		solutionFound.set(false);
+		searchParallel();
+		//search();
 	}
 
 	private ColumnObject makeLinks(Cell[][] matrix) {
@@ -160,33 +160,52 @@ public class DancingLinkSolver {
 		return head;
 	}
 
-	public void search() {
-		if(solutionFound.get()) return;
+	private void searchParallel(){
+		for (int i = 0; i < 10; i++) {  // Example: submit initial tasks, you might need a different way to generate or manage tasks
+			executor.submit(this::search);
+		}
+	
+		executor.shutdown();
+		try {
+			if (!executor.awaitTermination(1, TimeUnit.HOURS)) { // Wait 1 hour for existing tasks to terminate
+				executor.shutdownNow(); // Cancel currently executing tasks
+				System.out.println("Solver timeout exceeded, forced shutdown.");
+			}
+		} catch (InterruptedException e) {
+			System.out.println("Solver was interrupted: " + e.getMessage());
+			Thread.currentThread().interrupt(); // Preserve interrupt status
+		}
+	}
+
+	private void search() {
+		if (solutionFound.get()) return; //Check if another thread found the solution
+
 		if (header.right == header) {
 			makeSolution();
-		} else {
-			ColumnObject curr = chooseColumn();
-			curr.cover();
-			for (DancingLinkObject r = curr.down; r != curr; r = r.down) {
-				result.push(r);
-				for (DancingLinkObject j = r.right; j != r; j = j.right) {
-					j.column.cover();
-				}
-				
-				search();
-				if (done)
-					break;
-				//replace lines above with:
-				//executor.submit(this::search);
-				
-				r = result.pop();
-				curr = r.column;
-				for (DancingLinkObject j = r.left; j != r; j = j.left) {
-					j.column.uncover();
-				}
+			solutionFound.set(true);
+			return;
+		} 
+
+		ColumnObject curr = chooseColumn();
+		curr.cover();
+		for (DancingLinkObject r = curr.down; r != curr; r = r.down) {
+			result.push(r);
+			for (DancingLinkObject j = r.right; j != r; j = j.right) {
+				j.column.cover();
 			}
-			curr.uncover();
+			
+			search(); //continue to search (get deeper)
+			if (solutionFound.get()) break; //early exit if solution found
+			//replace lines above with:
+			//executor.submit(this::search);
+			
+			r = result.pop();
+			curr = r.column;
+			for (DancingLinkObject j = r.left; j != r; j = j.left) {
+				j.column.uncover();
+			}
 		}
+		curr.uncover();	
 	}
 	
 	private void makeSolution() {
