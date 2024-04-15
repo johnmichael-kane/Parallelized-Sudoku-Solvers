@@ -8,6 +8,8 @@
             "args": [
                 "-Wall",
                 "-Wextra",
+                "-fdiagnostics-color=always",
+                "-fopenmp",
                 "-g3",
                 "-std=c++11",
                 "\"${workspaceFolder}/src/Sudoku Solver.cpp\"",

@@ -6,6 +6,7 @@
 #define POSITION_H_
 
 #include <sstream>
+#include <omp.h>
 
 using namespace std;
 

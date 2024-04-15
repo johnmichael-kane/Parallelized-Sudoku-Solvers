@@ -85,8 +85,8 @@
     "span": "cpp",
     "stack": "cpp"
   },
-  "C_Cpp_Runner.cCompilerPath": "clang",
-  "C_Cpp_Runner.cppCompilerPath": "clang++",
+  "C_Cpp_Runner.cCompilerPath": "g++",
+  "C_Cpp_Runner.cppCompilerPath": "gcc",
   "C_Cpp_Runner.debuggerPath": "lldb",
   "C_Cpp_Runner.cStandard": "",
   "C_Cpp_Runner.cppStandard": "",

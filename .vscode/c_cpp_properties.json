@@ -1,18 +1,19 @@
 {
-  "configurations": [
-    {
-      "name": "macos-clang-x64",
-      "includePath": [
-        "${workspaceFolder}/**"
-      ],
-      "compilerPath": "/usr/bin/clang",
-      "cStandard": "${default}",
-      "cppStandard": "${default}",
-      "intelliSenseMode": "macos-clang-x64",
-      "compilerArgs": [
-        ""
-      ]
-    }
-  ],
-  "version": 4
+    "configurations": [
+        {
+            "name": "macOS",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/**"
+            ],
+            "compilerPath": "/usr/local/bin/g++-13",
+            "cStandard": "${default}",
+            "cppStandard": "${default}",
+            "intelliSenseMode": "gcc-x64",
+            "compilerArgs": [
+                ""
+            ]
+        }
+    ],
+    "version": 4
 }
