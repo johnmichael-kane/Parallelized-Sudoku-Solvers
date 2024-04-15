@@ -38,8 +38,8 @@ int main()
 	// Run game.
 
 	auto start = high_resolution_clock::now();
-	Game game(PATH + filename);
-	while (!game.evaluateBoard());
+	Game game(PATH + filename); // initialize board
+	while (!game.evaluateBoard()); // evaluate board
 	auto end = high_resolution_clock::now();
 
 	game.printResult();

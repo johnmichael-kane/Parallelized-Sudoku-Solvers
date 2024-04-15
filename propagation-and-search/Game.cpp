@@ -7,40 +7,47 @@
 
 #include "Game.h"
 
+// grid exists if file successfully read. 
+// if file successfully read, initialize the grid & analyze it for potential moves
 Game::Game(string path) : puzzle(path) {
-	hasSuccessInput = gameGrid.read(path);
-	if (hasSuccessInput) {
+	gridExists = gameGrid.read(path);
+	if (gridExists) {
 		possibleGrid.setGrid(&gameGrid);
 		possibleGrid.analyzeMoves(gameGrid);
 	}
 }
 
-bool Game::evaluateBoard() {
-	if (!hasSuccessInput || gameGrid.isComplete()) return gameGrid.isComplete();;
+void processSegment(int start, int end, bool &localTrigger)
+{
+	for (int i = start; i < end; ++i)
+	{
+		const auto &pos = possibleGrid.getUnsolvedPositions()[i];
+		const auto &possibleValues = possibleGrid.getPossibleValuesAt(pos.row, pos.col);
+		if (possibleValues.size() == 1)
+		{
+			localTrigger = false;
+			std::lock_guard<std::mutex> lock(gridMutex);
+			gameGrid.fill(pos, possibleValues.front());
+		}
+	}
+}
 
-	possibleGrid.setGrid(&gameGrid);
-	possibleGrid.analyzeMoves(gameGrid);
+// while an unfinished grid exists,
+// 1) set the grid
+// 
+bool Game::evaluateBoard() {
+	if (!gridExists || gameGrid.isComplete()) return gameGrid.isComplete();; // bool
+
 	bool trigger = true;
 
-	// does parallelizing these loops allow for other work to be done?
-	// is this really ideal since the point of the method is to start with linear constraints,
-	// then with cross referencing, Then with DFS? i don't see a major benefit here.
-	// does the order in which these are done really matter?
-
-	// Linear Constraints: solve single-value positions.
-	// parallelize loop
-	// each thread has a copy of "trigger"
 	#pragma omp parallel for reduction(&&: trigger) 
 	for (size_t i = 0; i < possibleGrid.getUnsolvedPositions().size(); ++i)
 	{
 		const auto &pos = possibleGrid.getUnsolvedPositions()[i];
 		const auto &possibleValues = possibleGrid.getPossibleValuesAt(pos.row, pos.col);
-		if (possibleValues.size() == 1) { // unqique
+		if (possibleValues.size() == 1) { // unique
 			trigger = false;
 
-			// mutual exclusion
-			// a position's unsolved value is filled into the grid state if deemed unique
-			// filled one thread at a time to ensure no unintended data modification
 			lock_guard<mutex> lock(gridMutex);
 			gameGrid.fill(pos, possibleValues.front());
 		} // lock automatically released here (out of scope)
@@ -55,9 +62,6 @@ bool Game::evaluateBoard() {
 		for (size_t i = 0; i < pairs.size(); ++i) {
 			const auto &pair = pairs[i];
 
-			// mutual exclusion
-			// each pair (retrieved from cross referencing) filled to grid state one thread at a time
-			// to ensure no unintended data modification
 			lock_guard<mutex> lock(gridMutex);
 			gameGrid.fill(pair.first, pair.second);
 		}
@@ -94,17 +98,11 @@ bool Game::depthFirstSearch() {
 			// private queue for each thread to avoid conflict & allow active integration
 			vector<Grid> privateQueue;
 
-			// distribute loop iterations amongst threads in parallel region, allowing for some 
-			// threads to finish before others ("nowait") - which works with a queue's flexibility
-			// QUESTION: how do distribute this work evenly? should it be?
 			#pragma omp for nowait 
 			for (size_t i = 0; i < searchQueue.size(); ++i) {
 				// move current queue element into current grid
 				Grid currentGrid = std::move(searchQueue[i]);
 
-				// if current grid not completed or legal, queue element as a "possible value,a'
-				// analyze its potential moves, and save the value & position of those possibilities.
-				// then, for every position and corresponding valuem
 				if (!currentGrid.isComplete() && currentGrid.isLegal()) {
 					PossibleGrid possibilities;
 					possibilities.setGrid(&currentGrid);
@@ -112,10 +110,6 @@ bool Game::depthFirstSearch() {
 					const auto &pos = possibilities.getUnsolvedPositions().front();
 					const auto &posValues = possibilities.getPossibleValuesAt(pos.row, pos.col);
 
-					// create copy of current grid state for each possible value, filling each grid
-					// state with each possible value at their specified position (row, col).
-					// move each potential grid state to the end of the searchQueue for later
-					// processing
 					for (int value : posValues) {
 						Grid newGrid = currentGrid;
 						newGrid.fill(pos, value);
@@ -124,26 +118,14 @@ bool Game::depthFirstSearch() {
 				}
 
 			}
-
-			// combine solutions found by threads into localSearchQueue (this ensure updates are
-			// controlled and Synchronized). only one thread can add to the localSearchQueue at a 
-			// time (avoiding data conflicts while bringing together previously independent work)
 			lock_guard<mutex> lock(gridMutex);
 			localSearchQueue.insert(localSearchQueue.end(), 
 									make_move_iterator(privateQueue.begin()), 
 									make_move_iterator(privateQueue.end()));
 		} // lock_guard released (out of scope)
 
-
-		// localSearchQue becomes new searchQueue (integrate thread findings dynamically & without 
-		// conflict, avoid unnecessary initializations)
 		searchQueue = std::move(localSearchQueue);
 
-		// QUESTION: what if there are multiple valid complete grid states? or is that not
-		// possible with sudoku, or at least not relevant?
-
-		// if search queue on last element (last possible grid), and the grid state of that element
-		// is complete, a solution has been found - move the grid from the queue into the current game
 		if (searchQueue.size() == 1 && searchQueue[0].isComplete()) {
 			gameGrid = std::move(searchQueue[0]); 
 			return true;
@@ -155,10 +137,38 @@ bool Game::depthFirstSearch() {
 	return false;
 }
 
-// Print resulting grid & whether a solution has been found.
+// TRIGGER MEANING?
+
+// loop through specified segment:
+// get spot
+// get possibilities at spot
+// if only 1 possibility,
+// fill spot in game grid
+void processSegment(int start, int end) comst
+{
+	bool localTrigger = true;
+	for (int i = start; i < end; ++i) {
+		const auto &pos = possibleGrid.getUnsolvedPositions()[i];
+		const auto &possibleValues = possibleGrid.getPossibleValuesAt(pos.row, pos.col);
+
+		if (possibleValues.size() == 1) {
+			localTrigger = false;
+
+			// QUESTION: HOW TO PREVENT THREADS WAITING ON EACH OTHER?
+			// NOTE: REFER TO LAST CODE NOTES
+
+			// lock before other threads can interfere
+			lock_guard<mutex> lock(gridMutex);
+			gameGrid.fill(pos, possibleValues.front());
+		} 
+	}
+	std::lock_guard<std::mutex> lock(gridMutex);
+	trigger = trigger && localTrigger; 
+}
+
 void Game::printResult() const
 {
-	if (hasSuccessInput) {
+	if (gridExists) {
 		std::cout << (hasSolution ? "\nSolved!!!" : "\nNo Solution.") << std::endl;
 		gameGrid.print();
 	}

@@ -14,13 +14,15 @@
 
 class Game {
 private:
+	Grid gameGrid;
+	PossibleGrid possibleGrid;
+	mutex gridMutex;
 	string puzzle;
+	bool trigger = true;
+
 	bool isFinished = false;
 	bool hasSolution = true;
-	bool hasSuccessInput = false;
-	Grid gameGrid;
-	mutex gridMutex;
-	PossibleGrid possibleGrid;
+	bool gridExists = false;
 	int linearCycle = 0;
 	int crossReferenceCycle = 0;
 	int searchCycle = 0;
@@ -29,6 +31,7 @@ private:
 public:
 	Game(string path);
 	bool evaluateBoard();
+	void processSegment(int start, int end) const; 
 	void printResult() const;
 };
 
