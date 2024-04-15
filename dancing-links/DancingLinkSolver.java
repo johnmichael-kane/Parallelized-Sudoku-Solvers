@@ -166,12 +166,26 @@ public class DancingLinkSolver {
 		curr.uncover();	
 	}
 	
+	//for some reason with the comments it runs 100% of the time but not without them
 	private void makeSolution() {
-		while (!result.isEmpty()) {
-			DancingLinkObject curr = result.pop();
+		DancingLinkObject curr = result.pop();
+		int i=0;
+		if(curr.info.number != 0){
 			solution[curr.info.row][curr.info.col] = curr.info.number;
+			System.out.print(curr.info.number);
+			while (!result.isEmpty()) {
+				if(curr.info.number == 0) return;
+				curr = result.pop();
+				solution[curr.info.row][curr.info.col] = curr.info.number;
+				System.out.print(curr.info.number);
+			}
+			System.out.println("\ni: " + i);
+			solutionFound.set(true);
 		}
-		solutionFound.set(true);
+		else{
+			System.out.println("INVALID!");
+		}
+		
 	}
 
 	private ColumnObject chooseColumn() {
