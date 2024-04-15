@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-
 class Cell {
 	public int row;
 	public int col;
@@ -97,7 +96,6 @@ public class DancingLinkSolver {
 	int size;
 	Stack<DancingLinkObject> result;
 	
-	//replace boolean done with the solutionFound
 	boolean done = false;
 	static AtomicBoolean solutionFound = new AtomicBoolean(false);
 	private ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -214,12 +212,6 @@ public class DancingLinkSolver {
 			DancingLinkObject curr = result.pop();
 			solution[curr.info.row][curr.info.col] = curr.info.number;
 		}
-//		for (int i = 0; i < solution.length; i++) {
-//			for (int j = 0; j < solution.length; j++) {
-//				System.out.print(solution[i][j]);
-//			}
-//			System.out.println();
-//		}
 	}
 
 	public ColumnObject chooseColumn() {
@@ -233,5 +225,4 @@ public class DancingLinkSolver {
 		}
 		return toReturn;
 	}
-
 }
