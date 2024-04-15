@@ -19,9 +19,23 @@
 
 class PossibleGrid {
 public:
-	PossibleGrid();
-	void setGrid(Grid *g) { this->grid = g; }
-	void print() const;
+	// Initialization
+	PossibleGrid() : grid(nullptr), gridSize(0), sectionSize(0) {}
+
+	void setGrid(Grid *g) {
+		grid = g;
+		if (grid) {
+			gridSize = grid->getGridSize();
+			sectionSize = grid->getSectionSize();
+			clear();
+		}
+	}
+
+	void clear() {
+		possibleValues.clear();
+		unsolvedPositions.clear();
+		possibleValues.resize(gridSize, vector<vector<int>>(gridSize));
+	}
 
 	// Analysis
 	void analyzeMoves(const Grid &grid);
@@ -30,21 +44,14 @@ public:
 	// Getters
 	const std::vector<Position> &getUnsolvedPositions() const { return unsolvedPositions; }
 	const std::vector<int> &getPossibleValuesAt(int row, int col) const {
-		if (row < 0 || row >= possibleValues.size() || col < 0 || col >= possibleValues[row].size()) {
-			throw std::out_of_range("Accessing possibleValues out of range");
-		}
 		return possibleValues[row][col];
 	}
-
 private:
 	Grid *grid;
+	int gridSize;
+	int sectionSize;
 	vector<vector<vector<int>>> possibleValues;
 	vector<Position> unsolvedPositions;
-
-	void clear();
-	string vectorToString(const std::vector<int> &vec) const;
-
-	// Uniqueness
 	vector<int> uniqueValues(vector<int> vec);
 	std::vector<std::pair<Position, int>> identifyUnique(int index, bool isRow) const;
 };

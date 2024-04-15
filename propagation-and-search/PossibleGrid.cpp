@@ -7,28 +7,21 @@
 
 #include "PossibleGrid.h"
 
-PossibleGrid::PossibleGrid() : grid(nullptr) {}
-
-void PossibleGrid::clear() {
-	possibleValues.clear();
-	unsolvedPositions.clear();
-}
-
 void PossibleGrid::analyzeMoves(const Grid &grid) {
 	if (this->grid == nullptr) return;
 
 	clear();
-	possibleValues.resize(grid.gridSize, vector<vector<int>>(grid.gridSize));
+	possibleValues.resize(gridSize, vector<vector<int>>(gridSize));
 	unsolvedPositions = grid.getUnsolvedPositions();
 
 	// fill vector with [1 ... gridSize]
 	const vector<int> range = [&] {
-		vector<int> r(grid.gridSize);
+		vector<int> r(gridSize);
 		iota(r.begin(), r.end(), 1); 
 		return r;
 	}();
 
-	vector<int> usedValues(grid.gridSize);
+	vector<int> usedValues(gridSize);
 
 	for (const auto &pos : unsolvedPositions) {
 		const vector<int> &usedSectionValues = grid.getSection(pos.row, pos.col);
@@ -53,7 +46,7 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 // Cross-reference rows and columns and return unique possible value pairs (position & value).
 vector<pair<Position, int>> PossibleGrid::crossReference() const {
 	vector<pair<Position, int>> pairs;
-	for (int i = 0; i < grid->gridSize; ++i) {
+	for (int i = 0; i < gridSize; ++i) {
 		auto rowUnique = identifyUnique(i, true);  // ith row possibilities
 		auto colUnique = identifyUnique(i, false); // ith col possibilities
 		pairs.insert(pairs.end(), rowUnique.begin(), rowUnique.end());
@@ -65,7 +58,7 @@ vector<pair<Position, int>> PossibleGrid::crossReference() const {
 // Identify unique values in a specified row/column
 vector<pair<Position, int>> PossibleGrid::identifyUnique(int index, bool isRow) const {
 	multimap<int, Position> valueMap; // map: quick lookup
-	for (int i = 0; i < grid->gridSize; ++i) {
+	for (int i = 0; i < gridSize; ++i) {
 		const vector<int> &values = isRow ? possibleValues[index][i] : possibleValues[i][index];
 		for (int val : values) {
 			valueMap.emplace(val, isRow ? Position(index, i) : Position(i, index));
@@ -83,16 +76,4 @@ vector<pair<Position, int>> PossibleGrid::identifyUnique(int index, bool isRow) 
 	}
 
 	return uniquePairs;
-}
-
-void PossibleGrid::print() const {
-	for (const Position &pos : unsolvedPositions) {
-		cout << pos.toString() << " : " << vectorToString(possibleValues[pos.row][pos.col]) << endl;
-	}
-}
-
-string PossibleGrid::vectorToString(const vector<int> &vec) const{
-	stringstream ss;
-	copy(vec.begin(), vec.end(), ostream_iterator<int>(ss, " ")); // copy vec
-	return ss.str().substr(0, ss.str().length() - 1); // remove last space
 }

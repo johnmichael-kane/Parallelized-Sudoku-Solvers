@@ -14,53 +14,38 @@
 
 #include "Game.h"
 
-using namespace std;
 using namespace std::chrono;
 
 int main()
 {
-	// Puzzle selection (user inputted filename)
+	// Puzzle selection (user input).
 	
 	const string PATH = "puzzles/";
-
-	cout << "\nGame Difficulties: easy, medium, hard" << endl;
-	cout << "Board Sizes: 9 (9x9), 16 (16x16), 25 (25x25)" << endl;
-	cout << "File Name Format: [mode][size].txt (e.g., easy9.txt)\n" << endl;
-
+	std::cout << "\nLEVELS: easy, medium, hard\nSIZES: 9, 16, 25\n\n";
+	std::cout << "Enter a file name (e.g., easy9.txt) to start the game!\n\n";
 	ifstream file;
-	string name;
-	while (!file.is_open()) 
-	{
-		cout << "Enter a file name to start the game! >> " << flush;
-		cin >> name;
-		file.open(PATH + name);
-		if (!file)
-		{
-			cout << "Invalid file name.\n" << endl;
-			cin.clear();
-		}
-	}
+	string filename;
+
+	do {
+		std::cout << "File name: ";
+		cin >> filename;
+		file.open(PATH + filename);
+
+		if (!file) (std::cout << "File not found, try again!\n\n");
+	} while (!file);
 	file.close();
 
-	// Run game
+	// Run game.
 
-	auto start_time = high_resolution_clock::now();
-
-	Game game(PATH + name);
-	while (!game.Evaluate())
-	{
-	}
-
-	auto end_time = high_resolution_clock::now();
+	auto start = high_resolution_clock::now();
+	Game game(PATH + filename);
+	while (!game.Evaluate());
+	auto end = high_resolution_clock::now();
 
 	game.printResult();
 
-	// Measure game runtime
-
-	auto game_time = duration_cast<milliseconds>(end_time - start_time).count();
-
-	cout << "Time Taken: " << game_time << " milliseconds" << endl;
-
+	auto gameTime = duration_cast<milliseconds>(end - start).count();
+	cout << "\nTime Taken: " << gameTime << " milliseconds\n" << endl;
 	return 0;
 }
 

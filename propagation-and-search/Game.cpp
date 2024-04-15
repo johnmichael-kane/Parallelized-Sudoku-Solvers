@@ -48,68 +48,42 @@ bool Game::Evaluate() {
 	return gameGrid.isComplete();
 }
 
-bool Game::search()
-{
+bool Game::search() {
 	cout << "Depth First Search . . . " << endl;
-	bool success = true;
+	vector<Grid> searchQueue{gameGrid};
 
-	vector<Grid> searchQueue;
-	searchQueue.push_back(gameGrid);
-	while (!searchQueue.operator[](searchQueue.size() - 1).isComplete() && searchQueue.size() > 0)
-	{
-		searchCycle++; 
-		
-		Grid currentGrid = searchQueue.at(searchQueue.size() - 1);
+	while (!searchQueue.empty()) {
+		Grid currentGrid = std::move(searchQueue.back());
+		searchQueue.pop_back(); // process (remove)
 
-		if (currentGrid.isLegal())
-		{
-			PossibleGrid possGrid;
-			possGrid.analyzeMoves(currentGrid);
-			searchQueue.pop_back();
-			Position pos = possGrid.getUnsolvedPositions().at(0);
-			vector<int> posValues = possGrid.getPossibleValuesAt(pos.row, pos.col);
+		if (!currentGrid.isComplete()) {
+			if (!currentGrid.isLegal()) continue; // illegal -> skip
 
-			for (vector<int>::iterator it = posValues.begin(); it != posValues.end(); it++)
-			{
-				Grid tempGrid = currentGrid;
-				tempGrid.fill(pos, *it);
-				searchQueue.push_back(tempGrid);
+			PossibleGrid possibilities;
+			possibilities.setGrid(&currentGrid);
+			possibilities.analyzeMoves(currentGrid);
+			const auto &pos = possibilities.getUnsolvedPositions().front();
+			const auto &posValues = possibilities.getPossibleValuesAt(pos.row, pos.col);
+
+			for (int value : posValues) { // position
+				Grid newGrid = currentGrid;
+				newGrid.fill(pos, value);
+				searchQueue.push_back(std::move(newGrid)); // "move on"
 			}
-		}
-		else
-		{
-			searchQueue.pop_back();
+		} else {
+			gameGrid = std::move(currentGrid); // "move on"
+			return true;
 		}
 	}
 
-	if (!searchQueue.empty()) 
-	{
-		success = true;
-		gameGrid = searchQueue.back();
-	}
-	else
-	{
-		hasSolution = false;
-	}
-	return success; 
+	hasSolution = false;
+	return false;
 }
 
 void Game::printResult() const
 {
-	stringstream ss;
-
-	if (hasSolution)
-	{
-		ss << "Solved!!!";
-	}
-	else
-	{
-		ss << "Has no Solution.";
-	}
-
-	if (hasSuccessInput)
-	{
-		cout << ss.str() << endl;
+	if (hasSuccessInput) {
+		std::cout << (hasSolution ? "\nSolved!!!" : "\nNo Solution.") << std::endl;
 		gameGrid.print();
 	}
 }

@@ -20,7 +20,7 @@ void Grid::fill(const Position &pos, int value) {
 //
 
 // Verify whether rows, columns, and sections follow Sudoku rules (no duplicates).
-bool Grid::isLegal() {
+bool Grid::isLegal() const {
 	auto isUnique = [](const std::vector<int> &vec) -> bool {
 		std::vector<int> filteredVector;
 		std::copy_if(vec.begin(), vec.end(), std::back_inserter(filteredVector), [](int v)
@@ -40,7 +40,7 @@ bool Grid::isLegal() {
 }
 
 // Verify that no rows contain empty cells (if empty cells exist, return false).
-bool Grid::isComplete() {
+bool Grid::isComplete() const {
 	return isLegal() && std::none_of(grid.begin(), grid.end(), [](const std::vector<int> &row)
 						{ return std::any_of(row.begin(), row.end(), [](int cell)
 						{ return cell == 0; }); });
@@ -90,15 +90,42 @@ bool Grid::write() const
 	return true;
 }
 
+// Print helper (horizontal line).
+void Grid::printHorizontalLine() const {
+	int calculation = 0;
+	calculation = (gridSize == 9) ? (3 * sectionSize) : ((3 * sectionSize) + 1);
+
+	std::string section = "*" + std::string(calculation, '-');
+	std::string horizontal = std::string(gridSize / sectionSize, ' ').replace(0, section.size(), section);
+
+	for (int i = 0; i < sectionSize; ++i) std::cout << horizontal;
+
+	std::cout << "*\n";
+};
+
 // Print grid to console.
 void Grid::print() const
 {
-	for (const auto &row : grid)
+	printHorizontalLine(); // top
+	for (int i = 0; i < gridSize; ++i)
 	{
-		for (int cell : row)
-			cout << cell << " ";
-		cout << "\n";
+		for (int j = 0; j < gridSize; ++j)
+		{
+			// beginning row & after section
+			if ((j + sectionSize) % sectionSize == 0) std::cout << '|';
+			
+			// numbers
+			if (gridSize == 9) {
+				std::cout << std::setw(2) << grid[i][j] << ' ';
+			} else {
+				if (j % sectionSize == 0) std::cout << ' ';
+				std::cout << std::setw(2) << grid[i][j] << ' ';
+			}
+		}
+		std::cout << "|\n"; // end row
+		if ((i + 1) % sectionSize == 0 && (i + 1) < gridSize) printHorizontalLine(); // row sect
 	}
+	printHorizontalLine(); // bottom
 }
 
 //
@@ -125,7 +152,8 @@ const vector<int> Grid::getCol(int col) const
 // Return section (vec) of grid, starting from the top leftmost corner.
 const vector<int> Grid::getSection(int row, int col) const {
 	vector<int> section;
-	int startRow = getSectionStart(row), startCol = getSectionStart(col); 
+	int startRow = (row / sectionSize) * sectionSize;
+	int startCol = (col / sectionSize) * sectionSize;
 	for (int r = startRow; r < startRow + sectionSize; ++r) {
 		for (int c = startCol; c < startCol + sectionSize; ++c) {
 			section.push_back(grid[r][c]); 
