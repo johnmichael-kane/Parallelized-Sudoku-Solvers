@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -6,6 +7,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -78,11 +81,61 @@ public class Sudoku {
 	private static long startTime; 
 	private static long endTime; 
 	private static final AtomicReference<int[][]> solutionMatrix = new AtomicReference<>();
-
+	private static final int BFS_DEPTH = 3;
+	
 
 	// Method to format single-digit numbers with leading zero
 	public static String n(int n) {
 		return n > 9 ? "" + n : "0" + n;
+	}
+	private static boolean isValidMove(int[][] board, Point cell, int num) {
+		int row = cell.x;
+		int col = cell.y;
+		
+		// Check row and column
+		for (int i = 0; i < board.length; i++) {
+			if (board[row][i] == num || board[i][col] == num) {
+				return false;
+			}
+		}
+	
+		// Check block
+		int sqrt = (int)Math.sqrt(board.length);
+		int blockRowStart = row - row % sqrt;
+		int blockColStart = col - col % sqrt;
+	
+		for (int r = blockRowStart; r < blockRowStart + sqrt; r++) {
+			for (int c = blockColStart; c < blockColStart + sqrt; c++) {
+				if (board[r][c] == num) {
+					return false;
+				}
+			}
+		}
+	
+		return true; // No violations, so it's a valid move
+	}
+	
+	private static Point findNextEmptyCell(int[][] board) {
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[i].length; j++) {
+				if (board[i][j] == 0) {
+					return new Point(i, j);
+				}
+			}
+		}
+		return null; // No empty cells found
+	}
+
+	private static int calculateEmptyCells(int[][] board) {
+		int emptyCells = 0;
+		for (int[] row : board) {
+			for (int cell : row) {
+				if (cell == 0) {
+					emptyCells++;
+				}
+			}
+		}
+		return emptyCells;
 	}
 
 	public static void printSudokuBoard(int boardSize, int blocksize, int vals[][] ) {
@@ -160,11 +213,37 @@ public class Sudoku {
 		if(numBoards == 1){
 			boards.add(deepCopy(originalBoard));
 		}
-		else{
-			for (int i = 0; i < numBoards; i++) {
-				int[][] newBoard = deepCopy(originalBoard); 
-				// ... apply BFS logic to fill first X empty spaces ...
-				boards.add(newBoard);
+		else {
+			// BFS Queue to hold the next cells to try
+			Queue<int[][]> queue = new LinkedList<>();
+			queue.add(originalBoard);
+		
+			// Start BFS until you have enough starting boards or the queue is empty
+			while (!queue.isEmpty() && boards.size() < numBoards) {
+				int[][] currentBoard = queue.remove();
+		
+				// Determine next empty cell
+				Point nextEmptyCell = findNextEmptyCell(currentBoard);
+				if (nextEmptyCell == null) {
+					continue; // Skip if no empty cells are left without a solution
+				}
+		
+				// Try all possible values in this cell
+				for (int num = 1; num <= blockSize * blockSize; num++) {
+					if (isValidMove(currentBoard, nextEmptyCell, num)) {
+						int[][] newBoard = deepCopy(currentBoard);
+						newBoard[nextEmptyCell.x][nextEmptyCell.y] = num;
+		
+						// Add new state to the BFS queue
+						queue.add(newBoard);
+		
+						// If reached BFS depth, add to starting boards
+						if (calculateEmptyCells(newBoard) <= BFS_DEPTH) {
+							boards.add(newBoard);
+							if (boards.size() >= numBoards) break;
+						}
+					}
+				}
 			}
 		}
 		
