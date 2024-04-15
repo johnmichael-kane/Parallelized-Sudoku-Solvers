@@ -39,7 +39,7 @@ int main()
 
 	auto start = high_resolution_clock::now();
 	Game game(PATH + filename);
-	while (!game.Evaluate());
+	while (!game.evaluateBoard());
 	auto end = high_resolution_clock::now();
 
 	game.printResult();

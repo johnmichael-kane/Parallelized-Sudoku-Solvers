@@ -83,7 +83,8 @@
     "set": "cpp",
     "format": "cpp",
     "span": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "list": "cpp"
   },
   "C_Cpp_Runner.cCompilerPath": "g++",
   "C_Cpp_Runner.cppCompilerPath": "gcc",

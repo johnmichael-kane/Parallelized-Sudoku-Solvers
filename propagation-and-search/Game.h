@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include <mutex>
 #include "PossibleGrid.h"
 #include "Grid.h"
 #include "Position.h"
@@ -18,15 +19,16 @@ private:
 	bool hasSolution = true;
 	bool hasSuccessInput = false;
 	Grid gameGrid;
+	mutex gridMutex;
 	PossibleGrid possibleGrid;
 	int linearCycle = 0;
 	int crossReferenceCycle = 0;
 	int searchCycle = 0;
 
-	bool search();
+	bool depthFirstSearch();
 public:
 	Game(string path);
-	bool Evaluate();
+	bool evaluateBoard();
 	void printResult() const;
 };
 
