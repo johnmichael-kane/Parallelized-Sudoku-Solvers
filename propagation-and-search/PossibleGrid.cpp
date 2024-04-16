@@ -23,13 +23,20 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 	vector<int> range(gridSize);
 	iota(range.begin(), range.end(), 1);
 
-	// Prepare futures for asynchronous execution
-	vector<future<void>> futures;
+	const size_t numThreads = thread::hardware_concurrency();
+	size_t batchSize = unsolvedPositions.size() / numThreads + (unsolvedPositions.size() % numThreads != 0);
+	vector<future<void>> futures; // asynchronous execution
 
-	for (const auto& position : unsolvedPositions) {
-		// Launch a task for each position asynchronously 
-		futures.push_back(async(launch::async, [&, position] {
+	for (size_t i = 0; i < numThreads; ++i) {
+		// Launch a task for each position asynchronously
+		futures.push_back(async(launch::async, [&, i] {
+			size_t start = i * batchSize;
+            size_t end = min(start + batchSize, unsolvedPositions.size());
+
+			for (size_t j = start; j < end; ++j) {
+				const auto &position = unsolvedPositions[j];
 				vector<int> usedValues;
+
 				const auto &usedSectionValues = grid.getSection(position.row, position.col);
 				const auto &usedRowValues = grid.getRow(position.row);
 				const auto &usedColValues = grid.getCol(position.col);
@@ -45,8 +52,8 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 				vector<int> possibilities;
 				set_difference(range.begin(), range.end(), usedValues.begin(), usedValues.end(),
 							back_inserter(possibilities));
-				possibleValues[position.row][position.col] = std::move(possibilities);
-		}));
+				possibleValues[position.row][position.col] = std::move(possibilities); 
+			} }));
 	}
 
 	// Wait for all futures to complete
