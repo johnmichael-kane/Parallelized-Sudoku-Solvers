@@ -13,13 +13,12 @@ public class Sudoku {
 	private static long startTime; // Start time for solving the puzzle
 	private static long endTime; // End time for solving the puzzle
 
-
 	// Method to format single-digit numbers with leading zero
 	public static String n(int n) {
 		return n > 9 ? "" + n : "0" + n;
 	}
 
-	public static void printSudokuBoard(int boardSize, int blocksize, int vals[][] ) {
+	public static void printSudokuBoard(int boardSize, int blocksize, int vals[][]) {
 		for (int y = 0; y < boardSize; y++) {
 			if (y % blocksize == 0) {
 				System.out.println(" ");
@@ -36,10 +35,9 @@ public class Sudoku {
 		System.out.println("");
 	}
 
-
 	public static void printSudokuBoardInFile(int boardSize, int blocksize, int vals[][]) {
 		try {
-			FileWriter writer = new FileWriter(boardSize+"x"+boardSize+"_out.txt"); // Open file for writing
+			FileWriter writer = new FileWriter(boardSize + "x" + boardSize + "_out.txt"); // Open file for writing
 			writer.write("Time taken: " + (endTime - startTime) + " milliseconds\n"); // Write time taken to solve
 			writer.write("Solved Sudoku:\n");
 			for (int y = 0; y < boardSize; y++) {
@@ -61,8 +59,8 @@ public class Sudoku {
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-		String filename = "../data/" + args[0];
-		
+		String filename = "../../data/" + args[0];
+
 		File inputFile = new File(filename);
 		Scanner input = null;
 		int[][] vals = null;
@@ -108,20 +106,19 @@ public class Sudoku {
 			throw new RuntimeException("Incorrect number of inputs.");
 
 		System.out.println("\nSudoku Board:");
-		printSudokuBoard(boardSize, partitionSize,vals);
+		printSudokuBoard(boardSize, partitionSize, vals);
 		Sudoku.startTime = System.currentTimeMillis(); // Record start time
 		ExactMatrix myMatrix = new ExactMatrix(vals);
 
-		DancingLinkSolver solver =  new DancingLinkSolver(myMatrix.finalMatrix, boardSize);
+		DancingLinkSolver solver = new DancingLinkSolver(myMatrix.finalMatrix, boardSize);
 		solver.startSearch();
-		
+
 		Sudoku.endTime = System.currentTimeMillis(); // Record end time
 		System.out.println("Solved Sudoku:");
 		System.out.print("Time taken: " + (Sudoku.endTime - Sudoku.startTime) + " milliseconds\n");
 		printSudokuBoard(boardSize, partitionSize, solver.getSolution());
 
 		printSudokuBoardInFile(boardSize, partitionSize, solver.getSolution());
-
 
 	}
 }
