@@ -72,9 +72,9 @@ git clone https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/m
 cd Parallelized-Sudoku-Solvers
 ```
 
-# Project Overview
+## Project Overview
 
-## Repository Features
+### Repository Features
 
 - All files located in the 'main' branch.
 - Each implementation uses the same puzzles.
@@ -83,7 +83,7 @@ cd Parallelized-Sudoku-Solvers
     - **Sizes:** 9x9, 16x16, 25x25
 - Each implementation implements a parallelized approach that take a file and thread number as input.
 
-## Common Challenges
+### Common Challenges
 
 - Beating the Sudoku solver sequential efficiency with parallelism.
 - Managing thread overhead, value synchronization, deadlocks, and thread conflicts.
