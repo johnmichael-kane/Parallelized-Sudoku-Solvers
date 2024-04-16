@@ -13,13 +13,16 @@
 #include <utility> // move
 #include <iterator> // distance
 #include <numeric> // iota
+#include <thread>
+#include <future>
 #include "Grid.h" 
 #include "Position.h"
 
 class PossibleGrid {
 public:
 	// Initialization
-	PossibleGrid() : grid(nullptr), gridSize(0), sectionSize(0) {}
+	PossibleGrid() : grid(nullptr), gridSize(0), sectionSize(0), 
+					 numThreads(std::thread::hardware_concurrency()), threadTasks(0) {}
 
 	void setGrid(Grid *g) {
 		grid = g;
@@ -27,6 +30,7 @@ public:
 			gridSize = grid->getGridSize();
 			sectionSize = grid->getSectionSize();
 			clear();
+			threadTasks = calculateThreadTasks();
 		}
 	}
 
@@ -53,6 +57,13 @@ private:
 	std::vector<Position> unsolvedPositions;
 	std::vector<int> uniqueValues(std::vector<int> vec);
 	std::vector<std::pair<Position, int>> identifyUniqueValues(int index, bool isRow) const;
+	const size_t numThreads;
+	size_t threadTasks;
+
+	size_t calculateThreadTasks() const {
+		return unsolvedPositions.size() / numThreads 
+			   + (unsolvedPositions.size() % numThreads != 0); // address remainder
+	}
 };
 
 #endif /* POSSIBLEGRID_H_ */

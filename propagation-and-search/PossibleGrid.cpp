@@ -6,8 +6,6 @@
 //==================================================================================================
 
 #include "PossibleGrid.h"
-#include <mutex>
-#include <future>
 
 using namespace std;
 
@@ -23,16 +21,13 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 	vector<int> range(gridSize);
 	iota(range.begin(), range.end(), 1);
 
-	const size_t numThreads = thread::hardware_concurrency();
-	size_t batchSize = unsolvedPositions.size() / numThreads 
-					   + (unsolvedPositions.size() % numThreads != 0); // accommodate remainder
 	vector<future<void>> futures; // asynchronous execution
 
 	for (size_t i = 0; i < numThreads; ++i) {
 		// Launch a task for each position asynchronously
 		futures.push_back(async(launch::async, [&, i] {
-			size_t start = i * batchSize;
-            size_t end = min(start + batchSize, unsolvedPositions.size());
+			size_t start = i * threadTasks;
+			size_t end = min(start + threadTasks, unsolvedPositions.size());
 
 			for (size_t j = start; j < end; ++j) {
 				const auto &position = unsolvedPositions[j];
@@ -54,10 +49,11 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 				set_difference(range.begin(), range.end(), usedValues.begin(), usedValues.end(),
 							back_inserter(possibilities));
 				possibleValues[position.row][position.col] = std::move(possibilities); 
-			} }));
+			} 
+		}));
 	}
 
-	// Wait for all futures to complete
+	// Wait for all futures, collect results
 	for (auto &fut : futures) {
 		fut.get();
 	}
@@ -77,22 +73,40 @@ vector<pair<Position, int>> PossibleGrid::crossReference() const {
 
 // Identify unique values in a specified row/column
 vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool isRow) const {
-	multimap<int, Position> valueMap; // map: quick lookup
+	vector<future<vector<pair<Position, int>>>> futures;
+	vector<pair<Position, int>> uniquePairs;
+
 	for (int i = 0; i < gridSize; ++i) {
-		const vector<int> &values = isRow ? possibleValues[index][i] : possibleValues[i][index];
-		for (int val : values) {
-			valueMap.emplace(val, isRow ? Position(index, i) : Position(i, index));
-		}
+		futures.push_back(async(launch::async, [&, i] {
+			// size_t start = i * batchSize;
+            // size_t end = min(start + batchSize, unsolvedPositions.size());
+
+			// Populate multimap (positions of all possible locations for each possible value)
+			// Note: int first (key) to allow multiple value (Position) associations 
+			multimap<int, Position> valueMap;
+			for (int j = 0; j < gridSize; ++j) {
+				const vector<int> &values = isRow ? possibleValues[index][j] : possibleValues[j][index];
+				for (int val : values) {
+					valueMap.emplace(val, isRow ? Position(index, j) : Position(j, index));
+				}
+			}
+
+			// Grab unique pairs (only 1 Position for an int key) from multimap
+			// Note: Position first (key) for quick unique check
+			vector<pair<Position, int>> localUniquePairs;
+			for (auto it = valueMap.begin(); it != valueMap.end(); ++it) { 
+				if (valueMap.count(it->first) == 1) {
+					localUniquePairs.push_back(make_pair(it->second, it->first)); // position, value
+				}
+			}
+			return localUniquePairs;
+		}));
 	}
 
-	vector<pair<Position, int>> uniquePairs;
-	for (auto it = valueMap.begin(); it != valueMap.end(); ++it) { // auto = type-safe
-		const auto &value = it->first;  // key
-		const auto &position = it->second; // value 
-
-		if (valueMap.count(value) == 1) { // appears once (unique)
-			uniquePairs.push_back(make_pair(position, value));
-		}
+	// Wait for all futures, collect results
+	for (auto &fut : futures) {
+		auto localPairs = fut.get();
+		uniquePairs.insert(uniquePairs.end(), localPairs.begin(), localPairs.end());
 	}
 
 	return uniquePairs;
