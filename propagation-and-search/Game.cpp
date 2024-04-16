@@ -13,6 +13,8 @@ using namespace std;
 Game::Game(string path) : puzzle(path)
 {
 	hasInput = gameGrid.read(path);
+	gridSize = gameGrid.getGridSize();
+	isDifficult = (path.find("hard") != string::npos);
 }
 
 bool Game::evaluateBoard()
@@ -53,14 +55,7 @@ bool Game::evaluateBoard()
 	// (3) Search: solve leftover positions across grid.
 	if (cellsLeft && !gameGrid.isComplete())
 	{
-		if (numUnsolvedCells > 9)
-		{ // Example condition: more complexity requires parallel processing
-			hasSolution = parallelDepthFirstSearch();
-		}
-		else
-		{
-			hasSolution = depthFirstSearch();
-		}
+		hasSolution = isDifficult ? parallelDepthFirstSearch() : depthFirstSearch();
 	}
 
 	return gameGrid.isComplete();

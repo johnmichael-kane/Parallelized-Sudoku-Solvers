@@ -24,8 +24,11 @@ private:
 	std::string puzzle;
 
 	Grid gameGrid;
+	int gridSize;
 	PossibleGrid possibleGrid;
 	bool hasSolution = true;
+	double complexityThreshold = 0.7; // 30% of cells are unsolved
+	bool isDifficult = false;
 
 	bool depthFirstSearch();
 	bool parallelDepthFirstSearch();
@@ -58,6 +61,8 @@ public:
 		// Return the number of possibilities for the most constrained cell
 		return possibleGrid.getPossibleValuesAt(minPosIt->row, minPosIt->col).size();
 	}
+
+	int getGridSize() const { return gridSize; }
 };
 
 #endif /* GAME_H_ */
