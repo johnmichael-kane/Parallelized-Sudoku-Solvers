@@ -55,7 +55,7 @@ git clone https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/m
 cd Parallelized-Sudoku-Solvers
 ```
 
-# (3) Layout
+# Repository Overview
 - shared file system
 - shared repository
 - shared parallelism approach (1, 2, 4, & 8 threads)
