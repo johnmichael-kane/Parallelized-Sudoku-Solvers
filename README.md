@@ -61,6 +61,8 @@ cd Parallelized-Sudoku-Solvers
 - shared parallelism approach (1, 2, 4, & 8 threads)
 
 # (3) Propagation and Search (C++)
+View the C++ [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
+
 // describe strategy
 
 ### Implementation
@@ -81,10 +83,8 @@ cd Parallelized-Sudoku-Solvers
 6. Run: `./SudokuSolver`
 7. Enter the file name and number of threads when prompted. Helpful information is printed to the console.
 
-# (1) Brute Force (Java)
-see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach
-
-
+# (1) Brute Force 
+View the Java [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
 
 ### Run
 1. Enter the correct directory: `cd propogation-and-search`
@@ -92,6 +92,7 @@ see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane
 3. Run: `./SudokuSolver`
 
 # (2) Dancing Links
+View the Java [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
 
 This program implements a Sudoku solver using a brute-force approach with Dancing Links
 
