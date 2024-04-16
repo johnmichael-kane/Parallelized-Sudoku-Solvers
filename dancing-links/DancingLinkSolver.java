@@ -1,4 +1,5 @@
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -95,11 +96,14 @@ public class DancingLinkSolver {
 	int size;
 	Stack<DancingLinkObject> result;
 	private AtomicBoolean solutionFound;
+	private AtomicReference<int[][]> solutionMatrix;
 
-	public DancingLinkSolver(Cell[][] matrix, int size, AtomicBoolean solutionFound) {
+	public DancingLinkSolver(Cell[][] matrix, int size, AtomicBoolean solutionFound, AtomicReference<int[][]> solutionMatrix) {
 		this.size = size;
 		this.solution = new int[size][size];
-		result = new Stack<>();
+		this.solutionMatrix = solutionMatrix;
+
+		this.result = new Stack<>();
 		this.header=makeLinks(matrix);
 		this.solutionFound = solutionFound;
 		search();
@@ -138,10 +142,37 @@ public class DancingLinkSolver {
 		return head;
 	}
 
+	private boolean isCompleteSolution() {
+		if (result.size() != size * size) {
+			System.out.println("nah");
+			return false;
+		}
+		int i=0;
+	
+		boolean[][] seen = new boolean[size][size];
+		for (DancingLinkObject item : result) {
+			System.out.print(Thread.currentThread().getName() + ": loop"+i+"/" + (size * size) + ":\t");
+			System.out.println(item.info.number);
+			if (item.info == null || seen[item.info.row][item.info.col] || item.info.number==0) {
+				// If we encounter a null cell info, or we've already seen a cell for this row and column,
+				// it's not a complete solution.
+				System.out.println("ERRRR!");
+				return false;
+			}
+			seen[item.info.row][item.info.col] = true;
+			i++;
+		}
+		
+		System.out.println("total i: " + i);
+		// If we've gotten this far, every cell has been seen exactly once, so it's a complete solution.
+		return true;
+	}
+
 	private void search() {
 		if (solutionFound.get()) return; //Check if another thread found the solution
 
 		if (header.right == header) {
+			System.out.println("Thread " + Thread.currentThread().getName() + " is a complete solution?");
 			makeSolution();
 			return;
 		} 
@@ -168,20 +199,21 @@ public class DancingLinkSolver {
 	
 	//for some reason with the comments it runs 100% of the time but not without them
 	private void makeSolution() {
-		DancingLinkObject curr = result.pop();
-		if(curr.info.number != 0){
-			solution[curr.info.row][curr.info.col] = curr.info.number;
-			System.out.print(curr.info.number);
-			while (!result.isEmpty()) {
-				if(curr.info.number == 0) return;
-				curr = result.pop();
-				solution[curr.info.row][curr.info.col] = curr.info.number;
-				System.out.print(curr.info.number);
+        synchronized (solutionFound) {
+            if (!solutionFound.get() && isCompleteSolution()) {
+                int[][] newSolution = new int[size][size];
+                for (DancingLinkObject dlo : result) {
+                    newSolution[dlo.info.row][dlo.info.col] = dlo.info.number;
+                }
+                solutionMatrix.set(newSolution);
+                solutionFound.set(true);
+            }
+			else{
+				System.out.println(Thread.currentThread().getName() + "is NOT a real working solution!");
 			}
-			solutionFound.set(true);
-		}
-	}
-
+        }
+    }
+	
 	private ColumnObject chooseColumn() {
 		ColumnObject toReturn = null;
 		int min = Integer.MAX_VALUE;

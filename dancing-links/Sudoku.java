@@ -81,7 +81,7 @@ public class Sudoku {
 	private static long startTime; 
 	private static long endTime; 
 	private static final AtomicReference<int[][]> solutionMatrix = new AtomicReference<>();
-	public static int BFS_DEPTH=150;
+	public static int BFS_DEPTH;
 	
 
 	// Method to format single-digit numbers with leading zero
@@ -89,7 +89,8 @@ public class Sudoku {
 		return n > 9 ? "" + n : "0" + n;
 	}
 
-	//used for BFS 
+	//used for BFS, this just checks whether or not a move can work 
+	//there should be nothing wrong with this part
 	private static boolean isValidMove(int[][] board, Point cell, int num) {
 		int row = cell.x;
 		int col = cell.y;
@@ -139,7 +140,7 @@ public class Sudoku {
 				}
 			}
 		}
-		System.out.println(emptyCells);
+		System.out.print(emptyCells + " ");
 		return emptyCells;
 	}
 
@@ -150,7 +151,7 @@ public class Sudoku {
 			boards.add(deepCopy(originalBoard));
 		}
 		else {
-			System.out.println(calculateEmptyCells(originalBoard));
+			BFS_DEPTH=calculateEmptyCells(originalBoard) - 3;
 
 			// BFS Queue to hold the next cells to try
 			Queue<int[][]> queue = new LinkedList<>();
@@ -249,10 +250,10 @@ public class Sudoku {
 		pool.shutdown(); // Disable new tasks from being submitted
 		try {
 			// Wait a while for existing tasks to terminate
-			if (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
+			if (!pool.awaitTermination(1, TimeUnit.HOURS)) {
 				pool.shutdownNow(); // Cancel currently executing tasks
 				// Wait a while for tasks to respond to being cancelled
-				if (!pool.awaitTermination(60, TimeUnit.SECONDS))
+				if (!pool.awaitTermination(1, TimeUnit.HOURS))
 					System.err.println("Pool did not terminate");
 			}
 		} catch (InterruptedException ie) {
@@ -349,10 +350,7 @@ public class Sudoku {
 			executor.submit(() -> {
 				ExactMatrix matrix = new ExactMatrix(board);
 				Cell[][] finalMatrix = matrix.makeFinalMatrix();
-				DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize, solutionFound);
-                if (solutionFound.get()) {
-                    solutionMatrix.set(solver.solution); // Store the solution when found
-                }
+				DancingLinkSolver solver = new DancingLinkSolver(finalMatrix, boardSize, solutionFound, solutionMatrix);
             });
         }
 
