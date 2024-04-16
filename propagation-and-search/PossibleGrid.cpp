@@ -84,14 +84,21 @@ vector<pair<Position, int>> PossibleGrid::crossReference() const
 	return pairs;
 }
 
+//
+// Parallelization - did not improve much
+//
+
 void workerFunction(const vector<vector<vector<int>>> &possibleValues, int index, bool isRow, int start, int end,
 					map<int, vector<Position>> &localMap)
 {
 	map<int, vector<Position>> threadLocalMap;
 	for (int i = start; i < end; ++i)
 	{
-		if (index >= possibleValues[i].size() || (isRow ? i >= possibleValues[index].size() : index >= possibleValues[i].size()))
+		if ((isRow && index >= possibleValues.size()) || (!isRow && i >= possibleValues.size()) ||
+			(isRow && i >= possibleValues[index].size()) || (!isRow && index >= possibleValues[i].size()))
+		{
 			continue; // Skip this iteration if indices are out of range
+		}
 
 		const vector<int> &values = isRow ? possibleValues[index][i] : possibleValues[i][index];
 
