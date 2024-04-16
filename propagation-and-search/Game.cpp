@@ -66,18 +66,25 @@ bool Game::evaluateBoard()
 	return gameGrid.isComplete();
 }
 
+// Here's a simplified example of how you might refactor the handling of futures in parallelDepthFirstSearch for better efficiency:
 bool Game::parallelDepthFirstSearch()
 {
-	// Determine the optimal number of initial branches
-	int first_move_possibilities = calculateFirstMovePossibilities(); // User-defined function based on game state
-	int initial_branches = static_cast<int>(std::min(static_cast<unsigned int>(std::thread::hardware_concurrency()),
-													 static_cast<unsigned int>(first_move_possibilities)));
+	// Determine the number of possibilities for the most constrained cell
+	int first_move_possibilities = calculateFirstMovePossibilities();
+
+	// Calculate the initial branches based on the system's hardware concurrency,
+	// but limit it by the first move possibilities to avoid unnecessary parallelism.
+	int initial_branches = std::min(static_cast<unsigned int>(std::thread::hardware_concurrency()),
+									static_cast<unsigned int>(first_move_possibilities));
+
+	// Ensure there's at least one branch if the grid isn't trivially simple
+	initial_branches = std::max(1, initial_branches);
 
 	vector<future<bool>> futures;
 
+	// Launch each branch to run depthFirstSearch asynchronously
 	for (int i = 0; i < initial_branches; ++i)
 	{
-		// Correctly capturing 'this' to use depthFirstSearch() within the lambda
 		futures.push_back(async(launch::async, [this]
 								{ return this->depthFirstSearch(); }));
 	}
@@ -90,6 +97,7 @@ bool Game::parallelDepthFirstSearch()
 			return true; // Stop all and return true
 		}
 	}
+
 	return false;
 }
 

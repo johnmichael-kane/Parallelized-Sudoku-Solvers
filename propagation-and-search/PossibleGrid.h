@@ -9,6 +9,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <set>
 #include <algorithm> // sort, move, etc.
 #include <utility> // move
 #include <iterator> // distance

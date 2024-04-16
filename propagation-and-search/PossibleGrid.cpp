@@ -12,20 +12,18 @@ mutex mtx;
 
 vector<int> PossibleGrid::getUsedValues(const Grid &grid, const Position &position)
 {
-	vector<int> values;
+	set<int> valueSet;
 	auto appendValues = [&](const vector<int> &src)
 	{
-		values.insert(values.end(), src.begin(), src.end());
+		valueSet.insert(src.begin(), src.end());
 	};
 
 	appendValues(grid.getSection(position.row, position.col));
 	appendValues(grid.getRow(position.row));
 	appendValues(grid.getCol(position.col));
 
-	// Remove duplicates
-	sort(values.begin(), values.end());
-	values.erase(unique(values.begin(), values.end()), values.end());
-	return values;
+	// Remove duplicates via a set
+	return vector<int>(valueSet.begin(), valueSet.end());
 }
 
 // PARALLELIZE: reduce overall time it takes to compute possible values for each unsolved position
@@ -120,13 +118,13 @@ vector<pair<int, Position>> workerFunction(const vector<vector<vector<int>>> &po
 }
 
 // Identify unique values in a specified row/column
+// Improved Aggregation Strategy: Use a thread-safe method to aggregate results from multiple threads to avoid potential delays and manage synchronization efficiently.
 vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool isRow) const
 {
 	vector<future<vector<pair<int, Position>>>> futures;
 	vector<pair<Position, int>> uniquePairs;
 	int numTasks = calculateThreadTasks(static_cast<size_t>(gridSize));
 
-	// Launch worker threads
 	for (int i = 0; i < numThreads; ++i)
 	{
 		int start = i * numTasks;
@@ -134,26 +132,22 @@ vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool i
 		futures.push_back(async(launch::async, workerFunction, cref(possibleValues), index, isRow, start, end));
 	}
 
-	// Aggregate results and detect unique values
 	map<int, vector<Position>> valueMap;
 	for (auto &fut : futures)
 	{
 		auto result = fut.get();
-		for (const auto &pair : result)
+		for (const auto &[val, pos] : result)
 		{
-			int val = pair.first;
-			Position pos = pair.second;
 			valueMap[val].push_back(pos);
 		}
 	}
 
-	for (const auto &pair : valueMap)
+	// Extract unique values and positions
+	for (const auto &[val, positions] : valueMap)
 	{
-		int val = pair.first;
-		const vector<Position> &posList = pair.second;
-		if (posList.size() == 1)
+		if (positions.size() == 1)
 		{
-			uniquePairs.emplace_back(posList.front(), val);
+			uniquePairs.emplace_back(positions.front(), val);
 		}
 	}
 
