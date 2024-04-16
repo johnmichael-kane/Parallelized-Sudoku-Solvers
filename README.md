@@ -44,8 +44,7 @@ A complete background and runtime analysis of each Sudoku solver is documented i
         - Check Homebrew installation: `brew --version`
         - Install [Homebrew](https://brew.sh/) if not installed already.
         - Run: `brew install git`
-    -   **Windows:**
-        - Download and install [Git for Windows](https://gitforwindows.org/).
+    -   **Windows:** Install [Git for Windows](https://gitforwindows.org/).
 -   **Java:**
     -   **Linux (Ubuntu/Debian):**
         ```sh
@@ -55,8 +54,7 @@ A complete background and runtime analysis of each Sudoku solver is documented i
         - Check Homebrew installation: `brew --version`
         - Install [Homebrew](https://brew.sh/) if not installed already.
         - Run: `brew install openjdk`
-    -   **Windows:**
-        - Download and install [JDK for Oracle]([https://gitforwindows.org/](https://www.oracle.com/java/technologies/downloads/)) or [AdoptOpenJDK]([https://gitforwindows.org/](https://adoptium.net/)).
+    -   **Windows:** Install [JDK for Oracle]([https://gitforwindows.org/](https://www.oracle.com/java/technologies/downloads/)) or [AdoptOpenJDK]([https://gitforwindows.org/](https://adoptium.net/)).
 -   **Clang:**
     -   **Linux (Ubuntu/Debian):**
         ```sh
@@ -66,8 +64,7 @@ A complete background and runtime analysis of each Sudoku solver is documented i
         - Check Homebrew installation: `brew --version`
         - Install [Homebrew](https://brew.sh/) if not installed already.
         - Run: `brew install llvm`
-    -   **Windows:**
-        - Download and install [LLVNM](https://releases.llvm.org/download.html).
+    -   **Windows:** Install [LLVNM](https://releases.llvm.org/download.html).
 
 ### 3. Clone Repository
 ```sh
@@ -75,13 +72,21 @@ git clone https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/m
 cd Parallelized-Sudoku-Solvers
 ```
 
-# Repository Overview
+# Project Overview
+
+## Repository Features
+
 - All files located in the 'main' branch.
 - Each implementation uses the same puzzles.
 - Each implementation implements a sequential approach that takes a file as input.
     - **Levels:** easy, medium, hard
     - **Sizes:** 9x9, 16x16, 25x25
 - Each implementation implements a parallelized approach that take a file and thread number as input.
+
+## Common Challenges
+
+- Beating the Sudoku solver sequential efficiency with parallelism.
+- Managing thread overhead, value synchronization, deadlocks, and thread conflicts.
 
 # (1) Brute Force 
 There are two implementations of the Brute Force technique: 
