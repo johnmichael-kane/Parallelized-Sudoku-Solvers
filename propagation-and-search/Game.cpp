@@ -1,9 +1,10 @@
-//========================================================================================
+//==================================================================================================
 // Name        : Game.cpp
 // Author      : Hongbo Tian
 // Editor      : Soleil Cordray
-// Description : ?
-//========================================================================================
+// Description : Implement (1) linear constraint propagation, (2) cross-referencing (if necessary), 
+// 				 and (3) a DFS (if necessary) to solve a Sudoku board. Return true if solved.
+//==================================================================================================
 
 #include "Game.h"
 
