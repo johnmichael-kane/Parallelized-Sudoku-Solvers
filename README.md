@@ -10,7 +10,7 @@ Below is an overview of three different approaches to solving a Sudoku board:
 
 We have referenced sequential solutions of these techniques and created a parallelized implementation to test how performance changes with parallelism. 
 
-A complete background and runtime analysis of each Sudoku solver is documented in our [LaTeX report](https://docs.google.com/document/d/1aVoKkxx--F2Nfqbh13ZVF21VNVL2wHYg11CZaXs5kX8/edit?usp=sharing).
+A complete background and runtime analysis of each Sudoku solver is documented in our [report](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/Parallelized_Sudoku_Solvers.pdf).
 
 ## Requirements: Milestone
 - Finish the compilable code instructions in the readme file below
@@ -22,13 +22,15 @@ A complete background and runtime analysis of each Sudoku solver is documented i
 
 -   C++ compiler (g++) with C++11 support.
 -   Git (for cloning the repository).
+-   Java (for running the Brute Force and Dancing Links implementation).
+-   Clang (for running the Propagate-Cross-Search implementation).
 
 ### 1. Check Prerequisite Installations
 
 -   **GCC (g++):** `g++ --version`
 -   **Git:** `git --version`
--   CLANG
--   JAVA
+-   **Clang:** `clang --version`
+-   **Java:** `java -version`
 
 ### 2. Install Prerequisites
 
@@ -50,6 +52,28 @@ A complete background and runtime analysis of each Sudoku solver is documented i
         - Run: `brew install git`
     -   **Windows:**
         - Download and install [Git for Windows](https://gitforwindows.org/).
+-   **Java:**
+    -   **Linux (Ubuntu/Debian):**
+        ```sh
+        sudo apt-get update
+        sudo apt-get install default-jdk
+    -   **macOS:**
+        - Check Homebrew installation: `brew --version`
+        - Install [Homebrew](https://brew.sh/) if not installed already.
+        - Run: `brew install openjdk`
+    -   **Windows:**
+        - Download and install [JDK for Oracle]([https://gitforwindows.org/](https://www.oracle.com/java/technologies/downloads/)) or [AdoptOpenJDK]([https://gitforwindows.org/](https://adoptium.net/)).
+-   **Clang:**
+    -   **Linux (Ubuntu/Debian):**
+        ```sh
+        sudo apt-get update
+        sudo apt-get install clang
+    -   **macOS:**
+        - Check Homebrew installation: `brew --version`
+        - Install [Homebrew](https://brew.sh/) if not installed already.
+        - Run: `brew install llvm`
+    -   **Windows:**
+        - Download and install [LLVNM](https://releases.llvm.org/download.html).
 
 ### 3. Clone Repository
 ```sh
@@ -58,27 +82,29 @@ cd Parallelized-Sudoku-Solvers
 ```
 
 # Repository Overview
-- shared file system
-- shared repository
-- shared parallelism approach (1, 2, 4, & 8 threads)
+- All files located in the 'main' branch.
+- Each implementation uses the same puzzles.
+- Each implementation implements a sequential approach that takes a file as input.
+    - **Levels:** easy, medium, hard
+    - **Sizes:** 9x9, 16x16, 25x25
+- Each implementation implements a parallelized approach that take a file and thread number as input.
 
 # (1) Brute Force 
-Here are two implementations of the brute force technique: 
-- the non-parallelized approach [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) 
-- the parallelized approach using 1, 2, 4, and 8 threads [ParallelizedBruteForce](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/ParallelizedBruteForce) 
-
-
-
-
-
+There are two implementations of the Brute Force technique: 
+- Java [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
+- Java [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/ParallelizedBruteForce) appoach.
 
 # (2) Dancing Links
-# Sequential Dancing-Links
-View the sequential java approach [here](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/basic).
+There are two implementations of the Dancing Links technique: 
+- Java [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/basic) approach.
+- Java [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/parallelized) approach.
 
-The non-parallelized implementation of Sudoku solving using Dancing Links is based on Donald Knuth's algorithm for efficiently solving exact cover problems. In this implementation, the Sudoku puzzle is represented as an exact cover problem, where each constraint corresponds to a matrix row and each possible placement of a number corresponds to a matrix column.
+## Implementation
 
-# Implementation
+### Sequential
+
+The sequential implementation of Sudoku solving using Dancing Links is based on Donald Knuth's algorithm for efficiently solving exact cover problems. In this implementation, the Sudoku puzzle is represented as an exact cover problem, where each constraint corresponds to a matrix row and each possible placement of a number corresponds to a matrix column.
+
 The implementation for the sequential Dancing-Link contains the following files:
 - [Cell.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/basic/Cell.java): Represents a cell in the Sudoku grid, storing its row, column, and assigned number.
 - [ColumnObject.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/basic/ColumnObject.java): Extends DancingLinkObject and represents a column in the Dancing Links matrix. It maintains the size of the column and handles covering and uncovering operations.
@@ -88,22 +114,22 @@ The implementation for the sequential Dancing-Link contains the following files:
 - [Sudoku.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/basic/Sudoku.java): Reads the Sudoku puzzle from an input file, initializes the exact cover matrix, and utilizes the DancingLinkSolver to find and print the solution.
 
 ### Run 
+
 1. Enter the correct directory: `cd dancing-links/basic`
 2. Compile Sudoku.java: `javac Sudoku.java`
 3. Run the file: `java Sudoku <FILE_NAME>`
-- <FILE_NAME> accepts different files for the 9x9, 16x16, and 25x25 of varying difficulties. To see all inputs, view [Data](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/data)
+- <FILE_NAME> accepts different files for the 9x9, 16x16, and 25x25 of varying difficulties. View the [data](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/data) to see all inputs.
 
-# Parallelized Dancing-Links
-View the parallelized java approach [here](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/parallelized).
+### Parallelized
 
 Parallelization for dancing-links is a little complicated, as the actual process itself is very fast and efficient, and uses a lot of backtracking and public information. So a traditional parallel approach would be difficult to implement. Rather, the strategy for the parallelization involves an initial BFS (Breadth-First-Search) where the program will create n boards, which each belong to n threads. After each thread has a board assigned, then they'll go through the normal dancing-links solution indpendently and once a thread finds a solution, a flag is marked and all the threads return.
 
-# Implementation
 The implementation consists of two files that carry all of the work:
 - [Sudoku.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/parallelized/Sudoku.java): Reads the Sudoku puzzle from an input file, generates starting boards using BFS, initializes multiple instances of the Dancing Links solver, and prints the solution.
 - [DancingLinkSolver.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/parallelized/DancingLinkSolver.java): Implements the Dancing Links algorithm with multithreading support. It creates a linked matrix representation of the Sudoku puzzle and performs parallel backtracking search to find solutions.
 
 ### Run
+
 1. Enter the correct directory: `cd dancing-links/parallelized`
 2. Compile the DancingLinkSolver: `javac DancingLinkSolver.java`
 3. Compile Sudoku.java: `javac Sudoku.java`
@@ -279,32 +305,44 @@ Time taken: 283 milliseconds
 ````
 
 # (3) Propagation and Search
-View the C++ [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
-
-// describe strategy
+C++ [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/sequential/) approach.
+C++ [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/parallel/) approach.
 
 ### Implementation
-// briefly describe & compare both implementations, highlighting your parallelized features, and link the original source here
 
-### Demo
+Technique:
+1. Check linear constraints (stand-alone values).
+2. Cross-reference rows, columns, and sections (intersecting values) if any remaining empty cells.
+3. Depth first search if any remaining empty cells.
 
-![Demo Image]()
+Parallelization Points:
+- Game and PossibleGrid files.
+- Conditionally parallelized DFS (on "hard" boards), parallelized possible and unsolved position checks.
+
+### Sequential
+
+![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/demo/sequential-prop-cross-search)
+
+### Parallelized
+
+![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/demo/parallel-prop-cross-search)
 
 ### Run
 
 1. Open your terminal and navigate to the directory containing the repository (see [Clone Repository](#3-clone-repository)).
-2. Navigate to the directory containing the propagation and search files (`cd propagation-and-search`).
+2. Navigate to the directory containing the propagation and search files (`cd PropagateCrossSearch`).
 3. Navigate to the directory containing the implementation of your choice.
    
-   a. Sequential: `cd sequential-prop-search`
+   a. Sequential: `cd sequential`
 
-   b. Parralelized: `cd parallelized-prop-search`
+   b. Parralelized: `cd parallel`
    
-5. Compile: `g++ -std=c++11 -g -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
+5. Compile: `g++ -std=c++17 -g -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
 6. Run: `./SudokuSolver`
-7. Replace "filename" in `filename.txt` with the board mode and size, then enter the number of threads when prompted. Refer to the console for guidance.
+7. Replace "filename" in `filename.txt` with the board mode and size, then enter the number of threads (if in `parallel` directory) when prompted. Refer to the console for guidance.
 
 # Troubleshooting
 
-- If you encounter any compilation errors, ensure you have the correct permissions and that your g++ installation is up to date with C++11 support.
+- Go back in the terminal using `cd ..` and forward using `cd [directory]`
+- If you encounter any compilation errors, ensure you have the correct permissions and that your g++ installation is up to date with C++17 support.
 - If you face issues with the pthread library on Windows, make sure you have the correct threading library for your setup or seek equivalent compilation flags for MinGW or Cygwin.
