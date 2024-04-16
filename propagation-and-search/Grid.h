@@ -10,8 +10,8 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
-#include <iomanip> // setw
-#include <iterator> // section
+#include <iomanip> 
+#include <iterator> 
 #include "Position.h"
 
 class Grid {

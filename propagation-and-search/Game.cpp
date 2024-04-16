@@ -2,163 +2,135 @@
 // Name        : Game.cpp
 // Author      : Hongbo Tian
 // Editor      : Soleil Cordray
-// Description : Implement (1) linear constraint propagation, (2) cross-referencing (if necessary),
-// 				 and (3) a DFS (if necessary) to solve a Sudoku board. Return true if solved.
+// Description : Implements methods to solve a Sudoku board using linear constraint propagation,
+//               cross-referencing, and depth-first search (DFS), potentially in parallel based on
+//               puzzle difficulty. Returns true if the board is solved.
 //==================================================================================================
 
 #include "Game.h"
-
+#include <vector>
+#include <future>
 using namespace std;
 
-Game::Game(string path) : puzzle(path)
-{
+Game::Game(string path, size_t threads) : puzzlePath(path), numThreads(threads) {
 	hasInput = gameGrid.read(path);
-	gridSize = gameGrid.getGridSize();
-	isDifficult = (path.find("hard") != string::npos);
+	isDifficult = (path.find("hard") != string::npos); // Check if the puzzle is labeled as 'hard'
+	possibleGrid.setGrid(&gameGrid, threads);		   // Initialize grid with possible values
 }
 
-bool Game::evaluateBoard()
-{
-	if (!hasInput || gameGrid.isComplete())
-		return gameGrid.isComplete(); // completion state
+// Evaluates the board and applies appropriate solving methods.
+bool Game::evaluateBoard() {
+	if (!hasInput || gameGrid.isComplete()) return gameGrid.isComplete();
 
-	possibleGrid.setGrid(&gameGrid);	 // initialize grid
-	possibleGrid.analyzeMoves(gameGrid); // get possible values & unsolved positions
+	possibleGrid.analyzeMoves(gameGrid); // Calculate possible moves
 	bool cellsLeft = true;
 
-	// (1) Linear Constraints: solve single-value positions.
-	// TRY (LATER ON): PARALLELIZING THIS FOR GRID SIZES > 9
-	int numUnsolvedCells = possibleGrid.getUnsolvedPositions().size();
-	for (int i = 0; i < numUnsolvedCells; ++i)
-	{
-		const auto &pos = possibleGrid.getUnsolvedPositions()[i];
+	// Linear Constraint Propagation: Solve cells with a single possible value
+	auto unsolvedCells = possibleGrid.getUnsolvedPositions();
+	for (const auto &pos : unsolvedCells) {
 		const auto &possibleValues = possibleGrid.getPossibleValuesAt(pos.row, pos.col);
-		if (possibleValues.size() == 1)
-		{
+		if (possibleValues.size() == 1) {
+			gameGrid.fill(pos, possibleValues.front()); // Fill in the single possible value
 			cellsLeft = false;
-			gameGrid.fill(pos, possibleValues.front());
 		}
 	}
 
-	// (2) Cross Reference: solve intersecting positions.
-	if (cellsLeft)
-	{
-		// cout << "Cross Reference . . . " << endl;
+	// Cross Referencing: Solve cells by checking intersecting rows, columns, and boxes
+	if (cellsLeft) {
 		auto pairs = possibleGrid.crossReference();
-		for (const auto &pair : pairs)
-		{
+		for (const auto &pair : pairs) {
 			cellsLeft = false;
-			gameGrid.fill(pair.first, pair.second);
+			gameGrid.fill(pair.first, pair.second); // Fill intersecting cells
 		}
 	}
 
-	// (3) Search: solve leftover positions across grid.
-	if (cellsLeft && !gameGrid.isComplete())
-	{
+	// Depth First Search: Apply DFS if there are still unsolved cells
+	if (cellsLeft && !gameGrid.isComplete()) {
 		hasSolution = isDifficult ? parallelDepthFirstSearch() : depthFirstSearch();
 	}
 
-	return gameGrid.isComplete();
+	return gameGrid.isComplete(); // Return true if the board is completely solved
 }
 
-// Here's a simplified example of how you might refactor the handling of futures in parallelDepthFirstSearch for better efficiency:
-bool Game::parallelDepthFirstSearch()
-{
-	// Determine the number of possibilities for the most constrained cell
-	int first_move_possibilities = calculateFirstMovePossibilities();
+// Calculates the number of possibilities for the most constrained cell.
+int Game::calculateFirstMovePossibilities() {
+	auto unsolvedPositions = possibleGrid.getUnsolvedPositions();
+	if (unsolvedPositions.empty()) return 0;
 
-	// Calculate the initial branches based on the system's hardware concurrency,
-	// but limit it by the first move possibilities to avoid unnecessary parallelism.
-	int initial_branches = std::min(static_cast<unsigned int>(std::thread::hardware_concurrency()),
-									static_cast<unsigned int>(first_move_possibilities));
+	auto minPosIt = min_element(unsolvedPositions.begin(), unsolvedPositions.end(),
+								[this](const Position &a, const Position &b)
+								{
+									return possibleGrid.getPossibleValuesAt(a.row, a.col).size() <
+										   possibleGrid.getPossibleValuesAt(b.row, b.col).size();
+								});
 
-	// Ensure there's at least one branch if the grid isn't trivially simple
-	initial_branches = std::max(1, initial_branches);
+	return possibleGrid.getPossibleValuesAt(minPosIt->row, minPosIt->col).size();
+}
+
+// Executes a parallel DFS if the puzzle is complex.
+bool Game::parallelDepthFirstSearch() {
+	int initial_branches = min(numThreads, static_cast<size_t>(calculateFirstMovePossibilities()));
+	initial_branches = max(1, initial_branches);
 
 	vector<future<bool>> futures;
-
-	// Launch each branch to run depthFirstSearch asynchronously
-	for (int i = 0; i < initial_branches; ++i)
-	{
+	for (int i = 0; i < initial_branches; ++i) {
 		futures.push_back(async(launch::async, [this]
 								{ return this->depthFirstSearch(); }));
 	}
 
-	// Wait for any branch to find a solution
-	for (auto &fut : futures)
-	{
-		if (fut.get()) // If any future returns true, a solution has been found
-		{
-			return true; // Stop all and return true
-		}
+	for (auto &fut : futures) {
+		if (fut.get())
+			return true; // Return true if any thread finds a solution
 	}
 
-	return false;
+	return false; // Return false if no solutions were found
 }
 
-// TRY (SOON): PARALLELIZE THIS (only applies to larger grids anyways!!)
-// problem: running too long - kept stopping on the puzzles DFS implemented in.
-// instead: optimized DFS - MRV heuristic to choose next cell to fill
-// Use parallel execution for the initial branching to quickly explore separate paths.
-// Switch to a sequential DFS beyond a certain depth or when the workload for a thread falls below a certain threshold.
-// hybrid implementation fixed my code!!
+// Depth-first search implementation for solving the Sudoku puzzle.
 bool Game::depthFirstSearch()
 {
-	std::vector<Grid> searchStack;	 // Using a vector as a stack for DFS
-	searchStack.push_back(gameGrid); // Start with the initial game grid
+	vector<Grid> searchStack = {gameGrid}; // Use a vector as a stack for DFS
 
-	while (!searchStack.empty())
-	{
+	while (!searchStack.empty()) {
 		Grid currentGrid = std::move(searchStack.back());
-		searchStack.pop_back(); // Pop the last element to continue the DFS
+		searchStack.pop_back();
 
-		if (currentGrid.isComplete())
-		{
-			gameGrid = std::move(currentGrid); // If complete, we found a solution
-			return true;
+		if (currentGrid.isComplete()) {
+			gameGrid = std::move(currentGrid);
+			return true; // Puzzle solved
 		}
 
-		if (!currentGrid.isLegal())
-		{
-			continue; // Skip this grid if it's not a legal configuration
-		}
+		if (!currentGrid.isLegal()) continue; // Skip illegal grid configurations
 
-		// Set up to analyze possible moves based on current grid state
 		PossibleGrid possibilities;
-		possibilities.setGrid(&currentGrid);
+		possibilities.setGrid(&currentGrid, numThreads);
 		possibilities.analyzeMoves(currentGrid);
 
-		// Use a heuristic to choose the next cell to try filling
 		auto unsolvedPositions = possibilities.getUnsolvedPositions();
 		if (unsolvedPositions.empty())
-		{
-			continue; // No unsolved positions left, but grid is not complete
-		}
+			continue;
 
-		// Select the position with the minimum remaining values for filling
-		auto pos = *std::min_element(unsolvedPositions.begin(), unsolvedPositions.end(),
-									 [&possibilities](const Position &a, const Position &b)
-									 {
-										 return possibilities.getPossibleValuesAt(a.row, a.col).size() < possibilities.getPossibleValuesAt(b.row, b.col).size();
-									 });
+		auto pos = *min_element(unsolvedPositions.begin(), unsolvedPositions.end(),
+								[&possibilities](const Position &a, const Position &b)
+								{
+									return possibilities.getPossibleValuesAt(a.row, a.col).size() <
+										   possibilities.getPossibleValuesAt(b.row, b.col).size();
+								});
 
-		auto possibleValues = possibilities.getPossibleValuesAt(pos.row, pos.col);
-		for (int value : possibleValues)
-		{
+		for (int value : possibilities.getPossibleValuesAt(pos.row, pos.col)) {
 			Grid newGrid = currentGrid;
-			newGrid.fill(pos, value);				   // Try filling the chosen cell with a possible value
-			searchStack.push_back(std::move(newGrid)); // Push the new grid state onto the stack
+			newGrid.fill(pos, value);
+			searchStack.push_back(std::move(newGrid)); // Push new state to stack
 		}
 	}
 
-	return false; // No solution found after exploring all possibilities
+	return false; // No solution found
 }
 
-void Game::printResult() const
-{
-	if (hasInput)
-	{
-		std::cout << (hasSolution ? "\nSolved!!!" : "\nNo Solution.") << std::endl;
+// Prints the result of the Sudoku solver.
+void Game::printResult() const {
+	if (hasInput) {
+		cout << (hasSolution ? "\nSolved!!!" : "\nNo Solution.") << endl;
 		gameGrid.print();
 	}
 }

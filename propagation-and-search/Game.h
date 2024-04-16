@@ -17,52 +17,24 @@
 #include "Grid.h"
 #include "Position.h"
 
-class Game
-{
+class Game {
 private:
 	bool hasInput = false;
-	std::string puzzle;
-
+	std::string puzzlePath;
 	Grid gameGrid;
-	int gridSize;
 	PossibleGrid possibleGrid;
 	bool hasSolution = true;
-	double complexityThreshold = 0.7; // 30% of cells are unsolved
-	bool isDifficult = false;
+	bool isDifficult = true;
+	size_t numThreads;
 
 	bool depthFirstSearch();
 	bool parallelDepthFirstSearch();
+	int calculateFirstMovePossibilities();
 
 public:
-	Game(std::string path);
+	Game(std::string path, size_t numThreads);
 	bool evaluateBoard();
 	void printResult() const;
-
-	int calculateFirstMovePossibilities()
-	{
-		possibleGrid.setGrid(&gameGrid);	 // Initialize the grid analysis
-		possibleGrid.analyzeMoves(gameGrid); // Calculate possible moves based on current grid state
-
-		// Retrieve unsolved positions from PossibleGrid
-		const auto &unsolvedPositions = possibleGrid.getUnsolvedPositions();
-		if (unsolvedPositions.empty())
-		{
-			return 0; // If no cells are unsolved, return 0 possibilities
-		}
-
-		// Find the position with the minimum remaining values using a lambda to compare the size of possible values
-		auto minPosIt = std::min_element(unsolvedPositions.begin(), unsolvedPositions.end(),
-										 [this](const Position &a, const Position &b)
-										 {
-											 return possibleGrid.getPossibleValuesAt(a.row, a.col).size() <
-													possibleGrid.getPossibleValuesAt(b.row, b.col).size();
-										 });
-
-		// Return the number of possibilities for the most constrained cell
-		return possibleGrid.getPossibleValuesAt(minPosIt->row, minPosIt->col).size();
-	}
-
-	int getGridSize() const { return gridSize; }
 };
 
 #endif /* GAME_H_ */

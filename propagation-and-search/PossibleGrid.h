@@ -25,10 +25,9 @@
 class PossibleGrid {
 public:
 	// Initialization
-	PossibleGrid() : grid(nullptr), gridSize(0), sectionSize(0), 
-					 numThreads(std::thread::hardware_concurrency()), threadTasks(0) {}
+	PossibleGrid() : grid(nullptr), gridSize(0), sectionSize(0), numThreads(0), threadTasks(0) {}
 
-	void setGrid(Grid *g) {
+	void setGrid(Grid *g, size_t threads) {
 		grid = g;
 		if (grid) {
 			gridSize = grid->getGridSize();
@@ -38,6 +37,7 @@ public:
 			possibleValues.resize(gridSize, std::vector<std::vector<int>>(gridSize));
 			unsolvedPositions = grid->getUnsolvedPositions();
 		}
+		numThreads = threads;
 	}
 
 	void clear() {
@@ -55,6 +55,7 @@ public:
 	const std::vector<int> &getPossibleValuesAt(int row, int col) const {
 		return possibleValues[row][col];
 	}
+
 private:
 	Grid *grid;
 	int gridSize;
@@ -63,7 +64,7 @@ private:
 	std::vector<Position> unsolvedPositions;
 	std::vector<int> uniqueValues(std::vector<int> vec);
 	std::vector<std::pair<Position, int>> identifyUniqueValues(int index, bool isRow) const;
-	const size_t numThreads;
+	size_t numThreads;
 	mutable size_t threadTasks;
 
 	size_t calculateThreadTasks(size_t size) const {

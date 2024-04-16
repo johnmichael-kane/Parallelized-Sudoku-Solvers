@@ -8,37 +8,52 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
-#include <cctype>
-#include <string>
-#include <algorithm>
+#include <limits>
 
 #include "Game.h"
 
 using namespace std;
 
-int main()
-{
-	// Puzzle selection (user input).
-	
+int main() {
+	// Puzzle selection (user input)
+
 	const string PATH = "puzzles/";
-	cout << "\nLEVELS: easy, medium, hard\nSIZES: 9, 16, 25\n\n";
-	cout << "Enter a file name (e.g., easy9.txt) to start the game!\n\n";
+	cout << "\nLEVELS: easy, medium, hard\nSIZES: 9, 16, 25\n";
+	cout << "THREADS: 1 to " << thread::hardware_concurrency() << "\n\n";
+	cout << "Enter a file name (e.g., easy9.txt) and number of threads to start the game!\n\n";
+
 	ifstream file;
 	string filename;
+	size_t numThreads;
 
 	do {
 		std::cout << "File name: ";
 		cin >> filename;
 		file.open(PATH + filename);
-
-		if (!file) { cout << "File not found, try again!\n\n"; }
+		if (!file) { 
+			cout << "File not found, try again!\n";
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		}
 	} while (!file);
 	file.close();
 
-	// Run game.
+	do {
+		std::cout << "Number of threads: ";
+		cin >> numThreads;
+
+		bool validThread = numThreads >= 1 && numThreads <= thread::hardware_concurrency();
+		if (!validThread) { 
+			cout << "Invalid number of threads, try again!\n\n";
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		} else { break; }
+	} while (true);
+
+	// Run game
 
 	auto start = chrono::high_resolution_clock::now();
-	Game game(PATH + filename); // initialize board
+	Game game(PATH + filename, numThreads); // initialize board
 	while (!game.evaluateBoard()); // evaluate board
 	auto end = chrono::high_resolution_clock::now();
 
