@@ -10,7 +10,10 @@
 
 using namespace std;
 
-Game::Game(string path) : puzzle(path) { hasInput = gameGrid.read(path); }
+Game::Game(string path) : puzzle(path)
+{
+	hasInput = gameGrid.read(path);
+}
 
 bool Game::evaluateBoard() {
 	if (!hasInput || gameGrid.isComplete()) return gameGrid.isComplete(); // completion state
@@ -50,31 +53,45 @@ bool Game::evaluateBoard() {
 }
 
 // TRY (SOON): PARALLELIZE THIS (only applies to larger grids anyways!!)
-bool Game::depthFirstSearch() {
-	// cout << "Depth First Search . . . " << endl;
+// problem: running too long - kept stopping on the puzzles DFS implemented in.
+// instead: optimized DFS - MRV heuristic to choose next cell to fill
+// Use parallel execution for the initial branching to quickly explore separate paths.
+// Switch to a sequential DFS beyond a certain depth or when the workload for a thread falls below a certain threshold.
+bool Game::depthFirstSearch()
+{
 	vector<Grid> searchQueue{gameGrid};
 
-	while (!searchQueue.empty()) {
+	while (!searchQueue.empty())
+	{
 		Grid currentGrid = std::move(searchQueue.back());
 		searchQueue.pop_back(); // process (remove)
 
-		if (!currentGrid.isComplete()) {
-			if (!currentGrid.isLegal()) continue; // illegal -> skip
-
-			PossibleGrid possibilities;
-			possibilities.setGrid(&currentGrid);
-			possibilities.analyzeMoves(currentGrid);
-			const auto &pos = possibilities.getUnsolvedPositions().front();
-			const auto &posValues = possibilities.getPossibleValuesAt(pos.row, pos.col);
-
-			for (int value : posValues) { // position
-				Grid newGrid = currentGrid;
-				newGrid.fill(pos, value);
-				searchQueue.push_back(std::move(newGrid)); // "move on"
-			}
-		} else {
-			gameGrid = std::move(currentGrid); // "move on"
+		if (currentGrid.isComplete())
+		{
+			gameGrid = std::move(currentGrid); // Found solution
 			return true;
+		}
+
+		if (!currentGrid.isLegal())
+			continue; // illegal -> skip
+
+		PossibleGrid possibilities;
+		possibilities.setGrid(&currentGrid);
+		possibilities.analyzeMoves(currentGrid);
+
+		auto unsolved = possibilities.getUnsolvedPositions();
+		if (unsolved.empty())
+			continue;
+
+		auto pos = *std::min_element(unsolved.begin(), unsolved.end(), [&](const Position &a, const Position &b)
+									 { return possibilities.getPossibleValuesAt(a.row, a.col).size() < possibilities.getPossibleValuesAt(b.row, b.col).size(); });
+
+		auto posValues = possibilities.getPossibleValuesAt(pos.row, pos.col);
+		for (int value : posValues)
+		{
+			Grid newGrid = currentGrid;
+			newGrid.fill(pos, value);
+			searchQueue.push_back(std::move(newGrid));
 		}
 	}
 

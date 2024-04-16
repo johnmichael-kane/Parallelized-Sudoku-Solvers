@@ -11,9 +11,12 @@
 #include <mutex>
 #include <algorithm>
 #include <functional>
+#include <atomic>
+#include <future>
 #include "PossibleGrid.h"
 #include "Grid.h"
 #include "Position.h"
+#include "ThreadSafeQueue.cpp"
 
 class Game {
 private:

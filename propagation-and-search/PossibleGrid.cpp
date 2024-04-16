@@ -74,24 +74,33 @@ void PossibleGrid::analyzeMoves(const Grid &grid)
 vector<pair<Position, int>> PossibleGrid::crossReference() const
 {
 	vector<pair<Position, int>> pairs;
+	vector<future<vector<pair<Position, int>>>> futures;
+
+	// Launch threads for rows and columns in parallel
 	for (int i = 0; i < gridSize; ++i)
 	{
-		auto rowUnique = identifyUniqueValues(i, true);	 // ith row possibilities
-		auto colUnique = identifyUniqueValues(i, false); // ith col possibilities
-		pairs.insert(pairs.end(), rowUnique.begin(), rowUnique.end());
-		pairs.insert(pairs.end(), colUnique.begin(), colUnique.end());
+		futures.push_back(async(launch::async, &PossibleGrid::identifyUniqueValues, this, i, true));  // For rows
+		futures.push_back(async(launch::async, &PossibleGrid::identifyUniqueValues, this, i, false)); // For columns
 	}
+
+	// Collect results from futures
+	for (auto &fut : futures)
+	{
+		vector<pair<Position, int>> unique = fut.get();
+		pairs.insert(pairs.end(), unique.begin(), unique.end());
+	}
+
 	return pairs;
 }
 
 //
-// Parallelization - did not improve much
-//
+// Parallelization - everything slightly worse except medium & hard 25 (those are slightly better)
+// goal: collect all outputs efficiently, minimize shared access & synchronization (collect at end)
+// accumulate results in shared storage instead of locking
 
-void workerFunction(const vector<vector<vector<int>>> &possibleValues, int index, bool isRow, int start, int end,
-					map<int, vector<Position>> &localMap)
+vector<pair<int, Position>> workerFunction(const vector<vector<vector<int>>> &possibleValues, int index, bool isRow, int start, int end)
 {
-	map<int, vector<Position>> threadLocalMap;
+	vector<pair<int, Position>> results;
 	for (int i = start; i < end; ++i)
 	{
 		if ((isRow && index >= possibleValues.size()) || (!isRow && i >= possibleValues.size()) ||
@@ -101,62 +110,50 @@ void workerFunction(const vector<vector<vector<int>>> &possibleValues, int index
 		}
 
 		const vector<int> &values = isRow ? possibleValues[index][i] : possibleValues[i][index];
-
 		for (int val : values)
 		{
 			Position pos = isRow ? Position(index, i) : Position(i, index);
-			threadLocalMap[val].push_back(pos);
+			results.emplace_back(val, pos);
 		}
 	}
-
-	{
-		lock_guard<mutex> lock(mtx);
-		for (const auto &pair : threadLocalMap)
-		{
-			localMap[pair.first].insert(localMap[pair.first].end(), pair.second.begin(), pair.second.end());
-		}
-	}
+	return results;
 }
 
 // Identify unique values in a specified row/column
 vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool isRow) const
 {
-	vector<thread> threads;
-	vector<map<int, vector<Position>>> threadMaps(numThreads);
-	mutex mtx;
+	vector<future<vector<pair<int, Position>>>> futures;
+	vector<pair<Position, int>> uniquePairs;
+	int numTasks = calculateThreadTasks(static_cast<size_t>(gridSize));
 
-	// Divide work among threads
-	threadTasks = calculateThreadTasks(static_cast<size_t>(gridSize));
+	// Launch worker threads
 	for (int i = 0; i < numThreads; ++i)
 	{
-		int start = i * threadTasks;
-		int end = (i == numThreads - 1) ? gridSize : start + threadTasks;
-		threads.emplace_back(workerFunction, ref(possibleValues), index, isRow, start, end, ref(threadMaps[i]));
+		int start = i * numTasks;
+		int end = (i == numThreads - 1) ? gridSize : start + numTasks;
+		futures.push_back(async(launch::async, workerFunction, cref(possibleValues), index, isRow, start, end));
 	}
 
-	// Wait for all threads to complete
-	for (auto &th : threads)
+	// Aggregate results and detect unique values
+	map<int, vector<Position>> valueMap;
+	for (auto &fut : futures)
 	{
-		th.join();
-	}
-
-	// Merge results
-	map<int, vector<Position>> mergedMap;
-	for (auto &tm : threadMaps)
-	{
-		for (auto &pair : tm)
+		auto result = fut.get();
+		for (const auto &pair : result)
 		{
-			mergedMap[pair.first].insert(mergedMap[pair.first].end(), pair.second.begin(), pair.second.end());
+			int val = pair.first;
+			Position pos = pair.second;
+			valueMap[val].push_back(pos);
 		}
 	}
 
-	// Extract unique values
-	vector<pair<Position, int>> uniquePairs;
-	for (auto &pair : mergedMap)
+	for (const auto &pair : valueMap)
 	{
-		if (pair.second.size() == 1)
+		int val = pair.first;
+		const vector<Position> &posList = pair.second;
+		if (posList.size() == 1)
 		{
-			uniquePairs.emplace_back(pair.second.front(), pair.first);
+			uniquePairs.emplace_back(posList.front(), val);
 		}
 	}
 
