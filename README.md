@@ -27,6 +27,8 @@ A complete background and runtime analysis of each Sudoku solver is documented i
 
 -   **GCC (g++):** `g++ --version`
 -   **Git:** `git --version`
+-   CLANG
+-   JAVA
 
 ### 2. Install Prerequisites
 
@@ -79,7 +81,7 @@ View the C++ [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/P
 3. Navigate to the directory containing the implementation of your choice.
    a. Sequential: `cd sequential-prop-search`
    b. Parralelized: `cd parallelized-prop-search`
-5. Compile: `g++ -std=c++11 -pthread problem1.cpp -o problem1`
+5. Compile: `g++ -std=c++11 -g -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
 6. Run: `./SudokuSolver`
 7. Enter the file name and number of threads when prompted. Helpful information is printed to the console.
 
