@@ -25,9 +25,9 @@ View the parallelized java approach [here](https://github.com/johnmichael-kane/P
 Parallelization for dancing-links is a little complicated, as the actual process itself is very fast and efficient, and uses a lot of backtracking and public information. So a traditional parallel approach would be difficult to implement. Rather, the strategy for the parallelization involves an initial BFS (Breadth-First-Search) where the program will create n boards, which each belong to n threads. After each thread has a board assigned, then they'll go through the normal dancing-links solution indpendently and once a thread finds a solution, a flag is marked and all the threads return.
 
 # Implementation
-The implementation consists of two files: [Sudoku.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/parallelized/Sudoku.java) and [DancingLinkSolver.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/parallelized/DancingLinkSolver.java):
-- Sudoku.java: Reads the Sudoku puzzle from an input file, generates starting boards using BFS, initializes multiple instances of the Dancing Links solver, and prints the solution.
-- DancingLinkSolver.java: Implements the Dancing Links algorithm with multithreading support. It creates a linked matrix representation of the Sudoku puzzle and performs parallel backtracking search to find solutions.
+The implementation consists of two files that carry all of the work:
+- [Sudoku.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/parallelized/Sudoku.java): Reads the Sudoku puzzle from an input file, generates starting boards using BFS, initializes multiple instances of the Dancing Links solver, and prints the solution.
+- [DancingLinkSolver.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/parallelized/DancingLinkSolver.java): Implements the Dancing Links algorithm with multithreading support. It creates a linked matrix representation of the Sudoku puzzle and performs parallel backtracking search to find solutions.
 
 ### Run
 1. Enter the correct directory: `cd dancing-links/parallelized`
