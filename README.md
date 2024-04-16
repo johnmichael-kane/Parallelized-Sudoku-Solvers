@@ -65,7 +65,7 @@ cd Parallelized-Sudoku-Solvers
 # (1) Brute Force 
 Here are two implementations of the brute force technique: 
 - the non-parallelized approach [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) 
-- the parallelized approach using 1, 2, 4, and 8 threads [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/ParallelizedBruteForce) 
+- the parallelized approach using 1, 2, 4, and 8 threads [ParallelizedBruteForce](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/ParallelizedBruteForce) 
 
 
 
