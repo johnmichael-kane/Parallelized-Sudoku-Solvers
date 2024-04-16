@@ -262,7 +262,7 @@ Time taken: 283 milliseconds
 
 ````
 
-# (3) Propagation and Search (C++)
+# (3) Propagation and Search
 View the C++ [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
 
 // describe strategy
