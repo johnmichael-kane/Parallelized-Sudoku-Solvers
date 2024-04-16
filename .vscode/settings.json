@@ -85,7 +85,8 @@
     "span": "cpp",
     "stack": "cpp",
     "list": "cpp",
-    "future": "cpp"
+    "future": "cpp",
+    "unordered_set": "cpp"
   },
   "C_Cpp_Runner.cCompilerPath": "g++",
   "C_Cpp_Runner.cppCompilerPath": "gcc",

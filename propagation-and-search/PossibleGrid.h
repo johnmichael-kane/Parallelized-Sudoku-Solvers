@@ -49,6 +49,7 @@ public:
 	std::vector<std::pair<Position, int>> crossReference() const;
 
 	// Getters
+	static std::vector<int> getUsedValues(const Grid &grid, const Position &position);
 	const std::vector<Position> &getUnsolvedPositions() const { return unsolvedPositions; }
 	const std::vector<int> &getPossibleValuesAt(int row, int col) const {
 		return possibleValues[row][col];
