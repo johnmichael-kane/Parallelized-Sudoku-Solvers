@@ -24,7 +24,8 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 	iota(range.begin(), range.end(), 1);
 
 	const size_t numThreads = thread::hardware_concurrency();
-	size_t batchSize = unsolvedPositions.size() / numThreads + (unsolvedPositions.size() % numThreads != 0);
+	size_t batchSize = unsolvedPositions.size() / numThreads 
+					   + (unsolvedPositions.size() % numThreads != 0); // accommodate remainder
 	vector<future<void>> futures; // asynchronous execution
 
 	for (size_t i = 0; i < numThreads; ++i) {
