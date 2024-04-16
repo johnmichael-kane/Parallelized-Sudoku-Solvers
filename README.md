@@ -6,7 +6,7 @@ Below is an overview of three different approaches to solving a Sudoku board:
 
 (2) [Dancing Links](#2-dancing-links) (Java)
 
-(3) [Propagation and Search](#3-propagation-cross-search) (C++)
+(3) [Propagation-Cross-Search](#3-propagation-cross-search) (C++)
 
 We have referenced sequential solutions of these techniques and created a parallelized implementation to test how performance changes with parallelism. 
 
@@ -92,11 +92,13 @@ cd Parallelized-Sudoku-Solvers
 There are two implementations of the Brute Force technique: 
 - Java [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
 - Java [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/ParallelizedBruteForce) appoach.
+Code built off of a referenced [repository](https://github.com/bryanesmith/Sudoku-solver/blob/master/SudokuPuzzle.cpp).
 
 # (2) Dancing Links
 There are two implementations of the Dancing Links technique: 
 - Java [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/basic) approach.
 - Java [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/parallelized) approach.
+Code built off of a referenced [repository](https://github.com/gkaranikas/dancing-links/tree/master).
 
 ## Implementation
 
@@ -303,9 +305,11 @@ Time taken: 283 milliseconds
 
 ````
 
-# (3) Propagation Cross Search
-C++ [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/sequential/) approach.
-C++ [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/parallel/) approach.
+# (3) Propagation-Cross-Search
+There are two implementations of the Propagation-Cross-Search technique: 
+- C++ [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/sequential/) approach.
+- C++ [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/parallel/) approach.
+Code built off of a referenced [repository](https://github.com/anthemEdge/Sudoku-Solver).
 
 ### Implementation
 
@@ -320,11 +324,11 @@ Parallelization Points:
 
 ### Sequential
 
-![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/demo/sequential-prop-cross-search)
+![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/sequential-prop-cross-search)
 
 ### Parallelized
 
-![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/demo/parallel-prop-cross-search)
+![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/parallel-prop-cross-search)
 
 ### Run
 
