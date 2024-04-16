@@ -91,7 +91,7 @@ see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane
 2. Compile the files: `g++ -g  -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
 3. Run: `./SudokuSolver`
 
-# Dancing Links
+# (2) Dancing Links
 
 This program implements a Sudoku solver using a brute-force approach with Dancing Links
 
