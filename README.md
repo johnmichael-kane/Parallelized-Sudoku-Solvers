@@ -2,7 +2,7 @@
 
 Below is an overview of three different approaches to solving a Sudoku board: 
 
-#### (1) [Brute Force](#(1)-brute-force)). (Java)
+#### (1) [Brute Force]((1)-brute-force) (Java)
 
 #### (2) Dancing Links (Java)
 
