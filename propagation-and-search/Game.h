@@ -7,31 +7,29 @@
 
 #include <iostream>
 #include <vector>
+#include <thread>
 #include <mutex>
+#include <algorithm>
+#include <functional>
 #include "PossibleGrid.h"
 #include "Grid.h"
 #include "Position.h"
 
+using namespace std;
+
 class Game {
 private:
+	bool hasInput = false;
+	string puzzle;
+
 	Grid gameGrid;
 	PossibleGrid possibleGrid;
-	mutex gridMutex;
-	string puzzle;
-	bool trigger = true;
-
-	bool isFinished = false;
 	bool hasSolution = true;
-	bool gridExists = false;
-	int linearCycle = 0;
-	int crossReferenceCycle = 0;
-	int searchCycle = 0;
 
 	bool depthFirstSearch();
 public:
 	Game(string path);
 	bool evaluateBoard();
-	void processSegment(int start, int end) const; 
 	void printResult() const;
 };
 
