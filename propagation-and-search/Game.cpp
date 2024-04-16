@@ -2,7 +2,7 @@
 // Name        : Game.cpp
 // Author      : Hongbo Tian
 // Editor      : Soleil Cordray
-// Description : Implement (1) linear constraint propagation, (2) cross-referencing (if necessary), 
+// Description : Implement (1) linear constraint propagation, (2) cross-referencing (if necessary),
 // 				 and (3) a DFS (if necessary) to solve a Sudoku board. Return true if solved.
 //==================================================================================================
 
@@ -15,37 +15,44 @@ Game::Game(string path) : puzzle(path)
 	hasInput = gameGrid.read(path);
 }
 
-bool Game::evaluateBoard() {
-	if (!hasInput || gameGrid.isComplete()) return gameGrid.isComplete(); // completion state
+bool Game::evaluateBoard()
+{
+	if (!hasInput || gameGrid.isComplete())
+		return gameGrid.isComplete(); // completion state
 
-	possibleGrid.setGrid(&gameGrid); // initialize grid
+	possibleGrid.setGrid(&gameGrid);	 // initialize grid
 	possibleGrid.analyzeMoves(gameGrid); // get possible values & unsolved positions
 	bool cellsLeft = true;
 
 	// (1) Linear Constraints: solve single-value positions.
 	// TRY (LATER ON): PARALLELIZING THIS FOR GRID SIZES > 9
 	int numUnsolvedCells = possibleGrid.getUnsolvedPositions().size();
-	for (int i = 0; i < numUnsolvedCells; ++i) {
+	for (int i = 0; i < numUnsolvedCells; ++i)
+	{
 		const auto &pos = possibleGrid.getUnsolvedPositions()[i];
 		const auto &possibleValues = possibleGrid.getPossibleValuesAt(pos.row, pos.col);
-		if (possibleValues.size() == 1) {
+		if (possibleValues.size() == 1)
+		{
 			cellsLeft = false;
 			gameGrid.fill(pos, possibleValues.front());
 		}
 	}
 
 	// (2) Cross Reference: solve intersecting positions.
-	if (cellsLeft) {
+	if (cellsLeft)
+	{
 		// cout << "Cross Reference . . . " << endl;
 		auto pairs = possibleGrid.crossReference();
-		for (const auto &pair : pairs) {
+		for (const auto &pair : pairs)
+		{
 			cellsLeft = false;
 			gameGrid.fill(pair.first, pair.second);
 		}
 	}
 
 	// (3) Search: solve leftover positions across grid.
-	if (cellsLeft && !gameGrid.isComplete()) {
+	if (cellsLeft && !gameGrid.isComplete())
+	{
 		if (numUnsolvedCells > 9)
 		{ // Example condition: more complexity requires parallel processing
 			hasSolution = parallelDepthFirstSearch();
@@ -72,7 +79,7 @@ bool Game::parallelDepthFirstSearch()
 	{
 		// Correctly capturing 'this' to use depthFirstSearch() within the lambda
 		futures.push_back(async(launch::async, [this]
-									 { return this->depthFirstSearch(); }));
+								{ return this->depthFirstSearch(); }));
 	}
 
 	// Wait for any branch to find a solution
@@ -146,7 +153,8 @@ bool Game::depthFirstSearch()
 
 void Game::printResult() const
 {
-	if (hasInput) {
+	if (hasInput)
+	{
 		std::cout << (hasSolution ? "\nSolved!!!" : "\nNo Solution.") << std::endl;
 		gameGrid.print();
 	}

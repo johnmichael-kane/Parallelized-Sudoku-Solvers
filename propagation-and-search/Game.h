@@ -17,19 +17,20 @@
 #include "Grid.h"
 #include "Position.h"
 
-class Game {
+class Game
+{
 private:
 	bool hasInput = false;
 	std::string puzzle;
 
 	Grid gameGrid;
-	PossibleGrid possibleGrid; 
+	PossibleGrid possibleGrid;
 	bool hasSolution = true;
 
 	bool depthFirstSearch();
 	bool parallelDepthFirstSearch();
 
-public : 
+public:
 	Game(std::string path);
 	bool evaluateBoard();
 	void printResult() const;
