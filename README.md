@@ -81,8 +81,6 @@ cd Parallelized-Sudoku-Solvers
 6. Run: `./SudokuSolver`
 7. Enter the file name and number of threads when prompted. Helpful information is printed to the console.
 
-- (1)
-
 # (1) Brute Force (Java)
 see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach
 
@@ -93,7 +91,7 @@ see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane
 2. Compile the files: `g++ -g  -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
 3. Run: `./SudokuSolver`
 
-## Sudoku Solver using Dancing Links
+# Dancing Links
 
 This program implements a Sudoku solver using a brute-force approach with Dancing Links
 
@@ -286,3 +284,7 @@ Time taken: 283 milliseconds
 
 ````
 
+# Troubleshooting
+
+- If you encounter any compilation errors, ensure you have the correct permissions and that your g++ installation is up to date with C++11 support.
+- If you face issues with the pthread library on Windows, make sure you have the correct threading library for your setup or seek equivalent compilation flags for MinGW or Cygwin.
