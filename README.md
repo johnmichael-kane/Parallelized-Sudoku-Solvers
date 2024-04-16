@@ -1,9 +1,13 @@
 # Parallelized-Sudoku-Solvers
 
 Below is an overview of three different approaches to solving a Sudoku board: 
+
 (1) Brute Force (Java)
+
 (2) Dancing Links (Java)
+
 (3) Linear Propagation and Search (C++)
+
 We have referenced sequential solutions of these techniques and created a parallelized implementation to test how performance changes with parallelism. 
 
 A complete background and runtime analysis of each Sudoku solver is documented in our [LaTeX report](https://docs.google.com/document/d/1aVoKkxx--F2Nfqbh13ZVF21VNVL2wHYg11CZaXs5kX8/edit?usp=sharing).
