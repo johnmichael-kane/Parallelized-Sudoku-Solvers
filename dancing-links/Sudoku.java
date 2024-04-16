@@ -90,6 +90,107 @@ public class Sudoku {
 		return n > 9 ? "" + n : "0" + n;
 	}
 
+	// this is just for the input
+	private static int parseNumThreads(String input) {
+		try {
+			int numThreads = Integer.parseInt(input);
+			if (numThreads == 1 || numThreads == 2 || numThreads == 4 || numThreads == 8) {
+				return numThreads;
+			}
+		} catch (NumberFormatException ex) {
+			System.out.println("Number format exception for input string: " + input);
+		}
+		return -1; // Indicate invalid input
+	}
+
+	// used for printing the input/output
+	public static void printSudokuBoard(int boardSize, int blocksize, int vals[][]) {
+		for (int y = 0; y < boardSize; y++) {
+			if (y % blocksize == 0) {
+				System.out.println(" ");
+			}
+
+			for (int x = 0; x < boardSize; x++) {
+				if (x % blocksize == 0) {
+					System.out.print("|");
+				}
+				System.out.print(vals[y][x] == 0 ? "  . " : " " + n(vals[y][x]) + " ");
+			}
+			System.out.println("|");
+		}
+		System.out.println("");
+	}
+
+	// prints the file
+	public static void printSudokuBoardInFile(int boardSize, int blocksize, int vals[][], int threads) {
+		try {
+			FileWriter writer = new FileWriter(
+					"./output/" + threads + "-threads" + boardSize + "x" + boardSize + "_out.txt"); // Open file for
+																									// writing
+			writer.write("Time taken: " + (endTime - startTime) + " milliseconds\n"); // Write time taken to solve
+			writer.write("Solved Sudoku:\n");
+			for (int y = 0; y < boardSize; y++) {
+				if (y % blocksize == 0) {
+					writer.write("\n");
+				}
+				for (int x = 0; x < boardSize; x++) {
+					if (x % blocksize == 0) {
+						writer.write("|");
+					}
+					writer.write(vals[y][x] == 0 ? "  . " : " " + n(vals[y][x]) + " ");
+				}
+				writer.write("|\n");
+			}
+			writer.close(); // Close the writer after writing
+		} catch (IOException e) {
+			e.printStackTrace(); // Handle IO exception
+		}
+	}
+
+	// controls the threads and what shuts down and not
+	private static void shutdownAndAwaitTermination(ExecutorService pool) {
+		pool.shutdown(); // Disable new tasks from being submitted
+		try {
+			// Wait a while for existing tasks to terminate
+			if (!pool.awaitTermination(1, TimeUnit.HOURS)) {
+				pool.shutdownNow(); // Cancel currently executing tasks
+				// Wait a while for tasks to respond to being cancelled
+				if (!pool.awaitTermination(1, TimeUnit.HOURS))
+					System.err.println("Pool did not terminate");
+			}
+		} catch (InterruptedException ie) {
+			// (Re-)Cancel if current thread also interrupted
+			pool.shutdownNow();
+			// Preserve interrupt status
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	// temporary function to test the input I get:
+	private static void printBoard(int[][] board) {
+		System.out.println("Board Layout:");
+		for (int[] row : board) {
+			for (int cell : row) {
+				System.out.print(cell + " ");
+			}
+			System.out.println();
+		}
+		System.out.println("---------------");
+	}
+
+	// allows a copy without accessing the same information
+	// used in the generateStartingBoards
+	private static int[][] deepCopy(int[][] original) {
+		if (original == null) {
+			return null;
+		}
+		final int[][] result = new int[original.length][];
+		for (int i = 0; i < original.length; i++) {
+			result[i] = original[i].clone(); // This clones the inner array
+		}
+		return result;
+	}
+
 	// used for BFS, this just checks whether or not a move can work
 	// there should be nothing wrong with this part
 	private static boolean isValidMove(int[][] board, Point cell, int num) {
@@ -145,14 +246,89 @@ public class Sudoku {
 		return emptyCells;
 	}
 
+	public static List<Integer> getPossibleNumbers(int[][] board, int row, int col) {
+		int size = board.length;
+		boolean[] possible = new boolean[size + 1];
+		java.util.Arrays.fill(possible, false);
+
+		for (int i = 0; i < size; i++) {
+			if (board[row][i] != 0) {
+				possible[board[row][i]] = true;
+			}
+			if (board[i][col] != 0) {
+				possible[board[i][col]] = true;
+			}
+		}
+
+		int blockRowStart = (row / (int) Math.sqrt(size)) * (int) Math.sqrt(size);
+		int blockColStart = (col / (int) Math.sqrt(size)) * (int) Math.sqrt(size);
+		for (int r = blockRowStart; r < blockRowStart + (int) Math.sqrt(size); r++) {
+			for (int c = blockColStart; c < blockColStart + (int) Math.sqrt(size); c++) {
+				if (board[r][c] != 0) {
+					possible[board[r][c]] = true;
+				}
+			}
+		}
+
+		List<Integer> possibilities = new ArrayList<>();
+		for (int num = 1; num <= size; num++) {
+			if (!possible[num]) {
+				possibilities.add(num);
+			}
+		}
+
+		return possibilities;
+	}
+
+	// i want to try this one
+	public static Point selectCellWithFewestOptions(int[][] board) {
+		int minOptions = Integer.MAX_VALUE;
+		Point bestCell = null;
+
+		for (int row = 0; row < board.length; row++) {
+			for (int col = 0; col < board[row].length; col++) {
+				if (board[row][col] == 0) {
+					List<Integer> possibilities = getPossibleNumbers(board, row, col);
+					if (possibilities.size() < minOptions) {
+						minOptions = possibilities.size();
+						bestCell = new Point(row, col);
+					}
+				}
+			}
+		}
+
+		return bestCell;
+	}
+
+	// this is used for BFS
+	public static void applyConstraintPropagation(int[][] board) {
+		boolean progress;
+		do {
+			progress = false;
+			for (int row = 0; row < board.length; row++) {
+				for (int col = 0; col < board[row].length; col++) {
+					if (board[row][col] == 0) {
+						List<Integer> possibilities = getPossibleNumbers(board, row, col);
+						if (possibilities.size() == 1) {
+							board[row][col] = possibilities.get(0);
+							progress = true;
+						}
+					}
+				}
+			}
+		} while (progress);
+	}
+
 	// this is the function that does the initial BFS and splits them up
 	private static List<int[][]> generateStartingBoards(int[][] originalBoard, int blockSize, int numBoards) {
-		List<int[][]> boards = new ArrayList<int[][]>(); // Specify the type inside <>
-		if (numBoards == 1) {
-			boards.add(deepCopy(originalBoard));
-		} else {
-			BFS_DEPTH = calculateEmptyCells(originalBoard) - 3;
+		applyConstraintPropagation(originalBoard);
+		printBoard(originalBoard);
+		List<int[][]> boards = new ArrayList<>();
+		int desiredDepth = 10;
 
+		if (numBoards == 1) {
+			boards.add(originalBoard);
+		} else {
 			// BFS Queue to hold the next cells to try
 			Queue<int[][]> queue = new LinkedList<>();
 			queue.add(originalBoard);
@@ -160,8 +336,6 @@ public class Sudoku {
 			// Start BFS until you have enough starting boards or the queue is empty
 			while (!queue.isEmpty() && boards.size() < numBoards) {
 				int[][] currentBoard = queue.remove();
-				// Stuck here forever
-				// Determine next empty cell
 				Point nextEmptyCell = findNextEmptyCell(currentBoard);
 				if (nextEmptyCell == null) {
 					continue; // Skip if no empty cells are left without a solution
@@ -189,107 +363,6 @@ public class Sudoku {
 		}
 
 		return boards;
-	}
-
-	// used for printing the input/output
-	public static void printSudokuBoard(int boardSize, int blocksize, int vals[][]) {
-		for (int y = 0; y < boardSize; y++) {
-			if (y % blocksize == 0) {
-				System.out.println(" ");
-			}
-
-			for (int x = 0; x < boardSize; x++) {
-				if (x % blocksize == 0) {
-					System.out.print("|");
-				}
-				System.out.print(vals[y][x] == 0 ? "  . " : " " + n(vals[y][x]) + " ");
-			}
-			System.out.println("|");
-		}
-		System.out.println("");
-	}
-
-	// prints the file
-	public static void printSudokuBoardInFile(int boardSize, int blocksize, int vals[][], int threads) {
-		try {
-			FileWriter writer = new FileWriter(
-					"./output/" + threads + "-threads" + boardSize + "x" + boardSize + "_out.txt"); // Open file for
-																									// writing
-			writer.write("Time taken: " + (endTime - startTime) + " milliseconds\n"); // Write time taken to solve
-			writer.write("Solved Sudoku:\n");
-			for (int y = 0; y < boardSize; y++) {
-				if (y % blocksize == 0) {
-					writer.write("\n");
-				}
-				for (int x = 0; x < boardSize; x++) {
-					if (x % blocksize == 0) {
-						writer.write("|");
-					}
-					writer.write(vals[y][x] == 0 ? "  . " : " " + n(vals[y][x]) + " ");
-				}
-				writer.write("|\n");
-			}
-			writer.close(); // Close the writer after writing
-		} catch (IOException e) {
-			e.printStackTrace(); // Handle IO exception
-		}
-	}
-
-	// allows a copy without accessing the same information
-	// used in the generateStartingBoards
-	private static int[][] deepCopy(int[][] original) {
-		if (original == null) {
-			return null;
-		}
-		final int[][] result = new int[original.length][];
-		for (int i = 0; i < original.length; i++) {
-			result[i] = original[i].clone(); // This clones the inner array
-		}
-		return result;
-	}
-
-	// controls the threads and what shuts down and not
-	private static void shutdownAndAwaitTermination(ExecutorService pool) {
-		pool.shutdown(); // Disable new tasks from being submitted
-		try {
-			// Wait a while for existing tasks to terminate
-			if (!pool.awaitTermination(1, TimeUnit.HOURS)) {
-				pool.shutdownNow(); // Cancel currently executing tasks
-				// Wait a while for tasks to respond to being cancelled
-				if (!pool.awaitTermination(1, TimeUnit.HOURS))
-					System.err.println("Pool did not terminate");
-			}
-		} catch (InterruptedException ie) {
-			// (Re-)Cancel if current thread also interrupted
-			pool.shutdownNow();
-			// Preserve interrupt status
-			Thread.currentThread().interrupt();
-		}
-	}
-
-	// this just for the input
-	private static int parseNumThreads(String input) {
-		try {
-			int numThreads = Integer.parseInt(input);
-			if (numThreads == 1 || numThreads == 2 || numThreads == 4 || numThreads == 8) {
-				return numThreads;
-			}
-		} catch (NumberFormatException ex) {
-			System.out.println("Number format exception for input string: " + input);
-		}
-		return -1; // Indicate invalid input
-	}
-
-	// temporary function to test the input I get:
-	private static void printBoard(int[][] board) {
-		System.out.println("Board Layout:");
-		for (int[] row : board) {
-			for (int cell : row) {
-				System.out.print(cell + " ");
-			}
-			System.out.println();
-		}
-		System.out.println("---------------");
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
