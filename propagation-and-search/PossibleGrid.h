@@ -15,6 +15,9 @@
 #include <numeric> // iota
 #include <thread>
 #include <future>
+#include <mutex>
+#include <queue>
+#include <condition_variable>
 #include "Grid.h" 
 #include "Position.h"
 

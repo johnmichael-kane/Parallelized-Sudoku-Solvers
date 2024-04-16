@@ -32,6 +32,7 @@ bool Grid::isLegal() const {
 		return last == filteredVector.end(); // unique: nothing removed
 	};
 
+	// CHECK THESE CONCURRENTLY?
 	for (int i = 0; i < gridSize; ++i) {
 		if (!isUnique(getRow(i)) || !isUnique(getCol(i)) 
 			|| !isUnique(getSection(i / sectionSize, i % sectionSize))) // ith row, ith col

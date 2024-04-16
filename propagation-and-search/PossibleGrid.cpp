@@ -61,10 +61,12 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 }
 
 // Cross-reference rows and columns and return unique possible value pairs (position & value).
-vector<pair<Position, int>> PossibleGrid::crossReference() const {
+vector<pair<Position, int>> PossibleGrid::crossReference() const
+{
 	vector<pair<Position, int>> pairs;
-	for (int i = 0; i < gridSize; ++i) {
-		auto rowUnique = identifyUniqueValues(i, true);  // ith row possibilities
+	for (int i = 0; i < gridSize; ++i)
+	{
+		auto rowUnique = identifyUniqueValues(i, true);	 // ith row possibilities
 		auto colUnique = identifyUniqueValues(i, false); // ith col possibilities
 		pairs.insert(pairs.end(), rowUnique.begin(), rowUnique.end());
 		pairs.insert(pairs.end(), colUnique.begin(), colUnique.end());
@@ -72,39 +74,56 @@ vector<pair<Position, int>> PossibleGrid::crossReference() const {
 	return pairs;
 }
 
-// Identify unique values in a specified row/column
-vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool isRow) const {
-	vector<future<vector<pair<Position, int>>>> futures;
-	threadTasks = calculateThreadTasks(gridSize);
+// Cross-reference rows and columns and return unique possible value pairs (position & value).
+vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool isRow) const
+{
+	vector<thread> workers;
+	vector<pair<Position, int>> uniquePairs;
+	mutex uniquePairsMutex;
+	threadTasks = calculateThreadTasks(gridSize); // Ensure full coverage
 
-	for (size_t i = 0; i < numThreads; ++i) {
-		futures.push_back(async(launch::async, [&, i] {
-			size_t start = i * threadTasks;
-			size_t end = min(start + threadTasks, static_cast<size_t>(gridSize));
-
-			multimap<int, Position> valueMap;
-			for (size_t j = start; j < end; ++j) {
-				const vector<int> &values = isRow ? possibleValues[index][j] : possibleValues[j][index];
-				for (int val : values) {
-					valueMap.emplace(val, isRow ? Position(index, j) : Position(j, index));
-				}
+	auto workerFunc = [&](size_t startIdx, size_t endIdx)
+	{
+		unordered_map<int, vector<Position>> valueMap;
+		for (size_t j = startIdx; j < endIdx; ++j)
+		{
+			const auto &values = isRow ? possibleValues[index][j] : possibleValues[j][index];
+			for (int val : values)
+			{
+				valueMap[val].push_back(isRow ? Position(index, j) : Position(j, index));
 			}
+		}
 
-			vector<pair<Position, int>> localUniquePairs;
-			for (auto it = valueMap.begin(); it != valueMap.end(); ++it) { 
-				if (valueMap.count(it->first) == 1) {
-					localUniquePairs.push_back(make_pair(it->second, it->first)); // position, value
-				}
+		vector<pair<Position, int>> localUniquePairs;
+		for (auto &entry : valueMap)
+		{
+			if (entry.second.size() == 1)
+			{ // Only add if unique
+				localUniquePairs.emplace_back(entry.second.front(), entry.first);
 			}
-			return localUniquePairs;
-		}));
+		}
+
+		{
+			lock_guard<mutex> lock(uniquePairsMutex);
+			uniquePairs.insert(end(uniquePairs), begin(localUniquePairs), end(localUniquePairs));
+		}
+	};
+
+	// Launch worker threads
+	for (size_t i = 0; i < numThreads && i * threadTasks < gridSize; ++i)
+	{
+		size_t startIdx = i * threadTasks;
+		size_t endIdx = std::min(startIdx + threadTasks, static_cast<size_t>(gridSize));
+		workers.emplace_back(workerFunc, startIdx, endIdx);
 	}
 
-	// Wait for all futures, aggregate results
-	vector<pair<Position, int>> uniquePairs;
-	for (auto &fut : futures) {
-		auto localPairs = fut.get();
-		uniquePairs.insert(uniquePairs.end(), localPairs.begin(), localPairs.end());
+	// Join all threads
+	for (auto &worker : workers)
+	{
+		if (worker.joinable())
+		{
+			worker.join();
+		}
 	}
 
 	return uniquePairs;
