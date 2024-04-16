@@ -23,7 +23,7 @@ private:
 	string puzzle;
 
 	Grid gameGrid;
-	PossibleGrid possibleGrid;
+	PossibleGrid possibleGrid; 
 	bool hasSolution = true;
 
 	bool depthFirstSearch();

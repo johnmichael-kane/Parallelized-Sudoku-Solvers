@@ -16,7 +16,7 @@ bool Game::evaluateBoard() {
 
 	possibleGrid.setGrid(&gameGrid); // initialize grid
 	possibleGrid.analyzeMoves(gameGrid); // get possible values & unsolved positions
-	bool playGame = true;
+	bool cellsLeft = true;
 
 	// (1) Linear Constraints: solve single-value positions.
 	// TRY (LATER ON): PARALLELIZING THIS FOR GRID SIZES > 9
@@ -25,29 +25,30 @@ bool Game::evaluateBoard() {
 		const auto &pos = possibleGrid.getUnsolvedPositions()[i];
 		const auto &possibleValues = possibleGrid.getPossibleValuesAt(pos.row, pos.col);
 		if (possibleValues.size() == 1) {
-			playGame = false;
+			cellsLeft = false;
 			gameGrid.fill(pos, possibleValues.front());
 		}
 	}
 
 	// (2) Cross Reference: solve intersecting positions.
-	if (playGame) {
+	if (cellsLeft) {
 		cout << "Cross Reference . . . " << endl;
 		auto pairs = possibleGrid.crossReference();
 		for (const auto &pair : pairs) {
-			playGame = false;
+			cellsLeft = false;
 			gameGrid.fill(pair.first, pair.second);
 		}
 	}
 
 	// (3) Search: solve leftover positions across grid.
-	if (playGame && !gameGrid.isComplete()) {
+	if (cellsLeft && !gameGrid.isComplete()) {
 		hasSolution = depthFirstSearch();
 	}
 
 	return gameGrid.isComplete();
 }
 
+// TRY (SOON): PARALLELIZE THIS (only applies to larger grids anyways!!)
 bool Game::depthFirstSearch() {
 	cout << "Depth First Search . . . " << endl;
 	vector<Grid> searchQueue{gameGrid};
