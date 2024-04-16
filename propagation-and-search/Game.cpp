@@ -33,7 +33,7 @@ bool Game::evaluateBoard() {
 
 	// (2) Cross Reference: solve intersecting positions.
 	if (cellsLeft) {
-		cout << "Cross Reference . . . " << endl;
+		// cout << "Cross Reference . . . " << endl;
 		auto pairs = possibleGrid.crossReference();
 		for (const auto &pair : pairs) {
 			cellsLeft = false;
@@ -51,7 +51,7 @@ bool Game::evaluateBoard() {
 
 // TRY (SOON): PARALLELIZE THIS (only applies to larger grids anyways!!)
 bool Game::depthFirstSearch() {
-	cout << "Depth First Search . . . " << endl;
+	// cout << "Depth First Search . . . " << endl;
 	vector<Grid> searchQueue{gameGrid};
 
 	while (!searchQueue.empty()) {

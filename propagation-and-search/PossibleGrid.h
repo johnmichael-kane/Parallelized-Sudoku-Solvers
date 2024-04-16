@@ -13,7 +13,6 @@
 #include <utility> // move
 #include <iterator> // distance
 #include <numeric> // iota
-#include <sstream> // stringstream
 #include "Grid.h" 
 #include "Position.h"
 
