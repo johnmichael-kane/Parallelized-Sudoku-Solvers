@@ -14,15 +14,15 @@
 
 #include "Game.h"
 
-using namespace std::chrono;
+using namespace std;
 
 int main()
 {
 	// Puzzle selection (user input).
 	
 	const string PATH = "puzzles/";
-	std::cout << "\nLEVELS: easy, medium, hard\nSIZES: 9, 16, 25\n\n";
-	std::cout << "Enter a file name (e.g., easy9.txt) to start the game!\n\n";
+	cout << "\nLEVELS: easy, medium, hard\nSIZES: 9, 16, 25\n\n";
+	cout << "Enter a file name (e.g., easy9.txt) to start the game!\n\n";
 	ifstream file;
 	string filename;
 
@@ -31,20 +31,19 @@ int main()
 		cin >> filename;
 		file.open(PATH + filename);
 
-		if (!file) (std::cout << "File not found, try again!\n\n");
+		if (!file) { cout << "File not found, try again!\n\n"; }
 	} while (!file);
 	file.close();
 
 	// Run game.
 
-	auto start = high_resolution_clock::now();
+	auto start = chrono::high_resolution_clock::now();
 	Game game(PATH + filename); // initialize board
 	while (!game.evaluateBoard()); // evaluate board
-	auto end = high_resolution_clock::now();
+	auto end = chrono::high_resolution_clock::now();
 
 	game.printResult();
-
-	auto gameTime = duration_cast<milliseconds>(end - start).count();
+	auto gameTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 	cout << "\nTime Taken: " << gameTime << " milliseconds\n" << endl;
 	return 0;
 }
