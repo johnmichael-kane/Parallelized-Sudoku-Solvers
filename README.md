@@ -2,11 +2,11 @@
 
 Below is an overview of three different approaches to solving a Sudoku board: 
 
-(1) Brute Force (Java)
+###(1) Brute Force (Java)###
 
-(2) Dancing Links (Java)
+###(2) Dancing Links (Java)###
 
-(3) Linear Propagation and Search (C++)
+###(3) Linear Propagation and Search (C++)###
 
 We have referenced sequential solutions of these techniques and created a parallelized implementation to test how performance changes with parallelism. 
 
@@ -60,9 +60,7 @@ cd Parallelized-Sudoku-Solvers
 - shared repository
 - shared parallelism approach (1, 2, 4, & 8 threads)
 
-- (3) -
-
-# (3) Propogation and Search Approach
+# (3) Propagation and Search (C++)
 // describe strategy
 
 ### Implementation
@@ -85,7 +83,7 @@ cd Parallelized-Sudoku-Solvers
 
 - (1)
 
-# (1) Brute Force Approach
+# (1) Brute Force (Java)
 see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach
 
 
