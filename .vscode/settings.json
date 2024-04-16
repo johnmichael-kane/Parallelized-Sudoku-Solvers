@@ -84,7 +84,8 @@
     "format": "cpp",
     "span": "cpp",
     "stack": "cpp",
-    "list": "cpp"
+    "list": "cpp",
+    "future": "cpp"
   },
   "C_Cpp_Runner.cCompilerPath": "g++",
   "C_Cpp_Runner.cppCompilerPath": "gcc",

@@ -22,6 +22,7 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 	iota(range.begin(), range.end(), 1);
 
 	vector<future<void>> futures; // asynchronous execution
+	threadTasks = calculateThreadTasks(unsolvedPositions.size());
 
 	for (size_t i = 0; i < numThreads; ++i) {
 		// Launch a task for each position asynchronously
@@ -74,25 +75,21 @@ vector<pair<Position, int>> PossibleGrid::crossReference() const {
 // Identify unique values in a specified row/column
 vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool isRow) const {
 	vector<future<vector<pair<Position, int>>>> futures;
-	vector<pair<Position, int>> uniquePairs;
+	threadTasks = calculateThreadTasks(gridSize);
 
-	for (int i = 0; i < gridSize; ++i) {
+	for (size_t i = 0; i < numThreads; ++i) {
 		futures.push_back(async(launch::async, [&, i] {
-			// size_t start = i * batchSize;
-            // size_t end = min(start + batchSize, unsolvedPositions.size());
+			size_t start = i * threadTasks;
+			size_t end = min(start + threadTasks, static_cast<size_t>(gridSize));
 
-			// Populate multimap (positions of all possible locations for each possible value)
-			// Note: int first (key) to allow multiple value (Position) associations 
 			multimap<int, Position> valueMap;
-			for (int j = 0; j < gridSize; ++j) {
+			for (size_t j = start; j < end; ++j) {
 				const vector<int> &values = isRow ? possibleValues[index][j] : possibleValues[j][index];
 				for (int val : values) {
 					valueMap.emplace(val, isRow ? Position(index, j) : Position(j, index));
 				}
 			}
 
-			// Grab unique pairs (only 1 Position for an int key) from multimap
-			// Note: Position first (key) for quick unique check
 			vector<pair<Position, int>> localUniquePairs;
 			for (auto it = valueMap.begin(); it != valueMap.end(); ++it) { 
 				if (valueMap.count(it->first) == 1) {
@@ -103,7 +100,8 @@ vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool i
 		}));
 	}
 
-	// Wait for all futures, collect results
+	// Wait for all futures, aggregate results
+	vector<pair<Position, int>> uniquePairs;
 	for (auto &fut : futures) {
 		auto localPairs = fut.get();
 		uniquePairs.insert(uniquePairs.end(), localPairs.begin(), localPairs.end());

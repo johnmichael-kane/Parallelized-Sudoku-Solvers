@@ -30,14 +30,15 @@ public:
 			gridSize = grid->getGridSize();
 			sectionSize = grid->getSectionSize();
 			clear();
-			threadTasks = calculateThreadTasks();
+	
+			possibleValues.resize(gridSize, std::vector<std::vector<int>>(gridSize));
+			unsolvedPositions = grid->getUnsolvedPositions();
 		}
 	}
 
 	void clear() {
 		possibleValues.clear();
 		unsolvedPositions.clear();
-		possibleValues.resize(gridSize, std::vector<std::vector<int>>(gridSize));
 	}
 
 	// Analysis
@@ -58,11 +59,10 @@ private:
 	std::vector<int> uniqueValues(std::vector<int> vec);
 	std::vector<std::pair<Position, int>> identifyUniqueValues(int index, bool isRow) const;
 	const size_t numThreads;
-	size_t threadTasks;
+	mutable size_t threadTasks;
 
-	size_t calculateThreadTasks() const {
-		return unsolvedPositions.size() / numThreads 
-			   + (unsolvedPositions.size() % numThreads != 0); // address remainder
+	size_t calculateThreadTasks(size_t size) const {
+		return size / numThreads + (size % numThreads != 0); // add 1 if remainder 
 	}
 };
 
