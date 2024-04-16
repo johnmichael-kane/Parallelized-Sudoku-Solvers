@@ -1,14 +1,14 @@
 # Parallel-Sudoku-Project
-# Dancing Link Approach
+# Dancing-Links Approach
 
-###Run 
+### Run 
 1. Enter the correct directory: `cd dancing-links/basic`
 2. Compile Sudoku.java: `javac Sudoku.java`
 3. Run the file: `java Sudoku <FILE_NAME>`
 - <FILE_NAME> accepts different files for the 9x9, 16x16, and 25x25 of varying difficulties. To see all inputs, view [Data]()
 
 
-#Parallelized Dancing Links
+# Parallelized Dancing-Links
 View the java [DancingLinks]() approach.
 
 see the branch [DancingLinksUsingJava](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/DancingLinksUsingJava) for a more complete and detailed implementation.
