@@ -65,7 +65,17 @@ cd Parallelized-Sudoku-Solvers
 # (1) Brute Force 
 View the Java [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
 
+// define brute force strategy
+
+### Implementation
+// briefly describe & compare both sequential & parallel implementations, highlighting your parallelized features, and link the original source here
+
+### Demo
+
+![Demo Image]()
+
 ### Run
+
 1.
 
 # (2) Dancing Links
@@ -73,9 +83,16 @@ View the Java [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/
 
 This program implements a Sudoku solver using a brute-force approach with Dancing Links
 
-### How to Run
+// define brute force strategy
 
-To execute the solver, follow these steps:
+### Implementation
+// briefly describe & compare both sequential & parallel implementations, highlighting your parallelized features, and link the original source here
+
+### Demo
+
+![Demo Image]()
+
+### Run
 
 1. Enter the correct directory:
     ```sh
