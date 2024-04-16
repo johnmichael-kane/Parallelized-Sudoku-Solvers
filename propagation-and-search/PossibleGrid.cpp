@@ -8,6 +8,7 @@
 #include "PossibleGrid.h"
 
 using namespace std;
+mutex mtx;
 
 vector<int> PossibleGrid::getUsedValues(const Grid &grid, const Position &position)
 {
@@ -84,31 +85,28 @@ vector<pair<Position, int>> PossibleGrid::crossReference() const
 }
 
 void workerFunction(const vector<vector<vector<int>>> &possibleValues, int index, bool isRow, int start, int end,
-					map<int, vector<Position>> &localMap, mutex &mtx)
+					map<int, vector<Position>> &localMap)
 {
+	map<int, vector<Position>> threadLocalMap;
 	for (int i = start; i < end; ++i)
 	{
-		vector<int> localValues; // Local storage for thread-safe operation
-		{
-			lock_guard<mutex> lock(mtx); // Protect reading from shared vector
-			if (index < possibleValues[i].size() && isRow
-					? index < possibleValues.size() && i < possibleValues[index].size()
-					: i < possibleValues.size() && index < possibleValues[i].size())
-			{
-				const vector<int> &values = isRow ? possibleValues[index][i] : possibleValues[i][index];
-				localValues = values; // Make a local copy to work with
-			}
-			else
-			{
-				continue; // Skip this iteration if indices are out of range
-			}
-		} // Mutex unlocks here
+		if (index >= possibleValues[i].size() || (isRow ? i >= possibleValues[index].size() : index >= possibleValues[i].size()))
+			continue; // Skip this iteration if indices are out of range
 
-		for (int val : localValues)
+		const vector<int> &values = isRow ? possibleValues[index][i] : possibleValues[i][index];
+
+		for (int val : values)
 		{
 			Position pos = isRow ? Position(index, i) : Position(i, index);
-			lock_guard<mutex> lock(mtx); // Thread-safe insertion into map
-			localMap[val].push_back(pos);
+			threadLocalMap[val].push_back(pos);
+		}
+	}
+
+	{
+		lock_guard<mutex> lock(mtx);
+		for (const auto &pair : threadLocalMap)
+		{
+			localMap[pair.first].insert(localMap[pair.first].end(), pair.second.begin(), pair.second.end());
 		}
 	}
 }
@@ -126,7 +124,7 @@ vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool i
 	{
 		int start = i * threadTasks;
 		int end = (i == numThreads - 1) ? gridSize : start + threadTasks;
-		threads.emplace_back(workerFunction, ref(possibleValues), index, isRow, start, end, ref(threadMaps[i]), ref(mtx));
+		threads.emplace_back(workerFunction, ref(possibleValues), index, isRow, start, end, ref(threadMaps[i]));
 	}
 
 	// Wait for all threads to complete
