@@ -46,10 +46,44 @@ bool Game::evaluateBoard() {
 
 	// (3) Search: solve leftover positions across grid.
 	if (cellsLeft && !gameGrid.isComplete()) {
-		hasSolution = depthFirstSearch();
+		if (numUnsolvedCells > 9)
+		{ // Example condition: more complexity requires parallel processing
+			hasSolution = parallelDepthFirstSearch();
+		}
+		else
+		{
+			hasSolution = depthFirstSearch();
+		}
 	}
 
 	return gameGrid.isComplete();
+}
+
+bool Game::parallelDepthFirstSearch()
+{
+	// Determine the optimal number of initial branches
+	int first_move_possibilities = calculateFirstMovePossibilities(); // User-defined function based on game state
+	int initial_branches = static_cast<int>(std::min(static_cast<unsigned int>(std::thread::hardware_concurrency()),
+													 static_cast<unsigned int>(first_move_possibilities)));
+
+	vector<future<bool>> futures;
+
+	for (int i = 0; i < initial_branches; ++i)
+	{
+		// Correctly capturing 'this' to use depthFirstSearch() within the lambda
+		futures.push_back(async(launch::async, [this]
+									 { return this->depthFirstSearch(); }));
+	}
+
+	// Wait for any branch to find a solution
+	for (auto &fut : futures)
+	{
+		if (fut.get()) // If any future returns true, a solution has been found
+		{
+			return true; // Stop all and return true
+		}
+	}
+	return false;
 }
 
 // TRY (SOON): PARALLELIZE THIS (only applies to larger grids anyways!!)
@@ -57,45 +91,57 @@ bool Game::evaluateBoard() {
 // instead: optimized DFS - MRV heuristic to choose next cell to fill
 // Use parallel execution for the initial branching to quickly explore separate paths.
 // Switch to a sequential DFS beyond a certain depth or when the workload for a thread falls below a certain threshold.
+// hybrid implementation fixed my code!!
 bool Game::depthFirstSearch()
 {
-	vector<Grid> searchQueue{gameGrid};
+	std::vector<Grid> searchStack;	 // Using a vector as a stack for DFS
+	searchStack.push_back(gameGrid); // Start with the initial game grid
 
-	while (!searchQueue.empty())
+	while (!searchStack.empty())
 	{
-		Grid currentGrid = std::move(searchQueue.back());
-		searchQueue.pop_back(); // process (remove)
+		Grid currentGrid = std::move(searchStack.back());
+		searchStack.pop_back(); // Pop the last element to continue the DFS
 
 		if (currentGrid.isComplete())
 		{
-			gameGrid = std::move(currentGrid); // Found solution
+			gameGrid = std::move(currentGrid); // If complete, we found a solution
 			return true;
 		}
 
 		if (!currentGrid.isLegal())
-			continue; // illegal -> skip
+		{
+			continue; // Skip this grid if it's not a legal configuration
+		}
 
+		// Set up to analyze possible moves based on current grid state
 		PossibleGrid possibilities;
 		possibilities.setGrid(&currentGrid);
 		possibilities.analyzeMoves(currentGrid);
 
-		auto unsolved = possibilities.getUnsolvedPositions();
-		if (unsolved.empty())
-			continue;
+		// Use a heuristic to choose the next cell to try filling
+		auto unsolvedPositions = possibilities.getUnsolvedPositions();
+		if (unsolvedPositions.empty())
+		{
+			continue; // No unsolved positions left, but grid is not complete
+		}
 
-		auto pos = *std::min_element(unsolved.begin(), unsolved.end(), [&](const Position &a, const Position &b)
-									 { return possibilities.getPossibleValuesAt(a.row, a.col).size() < possibilities.getPossibleValuesAt(b.row, b.col).size(); });
+		// Select the position with the minimum remaining values for filling
+		auto pos = *std::min_element(unsolvedPositions.begin(), unsolvedPositions.end(),
+									 [&possibilities](const Position &a, const Position &b)
+									 {
+										 return possibilities.getPossibleValuesAt(a.row, a.col).size() < possibilities.getPossibleValuesAt(b.row, b.col).size();
+									 });
 
-		auto posValues = possibilities.getPossibleValuesAt(pos.row, pos.col);
-		for (int value : posValues)
+		auto possibleValues = possibilities.getPossibleValuesAt(pos.row, pos.col);
+		for (int value : possibleValues)
 		{
 			Grid newGrid = currentGrid;
-			newGrid.fill(pos, value);
-			searchQueue.push_back(std::move(newGrid));
+			newGrid.fill(pos, value);				   // Try filling the chosen cell with a possible value
+			searchStack.push_back(std::move(newGrid)); // Push the new grid state onto the stack
 		}
 	}
 
-	return false;
+	return false; // No solution found after exploring all possibilities
 }
 
 void Game::printResult() const
