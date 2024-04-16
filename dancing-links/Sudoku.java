@@ -166,18 +166,6 @@ public class Sudoku {
 		}
 	}
 
-	// temporary function to test the input I get:
-	private static void printBoard(int[][] board) {
-		System.out.println("Board Layout:");
-		for (int[] row : board) {
-			for (int cell : row) {
-				System.out.print(cell + " ");
-			}
-			System.out.println();
-		}
-		System.out.println("---------------");
-	}
-
 	// allows a copy without accessing the same information
 	// used in the generateStartingBoards
 	private static int[][] deepCopy(int[][] original) {
@@ -230,20 +218,6 @@ public class Sudoku {
 			}
 		}
 		return null; // No empty cells found
-	}
-
-	// used for BFS
-	private static int calculateEmptyCells(int[][] board) {
-		int emptyCells = 0;
-		for (int[] row : board) {
-			for (int cell : row) {
-				if (cell == 0) {
-					emptyCells++;
-				}
-			}
-		}
-		System.out.print(emptyCells + " ");
-		return emptyCells;
 	}
 
 	public static List<Integer> getPossibleNumbers(int[][] board, int row, int col) {
@@ -319,45 +293,54 @@ public class Sudoku {
 		} while (progress);
 	}
 
-	// this is the function that does the initial BFS and splits them up
-	private static List<int[][]> generateStartingBoards(int[][] originalBoard, int blockSize, int numBoards) {
-		applyConstraintPropagation(originalBoard);
-		printBoard(originalBoard);
-		List<int[][]> boards = new ArrayList<>();
-		int desiredDepth = 10;
+	private static boolean backtrack(int[][] board, int blockSize) {
+		Point nextEmptyCell = findNextEmptyCell(board);
+		if (nextEmptyCell == null) {
+			return true; // Solution found
+		}
 
-		if (numBoards == 1) {
-			boards.add(originalBoard);
-		} else {
-			// BFS Queue to hold the next cells to try
-			Queue<int[][]> queue = new LinkedList<>();
-			queue.add(originalBoard);
+		int row = nextEmptyCell.x;
+		int col = nextEmptyCell.y;
 
-			// Start BFS until you have enough starting boards or the queue is empty
-			while (!queue.isEmpty() && boards.size() < numBoards) {
-				int[][] currentBoard = queue.remove();
-				Point nextEmptyCell = findNextEmptyCell(currentBoard);
-				if (nextEmptyCell == null) {
-					continue; // Skip if no empty cells are left without a solution
+		for (int num = 1; num <= blockSize * blockSize; num++) {
+			if (isValidMove(board, nextEmptyCell, num)) {
+				board[row][col] = num;
+
+				if (backtrack(board, blockSize)) {
+					return true; // Solution found
 				}
 
-				// Try all possible values in this cell
-				for (int num = 1; num <= blockSize * blockSize; num++) {
-					if (isValidMove(currentBoard, nextEmptyCell, num)) {
-						// System.out.print("4");
-						int[][] newBoard = deepCopy(currentBoard);
-						newBoard[nextEmptyCell.x][nextEmptyCell.y] = num;
+				board[row][col] = 0; // Undo the assignment and try the next number
+			}
+		}
 
-						// Add new state to the BFS queue
-						queue.add(newBoard);
+		return false; // No valid number found for this cell, backtrack
+	}
 
-						// If reached BFS depth, add to starting boards
-						if (calculateEmptyCells(newBoard) <= BFS_DEPTH) {
-							boards.add(newBoard);
-							if (boards.size() >= numBoards)
-								break;
-						}
-					}
+	// this is the function that does the initial BFS and splits them up
+	private static List<int[][]> generateStartingBoards(int[][] originalBoard, int blockSize, int numBoards,
+			int numThreads) {
+		applyConstraintPropagation(originalBoard);
+
+		List<int[][]> boards = new ArrayList<>();
+
+		// Generate boards using BFS if only one thread is used
+		if (numThreads == 1) {
+			boards.add(originalBoard);
+			int count = 1;
+			while (count < numBoards) {
+				int[][] newBoard = deepCopy(originalBoard);
+				if (backtrack(newBoard, blockSize)) {
+					boards.add(newBoard);
+					count++;
+				}
+			}
+		} else {
+			// Generate boards using backtracking for multiple threads
+			while (boards.size() < numBoards) {
+				int[][] newBoard = deepCopy(originalBoard);
+				if (backtrack(newBoard, blockSize)) {
+					boards.add(newBoard);
 				}
 			}
 		}
@@ -430,10 +413,8 @@ public class Sudoku {
 		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 		AtomicBoolean solutionFound = new AtomicBoolean(false);
 
-		List<int[][]> startingBoards = generateStartingBoards(vals, partitionSize, numThreads);
+		List<int[][]> startingBoards = generateStartingBoards(vals, partitionSize, numThreads, numThreads);
 		for (int[][] board : startingBoards) {
-			System.out.println("Submitting board to thread:");
-			printBoard(board);
 			executor.submit(() -> {
 				ExactMatrix matrix = new ExactMatrix(board);
 				Cell[][] finalMatrix = matrix.makeFinalMatrix();
