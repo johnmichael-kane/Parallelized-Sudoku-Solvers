@@ -1,20 +1,113 @@
 {
   "version": "0.2.0",
   "configurations": [
-    {
-      "type": "java",
-      "name": "Sudoku",
-      "request": "launch",
-      "mainClass": "Sudoku",
-      "projectName": "Parallelized-Sudoku-Solvers_7ebecb39"
-    },
-    {
-      "name": "C/C++ Runner: Debug Session",
-      "type": "lldb",
-      "request": "launch",
-      "args": [],
-      "cwd": "/Users/soleil/Documents/GitHub/Parallelized-Sudoku-Solvers",
-      "program": "/Users/soleil/Documents/GitHub/Parallelized-Sudoku-Solvers/build/Debug/outDebug"
-    }
+      {
+          "name": "9x9 - 1 Thread",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "9x9_input.txt 1",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "9x9 - 2 Threads",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "9x9_input.txt 2",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "9x9 - 4 Threads",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "9x9_input.txt 4",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "9x9 - 8 Threads",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "9x9_input.txt 8",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "16x16 - 1 Thread",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "16x16_input.txt 1",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "16x16 - 2 Threads",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "16x16_input.txt 2",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "16x16 - 4 Threads",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "16x16_input.txt 4",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "16x16 - 8 Threads",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "16x16_input.txt 8",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "25x25 - 1 Thread",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "25x25_input.txt 1",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "25x25 - 2 Threads",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "25x25_input.txt 2",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "25x25 - 4 Threads",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "25x25_input.txt 4",
+          "cwd": "${workspaceFolder}/dancing-links"
+      },
+      {
+          "name": "25x25 - 8 Threads",
+          "type": "java",
+          "request": "launch",
+          "mainClass": "Sudoku",
+          "projectName": "dancing-links",
+          "args": "25x25_input.txt 8",
+          "cwd": "${workspaceFolder}/dancing-links"
+      }
   ]
 }
