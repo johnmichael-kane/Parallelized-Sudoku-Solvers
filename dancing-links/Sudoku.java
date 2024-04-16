@@ -81,7 +81,7 @@ public class Sudoku {
 	private static long startTime; 
 	private static long endTime; 
 	private static final AtomicReference<int[][]> solutionMatrix = new AtomicReference<>();
-	private static final int BFS_DEPTH = 3;
+	public static int BFS_DEPTH=150;
 	
 
 	// Method to format single-digit numbers with leading zero
@@ -139,7 +139,54 @@ public class Sudoku {
 				}
 			}
 		}
+		System.out.println(emptyCells);
 		return emptyCells;
+	}
+
+	//this is the function that does the initial BFS and splits them up
+	private static List<int[][]> generateStartingBoards(int[][] originalBoard, int blockSize, int numBoards) {
+		List<int[][]> boards = new ArrayList<int[][]>(); // Specify the type inside <>
+		if(numBoards == 1){
+			boards.add(deepCopy(originalBoard));
+		}
+		else {
+			System.out.println(calculateEmptyCells(originalBoard));
+
+			// BFS Queue to hold the next cells to try
+			Queue<int[][]> queue = new LinkedList<>();
+			queue.add(originalBoard);
+		
+			// Start BFS until you have enough starting boards or the queue is empty
+			while (!queue.isEmpty() && boards.size() < numBoards) {
+				int[][] currentBoard = queue.remove();
+				// Stuck here forever
+				// Determine next empty cell
+				Point nextEmptyCell = findNextEmptyCell(currentBoard);
+				if (nextEmptyCell == null) {
+					continue; // Skip if no empty cells are left without a solution
+				}
+		
+				// Try all possible values in this cell
+				for (int num = 1; num <= blockSize * blockSize; num++) {
+					if (isValidMove(currentBoard, nextEmptyCell, num)) {
+						//System.out.print("4");
+						int[][] newBoard = deepCopy(currentBoard);
+						newBoard[nextEmptyCell.x][nextEmptyCell.y] = num;
+		
+						// Add new state to the BFS queue
+						queue.add(newBoard);
+		
+						// If reached BFS depth, add to starting boards
+						if (calculateEmptyCells(newBoard) <= BFS_DEPTH) {
+							boards.add(newBoard);
+							if (boards.size() >= numBoards) break;
+						}
+					}
+				}
+			}
+		}
+		
+		return boards;
 	}
 
 	//used for printing the input/output
@@ -161,9 +208,9 @@ public class Sudoku {
 	}
 
 	//prints the file
-	public static void printSudokuBoardInFile(int boardSize, int blocksize, int vals[][]) {
+	public static void printSudokuBoardInFile(int boardSize, int blocksize, int vals[][], int threads) {
 		try {
-			FileWriter writer = new FileWriter(boardSize+"x"+boardSize+"_out.txt"); // Open file for writing
+			FileWriter writer = new FileWriter("./output/" +threads + "-threads" + boardSize+"x"+boardSize+"_out.txt"); // Open file for writing
 			writer.write("Time taken: " + (endTime - startTime) + " milliseconds\n"); // Write time taken to solve
 			writer.write("Solved Sudoku:\n");
 			for (int y = 0; y < boardSize; y++) {
@@ -215,49 +262,6 @@ public class Sudoku {
 			Thread.currentThread().interrupt();
 		}
 	}
-	
-	//this is the function that does the initial BFS and splits them up
-	private static List<int[][]> generateStartingBoards(int[][] originalBoard, int blockSize, int numBoards) {
-		List<int[][]> boards = new ArrayList<int[][]>(); // Specify the type inside <>
-		if(numBoards == 1){
-			boards.add(deepCopy(originalBoard));
-		}
-		else {
-			// BFS Queue to hold the next cells to try
-			Queue<int[][]> queue = new LinkedList<>();
-			queue.add(originalBoard);
-		
-			// Start BFS until you have enough starting boards or the queue is empty
-			while (!queue.isEmpty() && boards.size() < numBoards) {
-				int[][] currentBoard = queue.remove();
-		
-				// Determine next empty cell
-				Point nextEmptyCell = findNextEmptyCell(currentBoard);
-				if (nextEmptyCell == null) {
-					continue; // Skip if no empty cells are left without a solution
-				}
-		
-				// Try all possible values in this cell
-				for (int num = 1; num <= blockSize * blockSize; num++) {
-					if (isValidMove(currentBoard, nextEmptyCell, num)) {
-						int[][] newBoard = deepCopy(currentBoard);
-						newBoard[nextEmptyCell.x][nextEmptyCell.y] = num;
-		
-						// Add new state to the BFS queue
-						queue.add(newBoard);
-		
-						// If reached BFS depth, add to starting boards
-						if (calculateEmptyCells(newBoard) <= BFS_DEPTH) {
-							boards.add(newBoard);
-							if (boards.size() >= numBoards) break;
-						}
-					}
-				}
-			}
-		}
-		
-		return boards;
-	}
 
 	//this just for the input
 	private static int parseNumThreads(String input){
@@ -278,8 +282,10 @@ public class Sudoku {
             return;
 		}
 
-		String filename = args[0];
+		String filename = "../data/" + args[0];
 		int numThreads = parseNumThreads(args[1]);
+
+
 		if (numThreads == -1){
 			System.out.println("Invalid number of threads. Please use 1, 2, 4, or 8.");
             return;
@@ -358,6 +364,6 @@ public class Sudoku {
 
 		int[][] finalSolution = solutionMatrix.get();
 		printSudokuBoard(boardSize, partitionSize, finalSolution);
-		printSudokuBoardInFile(boardSize, partitionSize, finalSolution);
+		printSudokuBoardInFile(boardSize, partitionSize, finalSolution, numThreads);
 	}
 }
