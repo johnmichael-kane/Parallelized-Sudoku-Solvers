@@ -12,12 +12,6 @@ We have referenced sequential solutions of these techniques and created a parall
 
 A complete background and runtime analysis of each Sudoku solver is documented in our [report](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/Parallelized_Sudoku_Solvers.pdf) and [Google slides](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/Parallelized_Sudoku_Slides.pdf).
 
-## Requirements: Milestone
-- Finish the compilable code instructions in the readme file below
-- Finish a rough draft of the paper
-- All challenges, tasks, and goals for the project outlined
-
-*************************** ADD INFO FOR JAVA ***************************
 ## Prerequisites
 
 -   C++ compiler (g++) with C++11 support.
