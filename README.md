@@ -6,7 +6,8 @@ Below is an overview of three different approaches to solving a Sudoku board:
 
 #### (2) [Dancing Links](#2-dancing-links) (Java)
 
-#### (3) [Propagation and Search](#3-propagation-and-search) (C++)
+#### (3) [Propagation and Search](#3-propagation) (C++)
+
 
 We have referenced sequential solutions of these techniques and created a parallelized implementation to test how performance changes with parallelism. 
 
