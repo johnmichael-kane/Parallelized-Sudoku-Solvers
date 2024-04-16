@@ -2,112 +2,100 @@
   "version": "0.2.0",
   "configurations": [
       {
-          "name": "9x9 - 1 Thread",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "9x9_input.txt 1",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "9x9 - 1 Thread",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "9x9_input.txt 1",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "9x9 - 2 Threads",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "9x9_input.txt 2",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "9x9 - 2 Threads",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "9x9_input.txt 2",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "9x9 - 4 Threads",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "9x9_input.txt 4",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "9x9 - 4 Threads",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "9x9_input.txt 4",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "9x9 - 8 Threads",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "9x9_input.txt 8",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "9x9 - 8 Threads",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "9x9_input.txt 8",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "16x16 - 1 Thread",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "16x16_input.txt 1",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "16x16 - 1 Thread",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "16x16_input.txt 1",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "16x16 - 2 Threads",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "16x16_input.txt 2",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "16x16 - 2 Threads",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "16x16_input.txt 2",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "16x16 - 4 Threads",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "16x16_input.txt 4",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "16x16 - 4 Threads",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "16x16_input.txt 4",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "16x16 - 8 Threads",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "16x16_input.txt 8",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "16x16 - 8 Threads",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "16x16_input.txt 8",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "25x25 - 1 Thread",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "25x25_input.txt 1",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "25x25 - 1 Thread",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "25x25_input.txt 1",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "25x25 - 2 Threads",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "25x25_input.txt 2",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "25x25 - 2 Threads",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "25x25_input.txt 2",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "25x25 - 4 Threads",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "25x25_input.txt 4",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "25x25 - 4 Threads",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "25x25_input.txt 4",
+        "cwd": "${workspaceFolder}/dancing-links"
       },
       {
-          "name": "25x25 - 8 Threads",
-          "type": "java",
-          "request": "launch",
-          "mainClass": "Sudoku",
-          "projectName": "dancing-links",
-          "args": "25x25_input.txt 8",
-          "cwd": "${workspaceFolder}/dancing-links"
+        "name": "25x25 - 8 Threads",
+        "type": "java",
+        "request": "launch",
+        "mainClass": "Sudoku",
+        "args": "25x25_input.txt 8",
+        "cwd": "${workspaceFolder}/dancing-links"
       }
   ]
 }
