@@ -76,7 +76,7 @@ cd Parallelized-Sudoku-Solvers
 
 ### Repository Features
 
-- All files located in the 'main' branch.
+- All essential directories can be accessed through this README.
 - Each implementation uses the same puzzles.
 - Each implementation implements a sequential approach that takes a file as input.
     - **Levels:** easy, medium, hard
@@ -96,8 +96,8 @@ Code built off of a referenced [repository](https://github.com/bryanesmith/Sudok
 
 # (2) Dancing Links
 There are two implementations of the Dancing Links technique: 
-- Java [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/basic) approach.
-- Java [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/parallelized) approach.
+- Java [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/DancingLinks/sequential) approach.
+- Java [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/DancingLinks/parallel) approach.
 Code built off of a referenced [repository](https://github.com/gkaranikas/dancing-links/tree/master).
 
 ## Implementation
@@ -107,31 +107,31 @@ Code built off of a referenced [repository](https://github.com/gkaranikas/dancin
 The sequential implementation of Sudoku solving using Dancing Links is based on Donald Knuth's algorithm for efficiently solving exact cover problems. In this implementation, the Sudoku puzzle is represented as an exact cover problem, where each constraint corresponds to a matrix row and each possible placement of a number corresponds to a matrix column.
 
 The implementation for the sequential Dancing-Link contains the following files:
-- [Cell.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/basic/Cell.java): Represents a cell in the Sudoku grid, storing its row, column, and assigned number.
-- [ColumnObject.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/basic/ColumnObject.java): Extends DancingLinkObject and represents a column in the Dancing Links matrix. It maintains the size of the column and handles covering and uncovering operations.
-- [DancingLinkObject.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/basic/DancingLinkObject.java): Represents a node in the Dancing Links matrix. It maintains references to adjacent nodes and the column it belongs to.
-- [DancingLinkSolver.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/basic/DancingLinkSolver.java): Implements the Dancing Links algorithm to search for solutions recursively. It uses backtracking to explore possible placements of numbers while maintaining efficiency by choosing the column with the fewest possibilities first.
-- [ExactMatrix.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/basic/ExactMatrix.java): Converts the given Sudoku grid into an exact cover matrix by representing each possible placement of a number as a linked matrix row. Each row corresponds to a cell in the Sudoku grid, and each column corresponds to a constraint (row, column, number, and grid).
-- [Sudoku.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/basic/Sudoku.java): Reads the Sudoku puzzle from an input file, initializes the exact cover matrix, and utilizes the DancingLinkSolver to find and print the solution.
+- [Cell.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/DancingLinks/sequential/Cell.java): Represents a cell in the Sudoku grid, storing its row, column, and assigned number.
+- [ColumnObject.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/DancingLinks/sequential/basic/ColumnObject.java): Extends DancingLinkObject and represents a column in the Dancing Links matrix. It maintains the size of the column and handles covering and uncovering operations.
+- [DancingLinkObject.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dDancingLinks/sequential/DancingLinkObject.java): Represents a node in the Dancing Links matrix. It maintains references to adjacent nodes and the column it belongs to.
+- [DancingLinkSolver.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/DancingLinks/sequential/DancingLinkSolver.java): Implements the Dancing Links algorithm to search for solutions recursively. It uses backtracking to explore possible placements of numbers while maintaining efficiency by choosing the column with the fewest possibilities first.
+- [ExactMatrix.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/DancingLinks/sequential/ExactMatrix.java): Converts the given Sudoku grid into an exact cover matrix by representing each possible placement of a number as a linked matrix row. Each row corresponds to a cell in the Sudoku grid, and each column corresponds to a constraint (row, column, number, and grid).
+- [Sudoku.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/DancingLinks/sequential/Sudoku.java): Reads the Sudoku puzzle from an input file, initializes the exact cover matrix, and utilizes the DancingLinkSolver to find and print the solution.
 
 ### Run 
 
-1. Enter the correct directory: `cd dancing-links/basic`
+1. Enter the correct directory: `cd DancingLinks/sequential`
 2. Compile Sudoku.java: `javac Sudoku.java`
 3. Run the file: `java Sudoku <FILE_NAME>`
 - <FILE_NAME> accepts different files for the 9x9, 16x16, and 25x25 of varying difficulties. View the [data](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/data) to see all inputs.
 
-### Parallelized
+### Parallel
 
 Parallelization for dancing-links is a little complicated, as the actual process itself is very fast and efficient, and uses a lot of backtracking and public information. So a traditional parallel approach would be difficult to implement. Rather, the strategy for the parallelization involves an initial BFS (Breadth-First-Search) where the program will create n boards, which each belong to n threads. After each thread has a board assigned, then they'll go through the normal dancing-links solution indpendently and once a thread finds a solution, a flag is marked and all the threads return.
 
 The implementation consists of two files that carry all of the work:
-- [Sudoku.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/parallelized/Sudoku.java): Reads the Sudoku puzzle from an input file, generates starting boards using BFS, initializes multiple instances of the Dancing Links solver, and prints the solution.
-- [DancingLinkSolver.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/dancing-links/parallelized/DancingLinkSolver.java): Implements the Dancing Links algorithm with multithreading support. It creates a linked matrix representation of the Sudoku puzzle and performs parallel backtracking search to find solutions.
+- [Sudoku.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/DancingLinks/parallel/Sudoku.java): Reads the Sudoku puzzle from an input file, generates starting boards using BFS, initializes multiple instances of the Dancing Links solver, and prints the solution.
+- [DancingLinkSolver.java](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/blob/main/DancingLinks/parallel/DancingLinkSolver.java): Implements the Dancing Links algorithm with multithreading support. It creates a linked matrix representation of the Sudoku puzzle and performs parallel backtracking search to find solutions.
 
 ### Run
 
-1. Enter the correct directory: `cd dancing-links/parallelized`
+1. Enter the correct directory: `cd DancingLinks/parallel`
 2. Compile the DancingLinkSolver: `javac DancingLinkSolver.java`
 3. Compile Sudoku.java: `javac Sudoku.java`
 4. Run the file: `java Sudoku <FILE_NAME> <NUM_THREADS>`
@@ -307,8 +307,8 @@ Time taken: 283 milliseconds
 
 # (3) Propagation-Cross-Search
 There are two implementations of the Propagation-Cross-Search technique: 
-- C++ [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/sequential/) approach.
-- C++ [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/parallel/) approach.
+- C++ [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/sequential) approach.
+- C++ [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/parallel) approach.
 Code built off of a referenced [repository](https://github.com/anthemEdge/Sudoku-Solver).
 
 ### Implementation
@@ -324,11 +324,11 @@ Parallelization Points:
 
 ### Sequential
 
-![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/sequential-prop-cross-search)
+![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/sequential-prop-cross-search.png)
 
 ### Parallelized
 
-![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/parallel-prop-cross-search)
+![Demo Image](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/parallel-prop-cross-search.png)
 
 ### Run
 
@@ -342,7 +342,7 @@ Parallelization Points:
    
 5. Compile: `g++ -std=c++17 -g -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
 6. Run: `./SudokuSolver`
-7. Replace "filename" in `filename.txt` with the board mode and size, then enter the number of threads (if in `parallel` directory) when prompted. Refer to the console for guidance.
+7. Replace `[filename].txt` with the board mode and size, then enter the number of threads (if in `parallel` directory) when prompted. Refer to the console for guidance.
 
 # Troubleshooting
 
