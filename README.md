@@ -1,17 +1,90 @@
-# Parallel-Sudoku-Project
+# Parallelized-Sudoku-Solvers
 
-You can find the paper for the project [here](https://docs.google.com/document/d/1aVoKkxx--F2Nfqbh13ZVF21VNVL2wHYg11CZaXs5kX8/edit?usp=sharing)
+Below is an overview of three different approaches to solving a Sudoku board: 
+- (1) Brute Force (Java)
+- (2) Dancing Links (Java)
+- (3) Linear Propagation and Search (C++)
+We have referenced sequential solutions of these techniques and created a parallelized implementation to test how performance changes with parallelism. 
+
+A complete background and runtime analysis of each Sudoku solver is documented in our [LaTeX report](https://docs.google.com/document/d/1aVoKkxx--F2Nfqbh13ZVF21VNVL2wHYg11CZaXs5kX8/edit?usp=sharing).
 
 ## Requirements: Milestone
 - Finish the compilable code instructions in the readme file below
 - Finish a rough draft of the paper
 - All challenges, tasks, and goals for the project outlined
 
-# Brute Force Approach
+*************************** ADD INFO FOR JAVA ***************************
+## Prerequisites
+
+-   C++ compiler (g++) with C++11 support.
+-   Git (for cloning the repository).
+
+### 1. Check Prerequisite Installations
+
+-   **GCC (g++):** `g++ --version`
+-   **Git:** `git --version`
+
+### 2. Install Prerequisites
+
+-   **GCC (g++):**
+    -   **Linux (Ubuntu/Debian):**
+        ```sh
+        sudo apt-get update
+        sudo apt-get install g++
+    -   **macOS:** `xcode-select --install`
+    -   **Windows:** Install [MinGW](https://www.mingw-w64.org/) or [Cygwin](https://cygwin.com/) to get the g++ compiler.
+-   **Git:**
+    -   **Linux (Ubuntu/Debian):**
+        ```sh
+        sudo apt-get update
+        sudo apt-get install git
+    -   **macOS:**
+        - Check Homebrew installation: `brew --version`
+        - Install [Homebrew](https://brew.sh/) if not installed already.
+        - Run: `brew install git`
+    -   **Windows:**
+        - Download and install [Git for Windows](https://gitforwindows.org/).
+
+### 3. Clone Repository
+```sh
+git clone https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main
+cd Parallelized-Sudoku-Solvers
+```
+
+# (3) Layout
+- shared file system
+- shared repository
+- shared parallelism approach (1, 2, 4, & 8 threads)
+
+- (3) -
+
+# (3) Propogation and Search Approach
+// describe strategy
+
+### Implementation
+// briefly describe & compare both implementations, highlighting your parallelized features, and link the original source here
+
+### Demo
+
+![Demo Image]()
+
+### Run
+
+1. Open your terminal and navigate to the directory containing the repository (see [Clone Repository](#3-clone-repository)).
+2. Navigate to the directory containing the propagation and search files (`cd propagation-and-search`).
+3. Navigate to the directory containing the implementation of your choice.
+   a. Sequential: `cd sequential-prop-search`
+   b. Parralelized: `cd parallelized-prop-search`
+5. Compile: `g++ -std=c++11 -pthread problem1.cpp -o problem1`
+6. Run: `./SudokuSolver`
+7. Enter the file name and number of threads when prompted. Helpful information is printed to the console.
+
+- (1)
+
+# (1) Brute Force Approach
 see the branch [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach
 
-# Propogation and Search Approach
-//general description
+
 
 ### Run
 1. Enter the correct directory: `cd propogation-and-search`
