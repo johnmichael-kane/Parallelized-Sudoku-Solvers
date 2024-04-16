@@ -279,6 +279,7 @@ View the C++ [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/P
 1. Open your terminal and navigate to the directory containing the repository (see [Clone Repository](#3-clone-repository)).
 2. Navigate to the directory containing the propagation and search files (`cd propagation-and-search`).
 3. Navigate to the directory containing the implementation of your choice.
+   
    a. Sequential: `cd sequential-prop-search`
    b. Parralelized: `cd parallelized-prop-search`
 5. Compile: `g++ -std=c++11 -g -o SudokuSolver SudokuSolver.cpp Game.cpp Grid.cpp PossibleGrid.cpp`
