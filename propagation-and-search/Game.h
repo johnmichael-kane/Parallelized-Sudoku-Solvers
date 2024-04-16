@@ -7,12 +7,6 @@
 
 #include <iostream>
 #include <vector>
-#include <thread>
-#include <mutex>
-#include <algorithm>
-#include <functional>
-#include <atomic>
-#include <future>
 #include "PossibleGrid.h"
 #include "Grid.h"
 #include "Position.h"
@@ -25,14 +19,12 @@ private:
 	PossibleGrid possibleGrid;
 	bool hasSolution = true;
 	bool isDifficult = true;
-	size_t numThreads;
 
 	bool depthFirstSearch();
-	bool parallelDepthFirstSearch();
 	int calculateFirstMovePossibilities();
 
 public:
-	Game(std::string path, size_t numThreads);
+	Game(std::string path);
 	bool evaluateBoard();
 	void printResult() const;
 };
