@@ -12,9 +12,6 @@ View the sequential java approach [here](https://github.com/johnmichael-kane/Par
 # Parallelized Dancing-Links
 View the parallelized java approach [here](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/parallelized).
 
-see the branch [DancingLinksUsingJava](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/DancingLinksUsingJava) for a more complete and detailed implementation.
-The current version here only works for 9x9, the branch above works for 9x9, 16x16, 25x25 implementation.
-
 ### Run
 1. Enter the correct directory: `cd dancing-links/parallelized`
 2. Compile the DancingLinkSolver: `javac DancingLinkSolver.java`
