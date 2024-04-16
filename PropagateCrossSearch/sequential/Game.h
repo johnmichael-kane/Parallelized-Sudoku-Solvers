@@ -12,7 +12,7 @@
 #include "Position.h"
 
 class Game {
-private:
+private: 
 	bool hasInput = false;
 	std::string puzzlePath;
 	Grid gameGrid;

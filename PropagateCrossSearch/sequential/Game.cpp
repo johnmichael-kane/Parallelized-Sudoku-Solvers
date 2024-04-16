@@ -16,7 +16,7 @@ Game::Game(string path) : puzzlePath(path)
 {
 	hasInput = gameGrid.read(path);
 	possibleGrid.setGrid(&gameGrid);		   // Initialize grid with possible values
-}
+}  
 
 bool Game::evaluateBoard()
 {
