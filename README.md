@@ -6,7 +6,7 @@ Below is an overview of three different approaches to solving a Sudoku board:
 
 (2) [Dancing Links](#2-dancing-links) (Java)
 
-(3) [Propagation and Search](#3-propagation-and-search-c-1) (C++)
+(3) [Propagation and Search](#3-propagation-cross-search) (C++)
 
 We have referenced sequential solutions of these techniques and created a parallelized implementation to test how performance changes with parallelism. 
 
@@ -303,7 +303,7 @@ Time taken: 283 milliseconds
 
 ````
 
-# (3) Propagation and Search
+# (3) Propagation Cross Search
 C++ [sequential](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/sequential/) approach.
 C++ [parallelized](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/PropagateCrossSearch/parallel/) approach.
 
