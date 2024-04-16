@@ -2,10 +2,8 @@
 # Sequential Dancing-Links
 View the sequential java approach [here](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/main/dancing-links/basic).
 
-//define strategy
-
 # Implementation
-//define implementaiton
+The sequential approach to solving Sudoku puzzles using Dancing Links is based on the concept of exact cover problems. It utilizes Donald Knuth's Dancing Links algorithm to efficiently search for solutions by representing the Sudoku puzzle as an exact cover problem and solving it using backtracking. 
 
 ### Run 
 1. Enter the correct directory: `cd dancing-links/basic`
@@ -19,7 +17,9 @@ View the parallelized java approach [here](https://github.com/johnmichael-kane/P
 Parallelization for dancing-links is a little complicated, as the actual process itself is very fast and efficient, and uses a lot of backtracking and public information. So a traditional parallel approach would be difficult to implement. Rather, the strategy for the parallelization involves an initial BFS (Breadth-First-Search) where the program will create n boards, which each belong to n threads. After each thread has a board assigned, then they'll go through the normal dancing-links solution indpendently and once a thread finds a solution, a flag is marked and all the threads return.
 
 # Implementation
-//define implementation
+The implementation consists of two files: [Sudoku.java]() and [DancingLinkSolver.java]():
+- Sudoku.java: Reads the Sudoku puzzle from an input file, generates starting boards using BFS, initializes multiple instances of the Dancing Links solver, and prints the solution.
+- DancingLinkSolver.java: Implements the Dancing Links algorithm with multithreading support. It creates a linked matrix representation of the Sudoku puzzle and performs parallel backtracking search to find solutions.
 
 ### Run
 1. Enter the correct directory: `cd dancing-links/parallelized`
