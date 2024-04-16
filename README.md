@@ -63,20 +63,14 @@ cd Parallelized-Sudoku-Solvers
 - shared parallelism approach (1, 2, 4, & 8 threads)
 
 # (1) Brute Force 
-View the Java [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
+Here are two implementations of the brute force technique: 
+- the non-parallelized approach [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) 
+- the parallelized approach using 1, 2, 4, and 8 threads [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/ParallelizedBruteForce) 
 
-// define brute force strategy
 
-### Implementation
-// briefly describe & compare both sequential & parallel implementations, highlighting your parallelized features, and link the original source here
 
-### Demo
 
-![Demo Image]()
 
-### Run
-
-1.
 
 # (2) Dancing Links
 View the Java [BruteForceUsingBacktracking](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/BruteForceUsingBacktracking) approach.
