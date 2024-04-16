@@ -10,7 +10,7 @@ Below is an overview of three different approaches to solving a Sudoku board:
 
 We have referenced sequential solutions of these techniques and created a parallelized implementation to test how performance changes with parallelism. 
 
-A complete background and runtime analysis of each Sudoku solver is documented in our [report](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/Parallelized_Sudoku_Solvers.pdf).
+A complete background and runtime analysis of each Sudoku solver is documented in our [report](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/Parallelized_Sudoku_Solvers.pdf) and [Google slides](https://github.com/johnmichael-kane/Parallelized-Sudoku-Solvers/tree/attachments/Parallelized_Sudoku_Slides.pdf).
 
 ## Requirements: Milestone
 - Finish the compilable code instructions in the readme file below
