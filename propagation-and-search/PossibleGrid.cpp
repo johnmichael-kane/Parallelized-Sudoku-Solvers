@@ -6,6 +6,8 @@
 //==================================================================================================
 
 #include "PossibleGrid.h"
+#include <mutex>
+#include <future>
 
 using namespace std;
 
@@ -17,28 +19,39 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 	possibleValues.resize(gridSize, vector<vector<int>>(gridSize));
 	unsolvedPositions = grid.getUnsolvedPositions();
 
-	// fill vector with [1 ... gridSize]
+	// Define number range [1 ... gridSize]
 	vector<int> range(gridSize);
 	iota(range.begin(), range.end(), 1);
-	vector<int> usedValues(gridSize);
 
-	for (const auto &pos : unsolvedPositions) {
-		const vector<int> &usedSectionValues = grid.getSection(pos.row, pos.col);
-		const vector<int> &usedRowValues = grid.getRow(pos.row);
-		const vector<int> &usedColValues = grid.getCol(pos.col);
+	// Prepare futures for asynchronous execution
+	vector<future<void>> futures;
 
-		usedValues.clear();
-		usedValues.insert(usedValues.end(), usedSectionValues.begin(), usedSectionValues.end());
-		usedValues.insert(usedValues.end(), usedRowValues.begin(), usedRowValues.end());
-		usedValues.insert(usedValues.end(), usedColValues.begin(), usedColValues.end());
+	for (const auto& position : unsolvedPositions) {
+		// Launch a task for each position asynchronously 
+		futures.push_back(async(launch::async, [&, position] {
+				vector<int> usedValues;
+				const auto &usedSectionValues = grid.getSection(position.row, position.col);
+				const auto &usedRowValues = grid.getRow(position.row);
+				const auto &usedColValues = grid.getCol(position.col);
 
-		sort(usedValues.begin(), usedValues.end());
-		usedValues.erase(unique(usedValues.begin(), usedValues.end()), usedValues.end()); // no dups
+				usedValues.insert(usedValues.end(), usedSectionValues.begin(), usedSectionValues.end());
+				usedValues.insert(usedValues.end(), usedRowValues.begin(), usedRowValues.end());
+				usedValues.insert(usedValues.end(), usedColValues.begin(), usedColValues.end());
 
-		vector<int> possibilities;
-		set_difference(range.begin(), range.end(), usedValues.begin(), usedValues.end(),
-					   back_inserter(possibilities));
-		possibleValues[pos.row][pos.col] = std::move(possibilities);
+				// Remove duplicates
+				sort(usedValues.begin(), usedValues.end());
+				usedValues.erase(unique(usedValues.begin(), usedValues.end()), usedValues.end());
+
+				vector<int> possibilities;
+				set_difference(range.begin(), range.end(), usedValues.begin(), usedValues.end(),
+							back_inserter(possibilities));
+				possibleValues[position.row][position.col] = std::move(possibilities);
+		}));
+	}
+
+	// Wait for all futures to complete
+	for (auto &fut : futures) {
+		fut.get();
 	}
 }
 
