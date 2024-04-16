@@ -15,12 +15,10 @@
 #include "Grid.h"
 #include "Position.h"
 
-using namespace std;
-
 class Game {
 private:
 	bool hasInput = false;
-	string puzzle;
+	std::string puzzle;
 
 	Grid gameGrid;
 	PossibleGrid possibleGrid; 
@@ -28,7 +26,7 @@ private:
 
 	bool depthFirstSearch();
 public:
-	Game(string path);
+	Game(std::string path);
 	bool evaluateBoard();
 	void printResult() const;
 };

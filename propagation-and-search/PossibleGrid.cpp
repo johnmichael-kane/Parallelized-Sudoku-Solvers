@@ -7,6 +7,9 @@
 
 #include "PossibleGrid.h"
 
+using namespace std;
+
+// PARALLELIZE: reduce overall time it takes to compute possible values for each unsolved position
 void PossibleGrid::analyzeMoves(const Grid &grid) {
 	if (this->grid == nullptr) return;
 
@@ -15,12 +18,8 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 	unsolvedPositions = grid.getUnsolvedPositions();
 
 	// fill vector with [1 ... gridSize]
-	const vector<int> range = [&] {
-		vector<int> r(gridSize);
-		iota(r.begin(), r.end(), 1); 
-		return r;
-	}();
-
+	vector<int> range(gridSize);
+	iota(range.begin(), range.end(), 1);
 	vector<int> usedValues(gridSize);
 
 	for (const auto &pos : unsolvedPositions) {
@@ -47,8 +46,8 @@ void PossibleGrid::analyzeMoves(const Grid &grid) {
 vector<pair<Position, int>> PossibleGrid::crossReference() const {
 	vector<pair<Position, int>> pairs;
 	for (int i = 0; i < gridSize; ++i) {
-		auto rowUnique = identifyUnique(i, true);  // ith row possibilities
-		auto colUnique = identifyUnique(i, false); // ith col possibilities
+		auto rowUnique = identifyUniqueValues(i, true);  // ith row possibilities
+		auto colUnique = identifyUniqueValues(i, false); // ith col possibilities
 		pairs.insert(pairs.end(), rowUnique.begin(), rowUnique.end());
 		pairs.insert(pairs.end(), colUnique.begin(), colUnique.end());
 	}
@@ -56,7 +55,7 @@ vector<pair<Position, int>> PossibleGrid::crossReference() const {
 }
 
 // Identify unique values in a specified row/column
-vector<pair<Position, int>> PossibleGrid::identifyUnique(int index, bool isRow) const {
+vector<pair<Position, int>> PossibleGrid::identifyUniqueValues(int index, bool isRow) const {
 	multimap<int, Position> valueMap; // map: quick lookup
 	for (int i = 0; i < gridSize; ++i) {
 		const vector<int> &values = isRow ? possibleValues[index][i] : possibleValues[i][index];

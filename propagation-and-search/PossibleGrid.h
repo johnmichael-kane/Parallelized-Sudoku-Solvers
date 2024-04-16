@@ -34,26 +34,26 @@ public:
 	void clear() {
 		possibleValues.clear();
 		unsolvedPositions.clear();
-		possibleValues.resize(gridSize, vector<vector<int>>(gridSize));
+		possibleValues.resize(gridSize, std::vector<std::vector<int>>(gridSize));
 	}
 
 	// Analysis
 	void analyzeMoves(const Grid &grid);
-	vector<pair<Position, int>> crossReference() const;
+	std::vector<std::pair<Position, int>> crossReference() const;
 
 	// Getters
-	const vector<Position> &getUnsolvedPositions() const { return unsolvedPositions; }
-	const vector<int> &getPossibleValuesAt(int row, int col) const {
+	const std::vector<Position> &getUnsolvedPositions() const { return unsolvedPositions; }
+	const std::vector<int> &getPossibleValuesAt(int row, int col) const {
 		return possibleValues[row][col];
 	}
 private:
 	Grid *grid;
 	int gridSize;
 	int sectionSize;
-	vector<vector<vector<int>>> possibleValues;
-	vector<Position> unsolvedPositions;
-	vector<int> uniqueValues(vector<int> vec);
-	std::vector<std::pair<Position, int>> identifyUnique(int index, bool isRow) const;
+	std::vector<std::vector<std::vector<int>>> possibleValues;
+	std::vector<Position> unsolvedPositions;
+	std::vector<int> uniqueValues(std::vector<int> vec);
+	std::vector<std::pair<Position, int>> identifyUniqueValues(int index, bool isRow) const;
 };
 
 #endif /* POSSIBLEGRID_H_ */

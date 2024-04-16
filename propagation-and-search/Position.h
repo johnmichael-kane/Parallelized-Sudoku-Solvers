@@ -6,17 +6,14 @@
 #define POSITION_H_
 
 #include <sstream>
-#include <omp.h>
-
-using namespace std;
 
 struct Position {
     int row, col;
 
     Position(int r, int c) : row(r), col(c) {}
 
-    string toString() const {
-        stringstream ss;
+    std::string toString() const {
+        std::stringstream ss;
         ss << "[" << row << ", " << col << "]";
         return ss.str();
     }

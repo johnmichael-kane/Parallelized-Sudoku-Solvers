@@ -8,6 +8,8 @@
 
 #include "Grid.h"
 
+using namespace std;
+
 // Fill cell with specified value at specified position (if in bounds).
 void Grid::fill(const Position &pos, int value) {
 	if (pos.row >= 0 && pos.row < gridSize && pos.col >= 0 && pos.col < gridSize) { 
@@ -22,11 +24,11 @@ void Grid::fill(const Position &pos, int value) {
 // Verify whether rows, columns, and sections follow Sudoku rules (no duplicates).
 bool Grid::isLegal() const {
 	auto isUnique = [](const std::vector<int> &vec) -> bool {
-		std::vector<int> filteredVector;
-		std::copy_if(vec.begin(), vec.end(), std::back_inserter(filteredVector), [](int v)
+		vector<int> filteredVector;
+		copy_if(vec.begin(), vec.end(), back_inserter(filteredVector), [](int v)
 					 { return v != 0; }); // remove zeroes
-		std::sort(filteredVector.begin(), filteredVector.end());
-		auto last = std::unique(filteredVector.begin(), filteredVector.end());
+		sort(filteredVector.begin(), filteredVector.end());
+		auto last = unique(filteredVector.begin(), filteredVector.end());
 		return last == filteredVector.end(); // unique: nothing removed
 	};
 
@@ -42,7 +44,7 @@ bool Grid::isLegal() const {
 // Verify that no rows contain empty cells (if empty cells exist, return false).
 bool Grid::isComplete() const {
 	return isLegal() && std::none_of(grid.begin(), grid.end(), [](const std::vector<int> &row)
-						{ return std::any_of(row.begin(), row.end(), [](int cell)
+						{ return any_of(row.begin(), row.end(), [](int cell)
 						{ return cell == 0; }); });
 }
 
@@ -95,10 +97,10 @@ void Grid::printHorizontalLine() const {
 	int calculation = 0;
 	calculation = (gridSize == 9) ? (3 * sectionSize) : ((3 * sectionSize) + 1);
 
-	std::string section = "*" + std::string(calculation, '-');
-	std::string horizontal = std::string(gridSize / sectionSize, ' ').replace(0, section.size(), section);
+	string section = "*" + string(calculation, '-');
+	string horizontal = string(gridSize / sectionSize, ' ').replace(0, section.size(), section);
 
-	for (int i = 0; i < sectionSize; ++i) std::cout << horizontal;
+	for (int i = 0; i < sectionSize; ++i) { cout << horizontal; }
 
 	std::cout << "*\n";
 };
@@ -112,17 +114,17 @@ void Grid::print() const
 		for (int j = 0; j < gridSize; ++j)
 		{
 			// beginning row & after section
-			if ((j + sectionSize) % sectionSize == 0) std::cout << '|';
+			if ((j + sectionSize) % sectionSize == 0) cout << '|';
 			
 			// numbers
 			if (gridSize == 9) {
-				std::cout << std::setw(2) << grid[i][j] << ' ';
+				cout << setw(2) << grid[i][j] << ' ';
 			} else {
 				if (j % sectionSize == 0) std::cout << ' ';
-				std::cout << std::setw(2) << grid[i][j] << ' ';
+				cout << setw(2) << grid[i][j] << ' ';
 			}
 		}
-		std::cout << "|\n"; // end row
+		cout << "|\n"; // end row
 		if ((i + 1) % sectionSize == 0 && (i + 1) < gridSize) printHorizontalLine(); // row sect
 	}
 	printHorizontalLine(); // bottom
