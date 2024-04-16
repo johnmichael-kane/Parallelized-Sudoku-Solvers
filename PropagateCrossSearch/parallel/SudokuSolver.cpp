@@ -17,7 +17,7 @@ using namespace std;
 int main() {
 	// Puzzle selection (user input)
 
-	const string PATH = "puzzles/";
+	const string PATH = "../puzzles/";
 	cout << "\nLEVELS: easy, medium, hard\nSIZES: 9, 16, 25\n";
 	cout << "THREADS: 1 to " << thread::hardware_concurrency() << "\n\n";
 	cout << "Enter a file name (e.g., easy9.txt) and number of threads to start the game!\n\n";
